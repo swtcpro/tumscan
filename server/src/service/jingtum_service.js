@@ -70,9 +70,32 @@ jingtumService.queryTxs = function (txHashs) {
         })(index);
     }
     return new Promise((resolve, reject) => {
-        console.log(txs);
         resolve(txs);
     })
+};
+
+jingtumService.queryTokens = function (address) {
+    return new Promise((resolve, reject) => {
+        if (remote.isConnected()) {
+            remote.disconnect();
+        }
+        remote.connect((err, result) => {
+            if (err) {
+                return console.log(err);
+            }
+            let options = {account: address};
+            let req = remote.requestAccountTums(options);
+            req.submit((err, result) => {
+                if (err) {
+                    console.log('err:', err);
+                }
+                else if (result) {
+                    // console.log('res:', result);
+                    resolve(result);
+                }
+            });
+        });
+    });
 };
 
 jingtumService.queryTx = function (hash) {
@@ -92,13 +115,10 @@ jingtumService.queryTx = function (hash) {
                 }
                 else if (transaction) {
                     remote.disconnect();
-                    console.log("queryTx");
-                    console.log(transaction);
                     resolve(transaction);
                 }
             });
         });
-
     })
 };
 

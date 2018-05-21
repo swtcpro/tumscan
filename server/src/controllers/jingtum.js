@@ -94,6 +94,15 @@ tumController.queryTxLib = function (req, res) {
 };
 
 /**
+ * 查询井通代币信息
+ * @param req
+ * @param res
+ */
+tumController.queryTokens = function (req, res) {
+
+};
+
+/**
  * 查询单个账本信息
  * @param req
  * @param res

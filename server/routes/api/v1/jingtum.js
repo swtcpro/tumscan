@@ -26,6 +26,9 @@ router.get('/query/tx/:hash', tumController.queryTx);
 // 查询单个区块相关信息
 router.get('/query/ledger/:hash', tumController.queryLedger);
 
+// 查询代币相关信息
+router.get('/query/tokens', tumController.queryTokens);
+
 // 获取钱包地址的余额相关信息
 router.get('/accounts/:address/balances', tumController.findBalancesByAddress);
 

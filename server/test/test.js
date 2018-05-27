@@ -5,8 +5,16 @@
  \* Time: 15:05
  \* Description:
  \*/
+import 'babel-polyfill'
+
 let jingtumService = require('../src/service/jingtum_service');
 let assert = require('assert');
+
+describe('#dataOrm()', () => {
+    it.only('orm test', () =>{
+    })
+
+});
 
 describe('#jingtumLib()', function () {
     describe('ledger tests', function () {
@@ -24,7 +32,7 @@ describe('#jingtumLib()', function () {
     });
 
     describe('transaction tests', function () {
-        it.only('query single transaction test', function () {
+        it('query single transaction test', function () {
             let result = {};
             new Promise(function () {
                 result = jingtumService.queryTx('68E502101C2E0644BC0BFE59665F533706A7FD8CABF579448EDEC526C66C9244');

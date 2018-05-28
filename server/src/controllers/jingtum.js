@@ -118,7 +118,6 @@ tumController.queryLedger = function (req, res) {
             res.json(ledger);
         })
     }
-
 };
 
 tumController.findBalancesByAddress = function (req, res) {

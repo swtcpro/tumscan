@@ -16,7 +16,6 @@
     "axios": "^0.18.0",
     "bootstrap": "^3.3.7",
     "element-ui": "^2.3.4",
-    "jingtum-lib": "^1.2.7",
     "node-sass": "^4.8.3",
     "uiv": "^0.21.4",
     "vue": "^2.5.2",

@@ -5,13 +5,21 @@
  \* Time: 15:05
  \* Description:
  \*/
-import 'babel-polyfill'
-
+import 'babel-polyfill' // mocha 支持es6的需要的设置
+import sequelize from '../src/model/sequelize_helper'
 let jingtumService = require('../src/service/jingtum_service');
 let assert = require('assert');
 
 describe('#dataOrm()', () => {
-    it.only('orm test', () =>{
+    it('orm test', () => {
+        sequelize
+            .authenticate()
+            .then(() => {
+                console.log('Connection has been established successfully.');
+            })
+            .catch(err => {
+                console.error('Unable to connect to the database:', err);
+            });
     })
 
 });
@@ -32,13 +40,12 @@ describe('#jingtumLib()', function () {
     });
 
     describe('transaction tests', function () {
-        it('query single transaction test', function () {
+        it.only('query single transaction test', function () {
             let result = {};
             new Promise(function () {
                 result = jingtumService.queryTx('68E502101C2E0644BC0BFE59665F533706A7FD8CABF579448EDEC526C66C9244');
             }).then(function () {
                 console.log(result);
-                assert(result)
             });
         })
     });

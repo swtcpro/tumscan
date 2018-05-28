@@ -24,6 +24,7 @@
     "less-middleware": "~2.2.0",
     "morgan": "~1.8.1",
     "mysql2": "^1.5.3",
+    "nconf": "^0.10.0",
     "reflect-metadata": "^0.1.12",
     "request": "^2.81.0",
     "sequelize": "^4.37.10",

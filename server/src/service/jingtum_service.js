@@ -7,11 +7,18 @@
  \*/
 const jlib = require('jingtum-lib');
 const Remote = jlib.Remote;
-const remote = new Remote({server: 'wss://c05.jingtum.com:5020', local_sign: true});
+
+const remote = require('../lib/remote');
+
 const async = require('async');
 const logger = require('../lib/logger');
+const config  = require('../lib/config');
 const ClientError = require('../lib/errors').ClientError;
 const NetworkError = require('../lib/errors').NetworkError;
+const resultCode = require('../lib/resultCode');
+const jutils = require('jingtum-lib').utils;
+const respond = require('../lib/respond');
+const CURRENCY = config.get('base_currency') || 'SWT';
 
 
 let jingtumService = {}
@@ -128,7 +135,8 @@ jingtumService.queryTx = function (hash) {
 
 
 jingtumService.queryBalance = function (req, res, callback) {
-    let address = req.params.account;
+    let address = _.trim(req.params.address || '');
+    console.log(address);
     if (!address || !jutils.isValidAddress(address)) {
         return callback(new ClientError(resultCode.C_ADDRESS));
     }

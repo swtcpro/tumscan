@@ -30,7 +30,7 @@ router.get('/query/ledger/:hash', tumController.queryLedger);
 router.get('/query/tokens', tumController.queryTokens);
 
 // 获取钱包地址的余额相关信息
-router.get('/accounts/:address/balances', tumController.findBalancesByAddress);
+router.get('/accounts/:address/balances', tumController.queryBalancesByAddress);
 
 // 获取钱包地址的交易信息
 router.get('/accounts/:address/transactions', tumController.findTransactionsByAddress);

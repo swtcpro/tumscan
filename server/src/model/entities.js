@@ -7,5 +7,18 @@
  \*/
 
 import messageBoard from "./messageBoard";
-const entities = { messageBoard };
+import messageTopic from "./messageTopic";
+import sequelize from "./sequelize_helper";
+
+//设置级联关系
+messageTopic.hasMany(messageBoard, {
+    as: "messageitem"
+})
+
+sequelize.sync();
+
+const entities = {
+    messageBoard,
+    messageTopic
+};
 export default entities;

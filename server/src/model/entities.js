@@ -6,3 +6,6 @@
  \* Description: 数据库实体文件，暂时定义为存放数据库中所有的实体表
  \*/
 
+import messageBoard from "./messageBoard";
+const entities = { messageBoard };
+export default entities;

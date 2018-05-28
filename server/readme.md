@@ -1,8 +1,9 @@
 后端提供接口。
 
-#改动
+# 改动
 
-##es2015语法环境下开发配置（代码文件监听重启服务）\
+## es2015 语法环境下开发配置（代码文件监听重启服务）\
+
 ```
 增加
 "dev": "nodemon ./bin/www --exec babel-node --presets es2015,stage-2"
@@ -11,11 +12,10 @@
 npm install nodemon -g
 
 npm run dev
-
 ```
 
+## routes/index.ejs
 
-##routes/index.ejs
 ```
     增加路由匹配，将前端页面路由和后端路由对应
     /* 服务端主页 */
@@ -27,10 +27,14 @@ npm run dev
     // });
 ```
 
-##views/index.ejx
+## views/index.ejx
 
 ```
     将模板js引向前端工程环境
     <script src='//localhost:3000/assets/app.js'></script>
-
 ```
+
+## 测试框架 mocha 使用
+
+windows 需要全局安装
+npm install -g mocha

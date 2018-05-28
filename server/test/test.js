@@ -5,10 +5,11 @@
  \* Time: 15:05
  \* Description:
  \*/
-import 'babel-polyfill' // mocha 支持es6的需要的设置
-import sequelize from '../src/model/sequelize_helper'
+import 'babel-polyfill'; // mocha 支持es6的需要的设置
+import sequelize from '../src/model/sequelize_helper';
 let jingtumService = require('../src/service/jingtum_service');
 let assert = require('assert');
+import messageBoard from '../src/model/messageBoard';
 
 describe('#dataOrm()', () => {
     it('orm test', () => {
@@ -20,8 +21,6 @@ describe('#dataOrm()', () => {
             .catch(err => {
                 console.error('Unable to connect to the database:', err);
             });
-    })
-
 });
 
 describe('#jingtumLib()', function () {
@@ -49,4 +48,14 @@ describe('#jingtumLib()', function () {
             });
         })
     });
+});
+
+describe("#modelQuery()", () => {
+  it("model test", () => {
+    messageBoard.sync().then(() => {
+      messageBoard.all().then(messageBoard => {
+        console.log(messageBoard);
+      });
+    });
+  });
 });

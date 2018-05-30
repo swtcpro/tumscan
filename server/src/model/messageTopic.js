@@ -6,7 +6,7 @@ import {
 const messageTopic = sequelize.define("messageTopic", {
     id: {
         type: Sequelize.INTEGER,
-        autoIncrement: true
+        autoIncrement: true,
         primaryKey: true
     },
     title: Sequelize.STRING,

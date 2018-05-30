@@ -6,19 +6,21 @@
  \* Description: 数据库实体文件，暂时定义为存放数据库中所有的实体表
  \*/
 
-import messageBoard from "./messageBoard";
-import messageTopic from "./messageTopic";
-import sequelize from "./sequelize_helper";
+import messageBoard from './messageBoard';
+import messageTopic from './messageTopic';
+import {
+    sequelize,
+} from './sequelize_helper';
 
-//设置级联关系
+// 设置级联关系
 messageTopic.hasMany(messageBoard, {
-    as: "messageitem"
-})
+    as: 'messageitem',
+});
 
 sequelize.sync();
 
 const entities = {
     messageBoard,
-    messageTopic
+    messageTopic,
 };
 export default entities;

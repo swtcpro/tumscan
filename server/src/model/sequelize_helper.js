@@ -14,13 +14,15 @@ const sequelize = new Sequelize('temp', 'root', 'egova', {
     max: 5,
     min: 0,
     acquire: 30000,
-    idle: 10000
+    idle: 10000,
   },
   // 仅限 SQLite
-  storage: 'path/to/database.sqlite'
+  storage: 'path/to/database.sqlite',
 });
 
 module.exports = {
   sequelize,
-  Sequelize
+  Sequelize,
 };
+
+export default sequelize;

@@ -1,8 +1,9 @@
-import {
-    messageBoard,
-    messageTopic,
-} from '../model/entities';
+import entities from '../model/entities';
 
+const {
+    messageBoard,
+    messageTopic
+} = entities
 /**
  * 留言业务类
  */
@@ -13,12 +14,7 @@ export default class messageService {
      * @return {promises} 结果回调
      */
     getMessage(id) {
-        return messageTopic.findById({
-            where: {
-                id,
-            },
-            include: [messageBoard],
-        });
+        return messageTopic.findById(id);
     }
 
     /**

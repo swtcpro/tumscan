@@ -7,19 +7,20 @@
 let express = require('express');
 let router = express.Router();
 let indexRouter = {};
-import messageService from '../../../src/service/messageService'
-import getClientIp from '../../../src/lib/utils'
+import messageService from '../../../src/service/message_service';
+import getClientIp from '../../../src/lib/utils';
 
+const message = new messageService()
 // 获取留言
 router.get('/messgae/:id', function (req, res) {
     let id = _.trim(req.params.id || '');
-    messageService.getMessage(id).then((result) => {
+    message.getMessage(id).then((result) => {
         console.log(result);
         return res.json(result);
     }).catch((error) => {
-        res.json({
-            "success": false,
-            "msg": error
+        return res.json({
+            'success': false,
+            'msg': error,
         });
     });
 });
@@ -28,15 +29,15 @@ router.get('/messgae/:id', function (req, res) {
 router.post('/message', function (req, res) {
     const title = req.body.title;
     const message = req.body.message;
-    messageService.addMessage(title, message, getClientIp(req)).then((result) => {
+    message.addMessage(title, message, getClientIp(req)).then((result) => {
         console.log(result);
         return res.json({
-            "success": true
+            'success': true,
         });
     }).catch((error) => {
         res.json({
-            "success": false,
-            "msg": error
+            'success': false,
+            'msg': error,
         });
     });
 });

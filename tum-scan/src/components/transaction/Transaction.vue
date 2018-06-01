@@ -25,10 +25,10 @@
                 <div class="transaction-item">
                   交易类型：
                   <el-tag v-if="tx.type === 'sent'"
-                          type="danger">买入
+                          type="danger">卖出
                   </el-tag>
                   <el-tag v-else-if="tx.type === 'received'"
-                          type="success">卖出
+                          type="success">买入
                   </el-tag>
                   <el-tag v-else-if="tx.type === 'offernew'"
                           type="info">挂单

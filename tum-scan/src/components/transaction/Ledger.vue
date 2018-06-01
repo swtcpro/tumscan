@@ -114,10 +114,10 @@
               filter-placement="bottom-end">
               <template slot-scope="scope">
                 <el-tag v-if="scope.row.TransactionType === 'Payment'"
-                        type="danger">买入
+                        type="danger">卖出
                 </el-tag>
                 <el-tag v-else-if="scope.row.TransactionType === 'received'"
-                        type="success">卖出
+                        type="success">买入
                 </el-tag>
                 <el-tag v-else-if="scope.row.TransactionType === 'OfferCreate'"
                         type="info">挂单

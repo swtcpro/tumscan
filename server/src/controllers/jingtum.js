@@ -123,26 +123,6 @@ tumController.queryLedger = function (req, res) {
 
 tumController.queryBalancesByAddress = function (req, res, callback) {
     jingtumService.queryBalance(req, res, callback)
-    // let address = _.trim(req.params.address || '');
-    // remote.connect(function (err, result) {
-    //     if (err) {
-    //         console.log("error:" + err);
-    //         remote.disconnect();
-    //         return res.json(err);
-    //     }
-    //     let options = {account: address};
-    //     remote.requestAccountInfo(options).submit(function (err, result) {
-    //         if (err) {
-    //             console.log("error:" + err);
-    //             remote.disconnect();
-    //             return res.json(err);
-    //         } else if (result) {
-    //             console.log(result);
-    //             remote.disconnect();
-    //             return res.json(result);
-    //         }
-    //     });
-    // });
 };
 
 tumController.findTransactionsByAddress = function (req, res) {

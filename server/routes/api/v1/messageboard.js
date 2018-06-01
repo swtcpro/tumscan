@@ -43,7 +43,8 @@ router.post('/message', function (req, res) {
 });
 
 // 更新留言
-router.post('/message/:id', function (req, res) {});
+router.post('/message/:id', function (req, res) {
+});
 
 indexRouter.router = router;
 

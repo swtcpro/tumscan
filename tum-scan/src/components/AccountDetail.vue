@@ -79,10 +79,10 @@
             filter-placement="bottom-end">
             <template slot-scope="scope">
               <el-tag v-if="scope.row.type === 'sent'"
-                      type="danger">买入
+                      type="danger">卖出
               </el-tag>
               <el-tag v-else-if="scope.row.type === 'received'"
-                      type="success">卖出
+                      type="success">买入
               </el-tag>
               <el-tag v-else-if="scope.row.type === 'offernew'"
                       type="info">挂单

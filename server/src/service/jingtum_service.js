@@ -12,7 +12,7 @@ const remote = require('../lib/remote');
 
 const async = require('async');
 const logger = require('../lib/logger');
-const config  = require('../lib/config');
+const config = require('../lib/config');
 const ClientError = require('../lib/errors').ClientError;
 const NetworkError = require('../lib/errors').NetworkError;
 const resultCode = require('../lib/resultCode');
@@ -101,7 +101,6 @@ jingtumService.queryTokens = function (address) {
                     console.log('err:', err);
                 }
                 else if (result) {
-                    // console.log('res:', result);
                     resolve(result);
                 }
             });

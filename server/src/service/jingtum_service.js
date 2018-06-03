@@ -25,50 +25,68 @@ let jingtumService = {}
 
 jingtumService.queryLedger = function (hash) {
     return new Promise(((resolve, reject) => {
-        if (remote.isConnected()) {
-            remote.disconnect();
+        if (!remote || !remote.isConnected()) {
+            logger.error(resultCode.N_REMOTE.msg);
+            return callback(new NetworkError(resultCode.N_REMOTE));
         }
-        remote.connect(function (err, result) {
+        let req = remote.requestLedger({
+            ledger_hash: hash,
+            transactions: true
+        });
+        req.submit(function (err, ledger) {
             if (err) {
                 console.log('err:', err);
-                return {success: false, error: err}
+                return {success: false, msg: err}
             }
-            let req = remote.requestLedger({
-                ledger_hash: hash,
-                transactions: true
-            });
-            req.submit(function (err, ledger) {
-                if (err) {
-                    console.log('err:', err);
-                    return {success: false, msg: err}
-                }
-                else if (ledger) {
-                    // 获取账本相关交易列表
-                    let txs = [];
-                    ledger.transactions.forEach((txHash, index) => {
-                        (function (txHash) {
-                            let req = remote.requestTx({
-                                hash: txHash,
-                            });
-                            req.submit(function (err, transaction) {
-                                if (err) {
-                                    console.log('err:', err);
+            else if (ledger) {
+                // 获取账本相关交易列表
+                let txs = [];
+                ledger.transactions.forEach((txHash, index) => {
+                    (function (txHash) {
+                        let req = remote.requestTx({
+                            hash: txHash,
+                        });
+                        req.submit(function (err, transaction) {
+                            if (err) {
+                                console.log('err:', err);
+                            }
+                            else if (transaction) {
+                                txs.push(transaction);
+                                if (txs.length === ledger.transactions.length) {
+                                    ledger.transactions = txs;
+                                    resolve(ledger);
                                 }
-                                else if (transaction) {
-                                    txs.push(transaction);
-                                    if (txs.length === ledger.transactions.length) {
-                                        ledger.transactions = txs;
-                                        remote.disconnect();
-                                        resolve(ledger);
-                                    }
-                                }
-                            });
-                        })(txHash);
-                    });
-                }
-            });
+                            }
+                        });
+                    })(txHash);
+                });
+            }
         });
+
     }))
+};
+
+/**
+ * 在此方法中并不迭代账本中的每一次交易的具体信息
+ * @param index
+ */
+jingtumService.queryLedgerByIndex = function (index) {
+    if (!remote || !remote.isConnected()) {
+        logger.error(resultCode.N_REMOTE.msg);
+        return callback(new NetworkError(resultCode.N_REMOTE));
+    }
+    let req = remote.requestLedger({
+        ledger_index: index,
+        transactions: true
+    });
+    req.submit(function (err, ledger) {
+        if (err) {
+            console.log('err:', err);
+        }
+        else if (ledger) {
+            return ledger;
+        }
+    });
 };
 
 jingtumService.queryTxs = function (txHashs) {
@@ -110,24 +128,20 @@ jingtumService.queryTokens = function (address) {
 
 jingtumService.queryTx = function (hash) {
     return new Promise((resolve, reject) => {
-
-        remote.connect(function (err, result) {
+        if (!remote || !remote.isConnected()) {
+            logger.error(resultCode.N_REMOTE.msg);
+            return callback(new NetworkError(resultCode.N_REMOTE));
+        }
+        let req = remote.requestTx({
+            hash: hash,
+        });
+        req.submit(function (err, transaction) {
             if (err) {
                 console.log('err:', err);
-                return {success: false, error: err}
             }
-            let req = remote.requestTx({
-                hash: hash,
-            });
-            req.submit(function (err, transaction) {
-                if (err) {
-                    console.log('err:', err);
-                }
-                else if (transaction) {
-                    remote.disconnect();
-                    resolve(transaction);
-                }
-            });
+            else if (transaction) {
+                resolve(transaction);
+            }
         });
     })
 };

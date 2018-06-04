@@ -7,9 +7,7 @@
  \*/
 const jlib = require('jingtum-lib');
 const Remote = jlib.Remote;
-
 const remote = require('../lib/remote');
-
 const async = require('async');
 const logger = require('../lib/logger');
 const config = require('../lib/config');
@@ -19,7 +17,6 @@ const resultCode = require('../lib/resultCode');
 const jutils = require('jingtum-lib').utils;
 const respond = require('../lib/respond');
 const CURRENCY = config.get('base_currency') || 'SWT';
-
 
 let jingtumService = {}
 
@@ -71,22 +68,25 @@ jingtumService.queryLedger = function (hash) {
  * @param index
  */
 jingtumService.queryLedgerByIndex = function (index) {
-    if (!remote || !remote.isConnected()) {
-        logger.error(resultCode.N_REMOTE.msg);
-        return callback(new NetworkError(resultCode.N_REMOTE));
-    }
-    let req = remote.requestLedger({
-        ledger_index: index,
-        transactions: true
-    });
-    req.submit(function (err, ledger) {
-        if (err) {
-            console.log('err:', err);
+    return new Promise((resolve, reject) => {
+        if (!remote || !remote.isConnected()) {
+            logger.error(resultCode.N_REMOTE.msg);
+            return new NetworkError(resultCode.N_REMOTE);
         }
-        else if (ledger) {
-            return ledger;
-        }
-    });
+        let req = remote.requestLedger({
+            ledger_index: index + '',
+            transactions: true
+        });
+        console.log('ledgerIndex', index);
+        req.submit(function (err, ledger) {
+            if (err) {
+                console.log('err:', err);
+            }
+            else if (ledger) {
+                resolve(ledger);
+            }
+        });
+    })
 };
 
 jingtumService.queryTxs = function (txHashs) {

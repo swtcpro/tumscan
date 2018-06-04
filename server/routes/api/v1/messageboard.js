@@ -8,13 +8,13 @@ let express = require('express');
 let router = express.Router();
 let indexRouter = {};
 import messageService from '../../../src/service/message_service';
-import getClientIp from '../../../src/lib/utils';
+const utils = require('../../../src/lib/utils');
 
-const message = new messageService()
+const message_servie = new messageService()
 // 获取留言
-router.get('/messgae/:id', function (req, res) {
+router.get('/message/:id', function (req, res) {
     let id = _.trim(req.params.id || '');
-    message.getMessage(id).then((result) => {
+    message_servie.getMessage(id).then((result) => {
         console.log(result);
         return res.json(result);
     }).catch((error) => {
@@ -29,7 +29,8 @@ router.get('/messgae/:id', function (req, res) {
 router.post('/message', function (req, res) {
     const title = req.body.title;
     const message = req.body.message;
-    message.addMessage(title, message, getClientIp(req)).then((result) => {
+    const ip = utils.getClientIp(req);
+    message_servie.addMessage(title, message, ip).then((result) => {
         console.log(result);
         return res.json({
             'success': true,

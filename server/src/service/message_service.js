@@ -14,7 +14,19 @@ export default class messageService {
      * @return {promises} 结果回调
      */
     getMessage(id) {
-        return messageTopic.findById(id);
+        return new Promise(function (resolve, reject) {
+            messageTopic.findById(id, {
+                include: [{
+                    model: messageBoard,
+                    as: 'messageitem'
+                }]
+            }).then(topic => {
+                resolve(topic);
+            }).catch((error) => {
+                console.log(error)
+                reject(error)
+            });
+        });
     }
 
     /**

@@ -77,7 +77,7 @@ jingtumService.queryLedgerByIndex = function (index) {
             ledger_index: index + '',
             transactions: true
         });
-        console.log('ledgerIndex', index);
+        logger.info('ledgerIndex', index);
         req.submit(function (err, ledger) {
             if (err) {
                 console.log('err:', err);

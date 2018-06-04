@@ -11,6 +11,7 @@ import messageTopic from './messageTopic';
 import Account from './account';
 import Balance from './balance';
 import Token from './token';
+import Ledger from './ledger'
 
 import {sequelize,} from './sequelize_helper';
 
@@ -31,6 +32,7 @@ const entities = {
     Account,
     Balance,
     Token,
+    Ledger,
     sequelize
 };
 export default entities;

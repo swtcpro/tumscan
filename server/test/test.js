@@ -71,8 +71,10 @@ describe('token tests', () => {
             if (err) {
                 return console.log(err);
             }
-            TimeTask.traverseLedgers('9826175', '9826165').then(ledgers => {
-                should.exists(ledgers);
+            // TimeTask.traverseLedgers('266955', '9826175').then(ledgers => {
+            TimeTask.traverseLedgers('9826155', '9826175').then(ledgers => {
+                ledgers.should.be.an.instanceOf(Array);
+                ledgers.should.have.length(20)
             })
         });
     });

@@ -16,8 +16,25 @@ import jingtumService from '../service/jingtum_service'
 import entities from '../model/entities'
 
 const CURRENCY = 'SWT';
+const INIT_LEDGER_INDEX = 266955;
 
 let timeTask = {}
+
+/**
+ * 初始化同步：从创世账本开始，同步所有公链账本数据
+ */
+timeTask.initSync = function () {
+
+};
+
+/**
+ * 普通同步，从tumscan数据库中存储最新的账本和公链中最新的账本高度对比，
+ * 根据差值，同步差异账本数据
+ */
+timeTask.sync = function () {
+
+};
+
 
 /**
  * 遍历指定的账本，检索其中的交易信息，如果是买入或者卖出的交易则记录交易双方的address
@@ -32,10 +49,10 @@ timeTask.traverseLedgers = function (from, to) {
             return new NetworkError(resultCode.N_REMOTE);
         }
         let ledgers = [];
-
         for (let ledgerIndex = from; ledgerIndex <= to; ledgerIndex++) {
             jingtumService.queryLedgerByIndex(ledgerIndex).then(ledger => {
                 ledgers.push(ledger);
+                saveLedger(ledger);
                 if (ledgers.length === (to - from)) {
                     analyseLedgerTransactions(ledgers).then(() => {
                         resolve(ledgers);
@@ -43,6 +60,23 @@ timeTask.traverseLedgers = function (from, to) {
                 }
             })
         }
+    })
+};
+
+/**
+ * 将账本存在tumscan数据库
+ * @param ledger
+ */
+function saveLedger(ledger) {
+    entities.Ledger.create({
+        hash: ledger.ledger_hash,
+        account_hash: ledger.account_hash,
+        close_time_human: ledger.close_time_human,
+        close_time_resolution: ledger.close_time_resolution,
+        ledger_index: ledger.ledger_index,
+        parent_hash: ledger.parent_hash,
+        total_coins: ledger.total_coins,
+        transaction_hash: ledger.transaction_hash
     })
 }
 
@@ -56,7 +90,7 @@ function analyseLedgerTransactions(ledgers) {
         ledgers.forEach(ledger => {
             ledger.transactions.forEach((transactionHash, index) => {
                 jingtumService.queryTx(transactionHash).then((transaction => {
-                    logger.format(transaction);
+                    logger.info(transaction);
                     let affectAccounts = extractAccount(transaction);
                     // 将链上数据库写入本地数据库，使用findOrCreate只是为了主键重复异常
                     entities.Account.findOrCreate({where: {address: affectAccounts.Account}})

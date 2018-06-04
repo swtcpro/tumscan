@@ -90,7 +90,7 @@ function onListening() {
   debug('Listening on ' + bind);
   console.log('server is runing... Listening on ' + bind)
   if (bind.indexOf("port") > -1) {
-    var uri = 'http://localhost:' + addr.port;
+    var uri = 'http://0.0.0.0:' + addr.port;
     console.log('> Listening at ' + uri + '\n')
   }
 

@@ -9,7 +9,7 @@ import Transactions from '@/components/transaction/Transactions';
 import Ledgers from '@/components/transaction/Ledgers';
 import Chart from '@/components/Chart'
 import Forum from '@/components/forum/forum'
-import Tokens from '@/components/Tokens'
+import Tokens from '@/components/token/Tokens'
 
 Vue.use(Router);
 

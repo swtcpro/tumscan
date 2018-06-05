@@ -15,7 +15,6 @@ const message_servie = new messageService()
 router.get('/message/:id', function (req, res) {
     let id = _.trim(req.params.id || '');
     message_servie.getMessage(id).then((result) => {
-        console.log(result);
         return res.json(result);
     }).catch((error) => {
         return res.json({
@@ -31,7 +30,6 @@ router.post('/message', function (req, res) {
     const message = req.body.message;
     const ip = utils.getClientIp(req);
     message_servie.addMessage(title, message, ip).then((result) => {
-        console.log(result);
         return res.json({
             'success': true,
         });
@@ -44,8 +42,7 @@ router.post('/message', function (req, res) {
 });
 
 // 更新留言
-router.post('/message/:id', function (req, res) {
-});
+router.post('/message/:id', function (req, res) {});
 
 indexRouter.router = router;
 

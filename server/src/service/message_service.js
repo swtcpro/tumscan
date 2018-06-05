@@ -40,12 +40,17 @@ export default class messageService {
         return messageTopic.create({
             title,
             lastUpdateTime: new Date(),
-            messageitem: {
+            messageitem: [{
                 description: message,
                 time: new Date(),
-                ip,
-            },
-        });
+                ip
+            }]
+        }, {
+            include: [{
+                model: messageBoard,
+                as: 'messageitem'
+            }]
+        })
     }
 
     /**

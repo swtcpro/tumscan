@@ -7,7 +7,7 @@
  \*/
 const jutils = require('jingtum-lib').utils;
 const remote = require('../lib/remote');
-const respond = require('../lib/respond');
+var async = require('async');
 const logger = require('../lib/logger');
 const resultCode = require('../lib/resultCode');
 const ClientError = require('../lib/errors').ClientError;
@@ -15,7 +15,6 @@ const NetworkError = require('../lib/errors').NetworkError;
 import jingtumService from '../service/jingtum_service'
 import entities from '../model/entities'
 
-const CURRENCY = 'SWT';
 const INIT_LEDGER_INDEX = 266955;
 
 let timeTask = {}
@@ -24,7 +23,11 @@ let timeTask = {}
  * 初始化同步：从创世账本开始，同步所有公链账本数据
  */
 timeTask.initSync = function () {
-
+    getLatestLedger().then(latest_index => {
+        this.traverseLedgers(INIT_LEDGER_INDEX, latest_index).then(ledgers => {
+            logger.info('time_task: 初始化同步完成!')
+        })
+    })
 };
 
 /**
@@ -32,9 +35,120 @@ timeTask.initSync = function () {
  * 根据差值，同步差异账本数据
  */
 timeTask.sync = function () {
-
+    let index_local = INIT_LEDGER_INDEX;
+    entities.Ledger.max('ledger_index').then(ledger_index => {
+        index_local = ledger_index;
+        // 获取当前公链中最新的账本高度
+        getLatestLedger().then(latest_index => {
+            this.traverseLedgers(index_local + 1, latest_index).then(ledgers => {
+                logger.info('time_task: 普通同步完成!')
+            })
+        })
+    })
 };
 
+/**
+ * 统计账户中的代币和余额信息
+ * 其中账户是已存储在本地数据库中的账户
+ */
+function countTokenAndBalances() {
+    entities.Account.findAll().then(accounts => {
+        accounts.forEach(account => {
+            // 结果参照REST API /accounts/{:address}/balances返回值
+            let result = this.queryBalance(account.address);
+            result.balances.forEach(balance => {
+                entities.Balance.create({
+                    value: balance.value,
+                    currency: balance.currency,
+                    issuer: balance.issuer,
+                    freezed: balance.freezed
+                }).then(savedBalance => {
+                    /***
+                     *
+                     *
+                     *
+                     *
+                     */
+                })
+            })
+        })
+    })
+}
+
+function queryBalance(address) {
+    let condition = {};
+    let options = {account: address, type: 'trust'};
+    let options2 = {account: address, type: 'freeze'};
+    async.parallel({
+        native: function (callback) {
+            let req1 = remote.requestAccountInfo(options);
+            req1.submit(callback);
+        },
+        lines: function (callback) {
+            let req2 = remote.requestAccountRelations(options);
+            req2.submit(callback);
+        },
+        lines2: function (callback) { //关系中设置的冻结
+            let req2 = remote.requestAccountRelations(options2);
+            req2.submit(callback);
+        },
+        orders: function (callback) {
+            let offers = [];
+
+            function getOffers() {
+                let req3 = remote.requestAccountOffers(options);
+                req3.submit(function (err, result) {
+                    if (err) {
+                        callback(err)
+                    }
+                    else if (result.marker) {
+                        offers = offers.concat(result.offers);
+                        options = {account: address, marker: result.marker};
+                        getOffers(options);
+                    } else {
+                        offers = offers.concat(result.offers);
+                        result.offers = offers;
+                        callback(null, result);
+                    }
+                });
+            }
+
+            getOffers(options);
+        }
+    }, function (err, results) {
+        if (err) {
+            let error = {};
+            if (err.msg) {
+                error = err;
+            } else {
+                error.msg = err;
+            }
+            logger.error('fail to get balance: ' + err);
+        } else {
+            return jingtumService.process_balance(results, condition);
+        }
+    });
+}
+
+/**
+ * 获取公链最新的账本
+ */
+function getLatestLedger() {
+    return new Promise((resolve, reject) => {
+        if (!remote || !remote.isConnected()) {
+            logger.error(resultCode.N_REMOTE.msg);
+            return new NetworkError(resultCode.N_REMOTE);
+        }
+        let req = remote.requestLedgerClosed();
+        req.submit((err, ledger) => {
+            if (err) {
+                logger.error(err);
+            } else {
+                resolve(ledger.ledger_index);
+            }
+        })
+    })
+}
 
 /**
  * 遍历指定的账本，检索其中的交易信息，如果是买入或者卖出的交易则记录交易双方的address

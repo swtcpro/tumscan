@@ -11,7 +11,7 @@ import messageBoard from '../src/model/messageBoard';
 import entities from '../src/model/entities'
 import Account from "../src/model/account";
 import TimeTask from '../src/common/timed_task'
-
+const logger = require('../src/lib/logger');
 const remote = require('../src/lib/remote');
 const should = require('should');
 let jingtumService = require('../src/service/jingtum_service');
@@ -36,6 +36,20 @@ describe('#dataOrm()', () => {
                 should.exist(account);
             })
     });
+    it("model test", () => {
+        messageBoard.sync().then(() => {
+            messageBoard.all().then(messageBoard => {
+                console.log(messageBoard);
+            });
+        });
+    });
+    it.only('should return the largest index of ledgers', function () {
+        entities.Ledger.max('ledger_index').then(ledger_index => {
+            logger.info('test:', ledger_index);
+            ledger_index.should.be.a.Number();
+        })
+    });
+
 });
 
 describe('#jingtumLib()', function () {
@@ -66,7 +80,7 @@ describe('#jingtumLib()', function () {
 });
 
 describe('token tests', () => {
-    it.only('should return a set of account', function () {
+    it('should return a set of account', function () {
         remote.connect((err, result) => {
             if (err) {
                 return console.log(err);
@@ -74,18 +88,8 @@ describe('token tests', () => {
             // TimeTask.traverseLedgers('266955', '9826175').then(ledgers => {
             TimeTask.traverseLedgers('9826155', '9826175').then(ledgers => {
                 ledgers.should.be.an.instanceOf(Array);
-                ledgers.should.have.length(20)
+                ledgers.should.have.length(21)
             })
-        });
-    });
-});
-
-describe("#modelQuery()", () => {
-    it("model test", () => {
-        messageBoard.sync().then(() => {
-            messageBoard.all().then(messageBoard => {
-                console.log(messageBoard);
-            });
         });
     });
 });

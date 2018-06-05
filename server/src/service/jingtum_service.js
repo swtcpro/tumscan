@@ -226,7 +226,7 @@ jingtumService.queryBalance = function (req, res, callback) {
     });
 };
 
-function process_balance(data, condition) {
+jingtumService.process_balance = function (data, condition) {
     let swt_value = new Number(data.native.account_data.Balance) / 1000000.0;
     let freeze0 = config.get('freezed').reserved
         + (data.lines.lines.length + data.orders.offers.length) * config.get('freezed').each_freezed;

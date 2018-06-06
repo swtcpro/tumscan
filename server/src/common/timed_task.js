@@ -63,12 +63,30 @@ function countTokenAndBalances() {
                     issuer: balance.issuer,
                     freezed: balance.freezed
                 }).then(savedBalance => {
-                    /***
-                     *
-                     *
-                     *
-                     *
-                     */
+                    // 将各账户中各代币余额统计到各代币实体的total总量
+                    entities.Token.findOne({
+                        where: {
+                            currency: savedBalance.currency,
+                            issuer: savedBalance.issuer
+                        }
+                        /**
+                         * 此处需要处理没有找到该种类代币的逻辑
+                         *
+                         *
+                         *
+                         *
+                         */
+                    }).then(token => {
+                        token.total += savedBalance.value;
+                        entities.Token.upset(token).then(created => {
+                            if (created) {
+                                // 抛出错误
+                                logger.err('time_task: 代币统计发生错误')
+                            } else {
+                                logger.info('time_task: 代币单次迭代统计成功')
+                            }
+                        })
+                    })
                 })
             })
         })

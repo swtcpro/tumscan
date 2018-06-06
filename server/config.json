@@ -18,7 +18,7 @@
 		"each_freezed": 5.0
 	},
 	"mysql_server": {
-		"host": "localhost",
+		"host": "106.14.65.102",
 		"user": "root",
 		"password": "m7315202",
 		"database": "apidb"

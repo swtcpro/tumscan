@@ -7,6 +7,6 @@
  \*/
 export default {
   // baseURL: 'http://state.jingtum.com',
-  baseURL: 'http://localhost:8081/api/v1',
+  baseURL: process.env.API_BASE,
   isDev: true
 }

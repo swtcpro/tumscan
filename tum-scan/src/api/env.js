@@ -7,9 +7,6 @@
  \*/
 export default {
   // baseURL: 'http://state.jingtum.com',
-  baseURL:
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:8081/api/v1"
-      : "http://106.14.65.102:8081/api/v1",
+  baseURL: process.env.NODE_ENV,
   isDev: true
 };

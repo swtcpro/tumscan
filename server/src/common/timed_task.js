@@ -25,7 +25,9 @@ let timeTask = {}
 timeTask.initSync = function () {
     getLatestLedger().then(latest_index => {
         this.traverseLedgers(INIT_LEDGER_INDEX, latest_index).then(ledgers => {
-            logger.info('time_task: 初始化同步完成!')
+            countTokenAndBalances().then(() => {
+                logger.info('time_task: 初始化同步完成!');
+            })
         })
     })
 };
@@ -41,7 +43,9 @@ timeTask.sync = function () {
         // 获取当前公链中最新的账本高度
         getLatestLedger().then(latest_index => {
             this.traverseLedgers(index_local + 1, latest_index).then(ledgers => {
-                logger.info('time_task: 普通同步完成!')
+                countTokenAndBalances().then(() => {
+                    logger.info('time_task: 普通同步完成!');
+                });
             })
         })
     })
@@ -52,45 +56,46 @@ timeTask.sync = function () {
  * 其中账户是已存储在本地数据库中的账户
  */
 function countTokenAndBalances() {
-    entities.Account.findAll().then(accounts => {
-        accounts.forEach(account => {
-            // 结果参照REST API /accounts/{:address}/balances返回值
-            let result = this.queryBalance(account.address);
-            result.balances.forEach(balance => {
-                entities.Balance.create({
-                    value: balance.value,
-                    currency: balance.currency,
-                    issuer: balance.issuer,
-                    freezed: balance.freezed
-                }).then(savedBalance => {
-                    // 将各账户中各代币余额统计到各代币实体的total总量
-                    entities.Token.findOne({
-                        where: {
-                            currency: savedBalance.currency,
-                            issuer: savedBalance.issuer
-                        }
-                        /**
-                         * 此处需要处理没有找到该种类代币的逻辑
-                         *
-                         *
-                         *
-                         *
-                         */
-                    }).then(token => {
-                        token.total += savedBalance.value;
-                        entities.Token.upset(token).then(created => {
-                            if (created) {
-                                // 抛出错误
-                                logger.err('time_task: 代币统计发生错误')
-                            } else {
-                                logger.info('time_task: 代币单次迭代统计成功')
-                            }
+    new Promise((resolve, reject) => {
+        entities.Token.update({total: 0}).then(arrays => { // 将每种代币的总量清0，然后通过重新遍历各账户进行统计
+            logger.info(arrays);
+            entities.Account.findAll().then(accounts => {
+                accounts.forEach(account => {
+                    // 结果参照REST API /accounts/{:address}/balances返回值
+                    let result = this.queryBalance(account.address);
+                    result.balances.forEach(balance => {
+                        entities.Balance.create({
+                            value: balance.value,
+                            currency: balance.currency,
+                            issuer: balance.issuer,
+                            freezed: balance.freezed
+                        }).then(savedBalance => {
+                            // 将各账户中各代币余额统计到各代币实体的total总量
+                            entities.Token.findOrCreate({
+                                where: {
+                                    currency: savedBalance.currency,
+                                    issuer: savedBalance.issuer
+                                }
+                            }).spread((token, created) => {
+                                token.total += savedBalance.value;
+                                entities.Token.upset(token).then(created => {
+                                    if (created) {
+                                        // 抛出错误
+                                        logger.err('time_task: 代币统计发生错误');
+                                        reject();
+                                    } else {
+                                        resolve();
+                                        logger.info('time_task: 代币单次迭代统计成功')
+                                    }
+                                })
+                            })
                         })
                     })
                 })
             })
-        })
+        });
     })
+
 }
 
 function queryBalance(address) {

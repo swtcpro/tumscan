@@ -6,7 +6,6 @@
  \* Description:
  \*/
 export default {
-  // baseURL: 'http://state.jingtum.com',
-  baseURL: process.env.NODE_ENV,
+  baseURL: process.env.API_BASE,
   isDev: true
 };

@@ -11,6 +11,7 @@ import messageBoard from '../src/model/messageBoard';
 import entities from '../src/model/entities'
 import Account from "../src/model/account";
 import TimeTask from '../src/common/timed_task'
+
 const logger = require('../src/lib/logger');
 const remote = require('../src/lib/remote');
 const should = require('should');
@@ -43,7 +44,7 @@ describe('#dataOrm()', () => {
             });
         });
     });
-    it.only('should return the largest index of ledgers', function () {
+    it('should return the largest index of ledgers', function () {
         entities.Ledger.max('ledger_index').then(ledger_index => {
             logger.info('test:', ledger_index);
             ledger_index.should.be.a.Number();
@@ -92,4 +93,22 @@ describe('token tests', () => {
             })
         });
     });
+    it('timed_task sync test', () => {
+        remote.connect((err, result) => {
+            if (err) {
+                return console.log('err', err);
+            }
+            TimeTask.sync();
+        });
+    });
+
+    it.only('timed_task countTokenAndBalances test', () => {
+        remote.connect((err, result) => {
+            if (err) {
+                return console.log('err', err);
+            }
+            TimeTask.countTokenAndBalances();
+        });
+    })
+
 });

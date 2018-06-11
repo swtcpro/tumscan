@@ -56,5 +56,6 @@ export default class messageService {
     /**
      * 更新留言
      */
-    updateMessage() {}
+    updateMessage() {
+    }
 }

@@ -11,6 +11,7 @@
  * @param arr
  * @returns {Array}
  */
+
 function unique(arr) {
     var res = [];
 
@@ -19,3 +20,9 @@ function unique(arr) {
     });
     return res;
 }
+
+const util = {
+    unique: unique,
+}
+
+export default util;

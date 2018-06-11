@@ -9,6 +9,7 @@ import Account from "../model/account";
 import jingtumService from '../service/jingtum_service'
 import entities from '../model/entities'
 import Balance from "../model/balance";
+import util from '../common/utils'
 
 const jutils = require('jingtum-lib').utils;
 const remote = require('../lib/remote');
@@ -46,8 +47,10 @@ timeTask.sync = function () {
         // 获取当前公链中最新的账本高度
         getLatestLedger().then(latest_index => {
             traverseLedgers(index_local + 1, latest_index);
+            return Promise.resolve();
         }).then(ledgers => {
             analyseLedgerTransactions(ledgers);
+            return Promise.resolve();
         }).then(() => {
             logger.info('goes to countTokenAndBalances');
             this.countTokenAndBalances();
@@ -60,6 +63,12 @@ timeTask.sync = function () {
  * 其中账户是已存储在本地数据库中的账户
  */
 timeTask.countTokenAndBalances = function () {
+    /**
+     * 第一步将所有的代币total清零
+     * 第二步查询每个账户中的余额，将余额存入数据库，通过for循环遍历所有账户
+     * 第三步查询数据库所有的余额，根据各个账户的余额统计代币总量
+     *
+     */
     entities.Token.findAll().then(tokens => {
         if (tokens) {
             tokens.forEach((token, index) => {
@@ -68,23 +77,57 @@ timeTask.countTokenAndBalances = function () {
                         id: token.id
                     }
                 });
-                if (index === tokens.length) {
-                    return Promise.resolve();
-                }
             });
         }
     }).then(() => {
         entities.Account.findAll().then(accounts => {
-            loopQueryAndSave(accounts);
+            Promise.all([accounts.map(accout => queryBalanceAndSave(accout))]).then((savedBalances) => {
+                logger.info(savedBalances[0]);
+                return Promise.resolve(savedBalances);
+            }).catch(error => {
+                logger.info(error);
+            });
+            logger.info('Account.findAll()');
+            return Promise.resolve();
+        }).then(() => {
+            // 以下代码数据余额统计到代币代码，应该放在单个账户的循环之外
+            entities.Balance.findAll().then(allBalances => {
+                // logger.info('以下代码数据余额统计到代币代码', allBalances);
+                // 将全体各账户中各代币余额统计到各代币实体的total总量
+                allBalances.forEach((savedBalance, index) => {
+                    entities.Token.findOrCreate({
+                        where: {
+                            currency: savedBalance.currency,
+                            issuer: savedBalance.issuer
+                        }
+                    }).spread((token, created) => {
+                        // if (created) {
+                        //     logger.info('创建了新的代币');
+                        // } else {
+                        //     // logger.info(savedBalance.currency + savedBalance.issuer);
+                        //     token.total += savedBalance.value;
+                        //     entities.Token.update(token, {
+                        //         where: {
+                        //             currency: savedBalance.currency,
+                        //             issuer: savedBalance.issuer
+                        //         }
+                        //     }).then(array => {
+                        //         // logger.info(array);
+                        //     });
+                        // }
+
+                    })
+                })
+            })
         })
     });
 };
 
-let loopQueryAndSave = async function (accounts) {
-    for (let account of accounts) {
-        await queryBalanceAndSave(account);
-    }
-};
+// let loopQueryAndSave = async function (accounts) {
+//     for (let account of accounts) {
+//         await queryBalanceAndSave(account);
+//     }
+// };
 
 function queryBalanceAndSave(account) {
     new Promise((resolve, reject) => {
@@ -143,53 +186,17 @@ function queryBalanceAndSave(account) {
                 let result = jingtumService.process_balance(results, condition);
                 Account.hasMany(Balance);
                 Balance.belongsTo(Account);
-                if (result && result.balances) {
-
-                    // result.balances.forEach((balance, index) => {
-                    //     if (balance.id) {
-                    //
-                    //     } else {
-                    //         delete result.balances[index];
-                    //     }
-                    //
-                    // })
-
-                    // for (let balance of result.balances) {
-                    //     if (balance.id) {
-                    //
-                    //     }else {
-                    //         delete balance;
-                    //     }
-                    //     logger.info(balance.id);
-                    // }
-                    entities.Balance.bulkCreate(result.balances).then(savedBalances => {
-                        account.setBalances(savedBalances);
-                        return Promise.resolve();
-                    }).then(() => {
-                        entities.Balance.findAll().then(allBalances => {
-                            // 将全体各账户中各代币余额统计到各代币实体的total总量
-                            allBalances.forEach((savedBalance, index) => {
-                                entities.Token.findOrCreate({
-                                    where: {
-                                        currency: savedBalance.currency,
-                                        issuer: savedBalance.issuer
-                                    }
-                                }).spread((token, created) => {
-                                    token.total += savedBalance.value;
-                                    entities.Token.upsert(token).then(created => {
-                                        if (created) {
-                                            // 抛出错误
-                                            logger.info('time_task: 代币统计发生错误');
-                                        } else {
-                                            logger.info('time_task: 代币单次迭代统计成功')
-                                        }
-                                    })
-                                    resolve();
-                                })
-                            })
-                        })
-                    })
-                }
+                /**
+                 * 此处开始编码，将以下代码改造成单个循环的形式
+                 */
+                // let distinctBalances = util.unique(result.balances);
+                // if (result && result.balances) {
+                //     entities.Balance.bulkCreate(distinctBalances).then(savedBalances => {
+                //         account.setBalances(savedBalances);
+                //         logger.info('savedBalances length: ', savedBalances.length + );
+                //         resolve(savedBalances);
+                //     })
+                // }
             }
         });
     })

@@ -114,12 +114,7 @@ function queryBalanceAndSave(account) {
                 logger.error('fail to get balance: ' + err);
             } else {
                 let result = jingtumService.process_balance(results, condition);
-
-                return resolve(result);
-                /**
-                 * 干脆本地不存balances
-                 * 此处开始编码，将以下代码改造成单个循环的形式
-                 */
+                resolve(result);
             }
         });
     })
@@ -132,8 +127,9 @@ function queryBalanceAndSave(account) {
 timeTask.countTokenAndBalances = function () {
     /**
      * 第一步将所有的代币total清零
-     * 第二步查询每个账户中的余额，将余额存入数据库，通过for循环遍历所有账户
-     * 第三步查询数据库所有的余额，根据各个账户的余额统计代币总量
+     * 第二部清空数据库中所有账户的余额数据
+     * 第三步查询公链每个账户中的余额，将余额存入数据库，通过for循环遍历所有账户
+     * 第四步查询数据库所有的余额，根据各个账户的余额统计代币总量
      *
      */
     localService.getAllTokens().then(tokens => {

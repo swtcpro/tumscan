@@ -11,6 +11,7 @@ import entities from '../model/entities'
 import Balance from "../model/balance";
 import util from '../common/utils'
 import localService from '../service/local_service'
+
 const jutils = require('jingtum-lib').utils;
 const remote = require('../lib/remote');
 const async = require('async');
@@ -59,7 +60,7 @@ timeTask.sync = function () {
 };
 
 function queryBalanceAndSave(account) {
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         if (!account.address || !jutils.isValidAddress(account.address)) {
             return new ClientError(resultCode.C_ADDRESS);
         }
@@ -113,7 +114,8 @@ function queryBalanceAndSave(account) {
                 logger.error('fail to get balance: ' + err);
             } else {
                 let result = jingtumService.process_balance(results, condition);
-                resolve(result);
+
+                return resolve(result);
                 /**
                  * 干脆本地不存balances
                  * 此处开始编码，将以下代码改造成单个循环的形式
@@ -140,11 +142,13 @@ timeTask.countTokenAndBalances = function () {
                 localService.updateToken(token.id, {total: 0});
             })
         }
-        localService.getAllAccounts().then(async accounts => {
+        localService.getAllAccounts().then(async function (accounts) {
+            let results = [];
             for (let account of accounts) {
                 let result = await queryBalanceAndSave(account);
-                logger.info(result);
+                results.push(result)
             }
+
         })
     });
 

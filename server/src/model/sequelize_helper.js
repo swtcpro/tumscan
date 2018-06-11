@@ -11,6 +11,7 @@ const sequelize = new Sequelize('temp', 'root', 'm7315202', {
     dialect: 'mysql',
     port: 3306,
     logging: false,
+    omitNull: true,
     pool: {
         max: 5,
         min: 0,

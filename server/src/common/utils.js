@@ -21,8 +21,37 @@ function unique(arr) {
     return res;
 }
 
+function isArray(val) {
+    return toString.call(val) === '[object Array]';
+}
+
+function promiseAll(promises) {
+    return new Promise(function (resolve, reject) {
+        if (!isArray(promises)) {
+            return reject(new TypeError('arguments must be an array'));
+        }
+        let resolvedCounter = 0;
+        let promiseNum = promises.length;
+        let resolvedValues = new Array(promiseNum);
+        for (let i = 0; i < promiseNum; i++) {
+            (function (i) {
+                Promise.resolve(promises[i]).then(function (value) {
+                    resolvedCounter++;
+                    resolvedValues[i] = value;
+                    if (resolvedCounter === promiseNum) {
+                        return resolve(resolvedValues)
+                    }
+                }, function (reason) {
+                    return reject(reason)
+                })
+            })(i)
+        }
+    })
+}
+
 const util = {
     unique: unique,
+    promiseAll: promiseAll
 }
 
 export default util;

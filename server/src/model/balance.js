@@ -14,6 +14,10 @@ const Balance = sequelize.define('balance', {
     //     autoIncrement: true,
     //     primaryKey: true
     // },
+    address: {
+        type: Sequelize.STRING,
+        primaryKey: true
+    },
     currency: {
         type: Sequelize.STRING,
         primaryKey: true

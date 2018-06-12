@@ -93,7 +93,7 @@ describe('token tests', () => {
             })
         });
     });
-    it('timed_task sync test', () => {
+    it.only('timed_task sync test', () => {
         remote.connect((err, result) => {
             if (err) {
                 return console.log('err', err);
@@ -102,7 +102,7 @@ describe('token tests', () => {
         });
     });
 
-    it.only('timed_task countTokenAndBalances test', () => {
+    it('timed_task countTokenAndBalances test', () => {
         remote.connect((err, result) => {
             if (err) {
                 return console.log('err', err);

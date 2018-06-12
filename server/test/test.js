@@ -102,6 +102,15 @@ describe('token tests', () => {
         });
     });
 
+    it('timed_task initSync test', function () {
+        remote.connect((err, result) => {
+            if (err) {
+                return console.log('err', err);
+            }
+            TimeTask.initSync();
+        })
+    });
+
     it('timed_task countTokenAndBalances test', () => {
         remote.connect((err, result) => {
             if (err) {

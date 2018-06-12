@@ -130,13 +130,14 @@ jingtumService.queryTx = function (hash) {
     return new Promise((resolve, reject) => {
         if (!remote || !remote.isConnected()) {
             logger.error(resultCode.N_REMOTE.msg);
-            return callback(new NetworkError(resultCode.N_REMOTE));
+            return new NetworkError(resultCode.N_REMOTE);
         }
         let req = remote.requestTx({
             hash: hash,
         });
         req.submit(function (err, transaction) {
             if (err) {
+                reject(err);
                 console.log('err:', err);
             }
             else if (transaction) {

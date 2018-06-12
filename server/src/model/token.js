@@ -8,13 +8,20 @@
 import {sequelize, Sequelize} from "./sequelize_helper";
 
 const Token = sequelize.define('token', {
-    id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
+    // id: {
+    //     type: Sequelize.INTEGER,
+    //     autoIncrement: true,
+    //     primaryKey: true
+    // },
+
+    currency: {
+        type: Sequelize.STRING,
         primaryKey: true
     },
-    currency: Sequelize.STRING,
-    issuer: Sequelize.STRING,
+    issuer: {
+        type: Sequelize.STRING,
+        primaryKey: true
+    },
     total: Sequelize.FLOAT  // 代币总量
 });
 

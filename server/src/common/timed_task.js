@@ -28,8 +28,15 @@ let timeTask = {}
  * 初始化同步：从创世账本开始，同步所有公链账本数据
  */
 timeTask.initSync = function () {
-    getLatestLedger().then(latest_index => {
-        this.traverseLedgers(INIT_LEDGER_INDEX, latest_index).then(ledgers => {
+    getLatestLedger().then(async latest_index => {
+        let savedLedgers = [];
+        for (let ledgerIndex = INIT_LEDGER_INDEX + 1; ledgerIndex <= latest_index; ledgerIndex++) {
+            let savedLedger = await extractAccountsLedger(ledgerIndex);
+            logger.info(ledgerIndex);
+            logger.info(latest_index);
+            savedLedgers.push(savedLedger);
+        }
+        analyseLedgerTransactions(savedLedgers).then(() => {
             this.countTokenAndBalances().then(() => {
                 logger.info('time_task: 初始化同步完成!');
             })
@@ -47,13 +54,18 @@ timeTask.sync = function () {
         index_local = ledger_index;
         // 获取当前公链中最新的账本高度
         getLatestLedger().then(async latest_index => {
-            logger.info('goes to 1 :', latest_index);
-
-            // let ledgers = await traverseLedgers(index_local + 1, latest_index).then(ledgers => {
-            //     analyseLedgerTransactions(ledgers).then(() => {
-            //         this.countTokenAndBalances();
-            //     })
-            // })
+            let ledgers = [];
+            for (let ledgerIndex = index_local + 1; ledgerIndex <= latest_index; ledgerIndex++) {
+                let ledger = await extractAccountsLedger(ledgerIndex);
+                // logger.info(ledgerIndex);
+                // logger.info(latest_index);
+                ledgers.push(ledger);
+            }
+            analyseLedgerTransactions(ledgers).then(() => {
+                this.countTokenAndBalances().then(() => {
+                    logger.info('time_task: 同步完成!');
+                })
+            })
         })
     })
 };
@@ -142,33 +154,79 @@ timeTask.countTokenAndBalances = function () {
      * 第三步查询数据库所有的余额，根据各个账户的余额统计代币总量
      *
      */
-    localService.getAllTokens().then(tokens => {
-        if (tokens) {
-            tokens.forEach((token, index) => {
-                localService.updateToken(token.id, {total: 0});
-            })
-        }
-        localService.getAllAccounts().then(async function (accounts) {
-            let allBalances = [];
-            for (let account of accounts) {
-                let balancesAssociated = await queryBalanceAndSave(account);
-                allBalances = allBalances.concat(balancesAssociated)
-            }
-            // 获取全部的余额进行代币统计
-            for (let balance of allBalances) {
-                localService.findOrCreateToken({
-                    currency: balance.currency,
-                    issuer: balance.issuer
-                }).then(token => {
-                    token.total += balance.value;
-                    localService.updateToken(token.id, {total: token.total}).then(token => {
-
-                    })
+    return new Promise((resolve, reject) => {
+        localService.getAllTokens().then(tokens => {
+            if (tokens) {
+                tokens.forEach(async (token, index) => {
+                    await localService.updateToken({
+                        currency: token.currency,
+                        issuer: token.issuer
+                    }, {total: 0});
                 })
             }
-        })
-    });
+            localService.getAllAccounts().then(async function (accounts) {
+                let allBalances = [];
+                for (let account of accounts) {
+                    let balancesAssociated = await queryBalanceAndSave(account);
+                    allBalances = allBalances.concat(balancesAssociated)
+                }
+                logger.info('allBalances length: ', allBalances.length);
+                // 获取全部的余额进行代币统计
+                for (let balance of allBalances) {
+                    // logger.info(balance.dataValues);
+                    await localService.findOrCreateToken({
+                        currency: balance.currency,
+                        issuer: balance.issuer
+                    }).then(async token => {
+                        token.total = token.total + util.changeTwoDecimal(balance.value);
+                        logger.info('total: ' + token.total, 'balance: ' + balance.value);
+                        await localService.updateToken({
+                            currency: balance.currency,
+                            issuer: balance.issuer
+                        }, {total: token.total});
+                    })
+                }
+                resolve();
+            })
+        });
+    })
 };
+
+/**
+ * 检索账本其中的交易信息，如果是买入或者卖出的交易则记录交易双方的address
+ * @param ledgerIndex 账本高度
+ */
+function extractAccountsLedger(ledgerIndex) {
+    return new Promise((resolve, reject) => {
+        if (!remote || !remote.isConnected()) {
+            logger.error(resultCode.N_REMOTE.msg);
+            return new NetworkError(resultCode.N_REMOTE);
+        }
+        /**
+         * 将下列代码queryLedgerByIndex方法中的内容直接提出，
+         */
+
+        let req = remote.requestLedger({
+            ledger_index: ledgerIndex + '',
+            transactions: true
+        });
+        req.submit(function (err, ledger) {
+            if (err) {
+                console.log('err:', err);
+            }
+            else if (ledger) {
+                /**
+                 * 此处虽然讲账本数据存在了本地，但是并没有遍历本地所有的账本来获取交易
+                 * 只是将增量账本中的交易取出进行账户地址分析
+                 */
+                localService.saveLedger(ledger).then(savedLedger => {
+                    // logger.info(savedLedger.dataValues);
+                    resolve(ledger);
+                })
+            }
+        });
+    })
+}
 
 /**
  * 获取公链最新的账本
@@ -187,83 +245,6 @@ function getLatestLedger() {
                 resolve(ledger.ledger_index);
             }
         })
-    })
-}
-
-/**
- * 遍历指定的账本，检索其中的交易信息，如果是买入或者卖出的交易则记录交易双方的address
- * 也就是统计全网中所有的账户
- * @param from 开始的账本高度
- * @param to 结束的账本高度
- */
-function traverseLedgers(from, to) {
-    return new Promise((resolve, reject) => {
-        if (!remote || !remote.isConnected()) {
-            logger.error(resultCode.N_REMOTE.msg);
-            return new NetworkError(resultCode.N_REMOTE);
-        }
-        let ledgers = [];
-        /**
-         * 将下列代码queryLedgerByIndex方法中的内容直接提出，
-         */
-        (async function () {
-            return new Promise(await function (resolve, reject) {
-                for (let ledgerIndex = from; ledgerIndex <= to; ledgerIndex++) {
-                    let req = remote.requestLedger({
-                        ledger_index: ledgerIndex + '',
-                        transactions: true
-                    });
-                    req.submit(function (err, ledger) {
-                        if (err) {
-                            console.log('err:', err);
-                        }
-                        else if (ledger) {
-                            entities.Ledger.create({
-                                hash: ledger.ledger_hash,
-                                account_hash: ledger.account_hash,
-                                close_time_human: ledger.close_time_human,
-                                close_time_resolution: ledger.close_time_resolution,
-                                ledger_index: ledger.ledger_index,
-                                parent_hash: ledger.parent_hash,
-                                total_coins: ledger.total_coins,
-                                transaction_hash: ledger.transaction_hash
-                            })
-                        }
-                    });
-                }
-                resolve();
-            })
-        })();
-        resolve();
-
-        // for (let ledgerIndex = from; ledgerIndex <= to; ledgerIndex++) {
-        //     let req = remote.requestLedger({
-        //         ledger_index: ledgerIndex + '',
-        //         transactions: true
-        //     });
-        //     req.submit(function (err, ledger) {
-        //         if (err) {
-        //             console.log('err:', err);
-        //         }
-        //         else if (ledger) {
-        //             entities.Ledger.create({
-        //                 hash: ledger.ledger_hash,
-        //                 account_hash: ledger.account_hash,
-        //                 close_time_human: ledger.close_time_human,
-        //                 close_time_resolution: ledger.close_time_resolution,
-        //                 ledger_index: ledger.ledger_index,
-        //                 parent_hash: ledger.parent_hash,
-        //                 total_coins: ledger.total_coins,
-        //                 transaction_hash: ledger.transaction_hash
-        //             }).then((savedLedger) => {
-        //                 ledgers.push(ledger);
-        //                 if (ledgers.length === (to - from)) {
-        //                     resolve(ledgers);
-        //                 }
-        //             })
-        //         }
-        //     });
-        // }
     })
 }
 
@@ -293,26 +274,31 @@ function saveLedger(ledger) {
  * @param ledgers
  */
 function analyseLedgerTransactions(ledgers) {
+    // logger.info(ledgers);
     return new Promise((resolve, reject) => {
-        ledgers.forEach(ledger => {
-            ledger.transactions.forEach((transactionHash, index) => {
-                jingtumService.queryTx(transactionHash).then((transaction => {
-                    let affectAccounts = extractAccount(transaction);
-                    // 将链上数据库写入本地数据库，使用findOrCreate只是为了主键重复异常
-                    entities.Account.findOrCreate({where: {address: affectAccounts.Account}})
-                        .spread((account, created) => {
-
-                        })
-                    entities.Account.findOrCreate({where: {address: affectAccounts.Destination}})
-                        .spread((account, created) => {
-
-                        })
-                    if (index === transactions.length) {
-                        resolve();
-                    }
-                }))
-            })
-        })
+        // ledgers.forEach(ledger => {
+        for (let ledger of ledgers) {
+            (async function () {
+                // ledger.transactions.forEach((transactionHash, index) => {
+                for (let transactionHash of ledger.transactions) {
+                    jingtumService.queryTx(transactionHash).then((async transaction => {
+                        // logger.info(transaction);
+                        let affectAccounts = extractAccount(transaction);
+                        // 将链上数据库写入本地数据库
+                        if (affectAccounts) {
+                            // logger.info('affectAccounts', affectAccounts);
+                            await
+                                localService.saveAccount({address: affectAccounts.Account}).catch(error => {
+                                });
+                            await
+                                localService.saveAccount({address: affectAccounts.Destination}).catch(error => {
+                                });
+                        }
+                    }))
+                }
+            })()
+        }
+        resolve();
     })
 }
 
@@ -330,4 +316,3 @@ function extractAccount(transaction) {
 }
 
 module.exports = timeTask;
-

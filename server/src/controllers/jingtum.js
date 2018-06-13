@@ -99,7 +99,12 @@ tumController.queryTxLib = function (req, res) {
  * @param res
  */
 tumController.queryTokens = function (req, res) {
-
+    /**
+     * 代码写到此处，下次继续需要写数据库查询接口
+     * queryByCurrency
+     * queryByIssuer
+     * queryAll
+     */
 };
 
 /**
@@ -147,4 +152,4 @@ tumController.findTransactionsByAddress = function (req, res) {
     })
 };
 
-module.exports = tumController;
+module.exports = tumControl

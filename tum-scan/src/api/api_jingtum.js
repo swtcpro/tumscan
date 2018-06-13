@@ -39,6 +39,11 @@ export default {
     return API.GET('/jingtum/accounts/' + address + '/balances');
   },
 
+  // 分页查询代币
+  queryTokens: params => {
+    return API.GET('/jingtum/query/tokens', params);
+  },
+
   // 查询账号下所有交易
   findTranscationsByAddress: address => {
     // return API.GET('/jingtum/accounts/' + address + '/transactions');

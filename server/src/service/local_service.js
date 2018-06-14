@@ -26,6 +26,85 @@ function getAllTokens() {
     })
 }
 
+
+/**
+ * 分页查询token
+ * @param page
+ * @param limit
+ */
+function getTokensPaging(page, limit) {
+    return new Promise(function (resolve, reject) {
+        let offset = (page - 1) * limit;
+        entities.Token.findAll({limit: limit, offset: offset}).then(function (array) {
+            resolve(array);
+        }).catch(function (error) {
+            logger.info(error);
+            reject(error);
+        })
+    })
+}
+
+/**
+ * 获取代币种类数量
+ * @returns {Promise}
+ */
+function getTokensCount() {
+    return new Promise(function (resolve, reject) {
+        entities.Token.count().then(function (count) {
+            resolve(count)
+        }).then(function (error) {
+            logger.info(error);
+            reject(error)
+        })
+    })
+}
+
+/**
+ * 通过issuer分页查询token
+ * @param page
+ * @param limit
+ * @param issuer
+ * @returns {Promise}
+ */
+function getTokensByIssuerPaging(page, limit, issuer) {
+    return new Promise(function (resolve, reject) {
+        let offset = (page - 1) * limit;
+        entities.Token.findAll({limit: limit, offset: offset}, {
+                where: {
+                    issuer: issuer
+                }
+            }
+        ).then(function (array) {
+            resolve(array)
+        }).catch(function (error) {
+            reject(error)
+        })
+    })
+}
+
+/**
+ * 通过currency分页查询token
+ * @param page
+ * @param limit
+ * @param currency
+ * @returns {Promise}
+ */
+function getTokensCurrencyPaging(page, limit, currency) {
+    return new Promise(function (resolve, reject) {
+        let offset = page * limit;
+        entities.Token.findAll({limit: limit, offset: offset}, {
+                where: {
+                    currency: currency
+                }
+            }
+        ).then(function (array) {
+            resolve(array)
+        }).catch(function (error) {
+            reject(error)
+        })
+    })
+}
+
 /**
  * 根据Id跟新token的属性值
  * @param params
@@ -61,7 +140,7 @@ function getAllAccounts() {
 
 /**
  * 保存账户
- * @param address
+ * @param account
  * @returns {Promise}
  */
 function saveAccount(account) {
@@ -194,5 +273,9 @@ export default {
     saveAccountBalances: saveAccountBalances,
     findOrCreateToken: findOrCreateToken,
     saveLedger: saveLedger,
-    saveAccount, saveAccount
+    saveAccount, saveAccount,
+    getTokensPaging, getTokensPaging,
+    getTokensCount, getTokensCount,
+    getTokensByIssuerPaging, getTokensByIssuerPaging,
+    getTokensCurrencyPaging, getTokensCurrencyPaging
 }

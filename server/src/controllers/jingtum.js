@@ -105,6 +105,14 @@ tumController.queryTokens = function (req, res) {
      * queryByIssuer
      * queryAll
      */
+    let page = _.trim(req.params.page || '');
+    let limit = _.trim(req.params.limit || '');
+    let param = _.trim(req.params.param || '');
+    jingtumService.queryTokens(page, limit, param).then(function (result) {
+        res.json(result);
+    }).catch(function (error) {
+        res.json({error: error})
+    })
 };
 
 /**
@@ -114,7 +122,7 @@ tumController.queryTokens = function (req, res) {
  */
 tumController.queryLedger = function (req, res) {
     let hash = _.trim(req.params.hash || '');
-    if (typeof hash == 'undefined' || hash === 'undefined') {
+    if (typeof hash === 'undefined' || hash === 'undefined') {
         res.status(500);
         return res.json({"success": false, "msg": "hash参数不合法"});
     } else {

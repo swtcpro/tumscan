@@ -5,6 +5,8 @@
  \* Time: 22:42
  \* Description:
  \*/
+import localService from "./local_service";
+
 const jlib = require('jingtum-lib');
 const Remote = jlib.Remote;
 const remote = require('../lib/remote');
@@ -103,27 +105,48 @@ jingtumService.queryTxs = function (txHashs) {
     })
 };
 
-jingtumService.queryTokens = function (address) {
-    return new Promise((resolve, reject) => {
-        if (remote.isConnected()) {
-            remote.disconnect();
+
+/**
+ * 通过issuer或者currency分页查询token代币
+ * @param page
+ * @param limit
+ * @param param
+ * @returns {Promise}
+ */
+jingtumService.queryTokens = function (page, limit, param) {
+    return new Promise(function (resolve, reject) {
+        if (!param) {
+            localService.getTokensPaging(page, limit).then(function (tokens) {
+                localService.getTokensCount().then(function (count) {
+                    resolve({total: count, tokens: tokens})
+                }).catch(function (error) {
+                    reject(error);
+                })
+            }).catch(function (error) {
+                reject(error);
+            })
+        } else if (jutils.isValidCurrency(param)) {
+            localService.getTokensCurrencyPaging(page, limit, param).then(function (tokens) {
+                localService.getTokensCount().then(function (count) {
+                    resolve({total: count, tokens: tokens})
+                }).catch(function (error) {
+                    reject(error);
+                })
+            }).catch(function (error) {
+                reject(error);
+            })
+        } else {
+            localService.getTokensByIssuerPaging(page, limit, param).then(function (tokens) {
+                localService.getTokensCount().then(function (count) {
+                    resolve({total: count, tokens: tokens})
+                }).catch(function (error) {
+                    reject(error);
+                })
+            }).catch(function (error) {
+                reject(error);
+            })
         }
-        remote.connect((err, result) => {
-            if (err) {
-                return console.log(err);
-            }
-            let options = {account: address};
-            let req = remote.requestAccountTums(options);
-            req.submit((err, result) => {
-                if (err) {
-                    console.log('err:', err);
-                }
-                else if (result) {
-                    resolve(result);
-                }
-            });
-        });
-    });
+    })
 };
 
 jingtumService.queryTx = function (hash) {

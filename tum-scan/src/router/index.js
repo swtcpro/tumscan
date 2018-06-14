@@ -10,6 +10,7 @@ import Ledgers from '@/components/transaction/Ledgers';
 import Chart from '@/components/Chart'
 import Forum from '@/components/forum/forum'
 import Tokens from '@/components/token/Tokens'
+import Ranking from '@/components/token/Ranking'
 
 Vue.use(Router);
 
@@ -51,6 +52,7 @@ export default new Router({
       menuShow: true,
       children: [
         {path: '/tokens', component: Tokens, name: 'tokens', label: '代币', menuShow: true},
+        {path: '/ranking', component: Ranking, name: 'ranking', label: '持仓排名', menuShow: false}
       ]
     },
     {

@@ -8,6 +8,8 @@
 import API from '../api/api_jingtum';
 import jingtumService from '../service/jingtum_service'
 
+const logger = require('../lib/logger');
+
 let tumController = {};
 
 /**
@@ -105,9 +107,10 @@ tumController.queryTokens = function (req, res) {
      * queryByIssuer
      * queryAll
      */
-    let page = _.trim(req.params.page || '');
-    let limit = _.trim(req.params.limit || '');
-    let param = _.trim(req.params.param || '');
+    let page = parseInt(_.trim(req.query.page || 0));
+    let limit = parseInt(_.trim(req.query.limit || 0));
+    let param = _.trim(req.query.param || '');
+    logger.info('param: ', param);
     jingtumService.queryTokens(page, limit, param).then(function (result) {
         res.json(result);
     }).catch(function (error) {
@@ -160,4 +163,4 @@ tumController.findTransactionsByAddress = function (req, res) {
     })
 };
 
-module.exports = tumControl
+module.exports = tumController

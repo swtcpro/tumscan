@@ -35,7 +35,7 @@ function getAllTokens() {
 function getTokensPaging(page, limit) {
     return new Promise(function (resolve, reject) {
         let offset = (page - 1) * limit;
-        entities.Token.findAll({limit: limit, offset: offset}).then(function (array) {
+        entities.Token.findAll({offset: offset, limit: limit}).then(function (array) {
             resolve(array);
         }).catch(function (error) {
             logger.info(error);
@@ -69,11 +69,11 @@ function getTokensCount() {
 function getTokensByIssuerPaging(page, limit, issuer) {
     return new Promise(function (resolve, reject) {
         let offset = (page - 1) * limit;
-        entities.Token.findAll({limit: limit, offset: offset}, {
+        entities.Token.findAll({
                 where: {
                     issuer: issuer
                 }
-            }
+            }, {limit: limit, offset: offset}
         ).then(function (array) {
             resolve(array)
         }).catch(function (error) {
@@ -92,11 +92,10 @@ function getTokensByIssuerPaging(page, limit, issuer) {
 function getTokensCurrencyPaging(page, limit, currency) {
     return new Promise(function (resolve, reject) {
         let offset = page * limit;
-        entities.Token.findAll({limit: limit, offset: offset}, {
-                where: {
-                    currency: currency
-                }
-            }
+        entities.Token.findAll({
+                where: {currency: currency}
+            },
+            {limit: limit, offset: offset}
         ).then(function (array) {
             resolve(array)
         }).catch(function (error) {

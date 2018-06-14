@@ -126,6 +126,7 @@ jingtumService.queryTokens = function (page, limit, param) {
                 reject(error);
             })
         } else if (jutils.isValidCurrency(param)) {
+            logger.info('goes to currency')
             localService.getTokensCurrencyPaging(page, limit, param).then(function (tokens) {
                 localService.getTokensCount().then(function (count) {
                     resolve({total: count, tokens: tokens})

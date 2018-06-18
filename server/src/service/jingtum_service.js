@@ -20,7 +20,7 @@ const jutils = require('jingtum-lib').utils;
 const respond = require('../lib/respond');
 const CURRENCY = config.get('base_currency') || 'SWT';
 
-let jingtumService = {}
+let jingtumService = {};
 
 jingtumService.queryLedger = function (hash) {
     return new Promise(((resolve, reject) => {
@@ -82,6 +82,7 @@ jingtumService.queryLedgerByIndex = function (index) {
         logger.info('ledgerIndex', index);
         req.submit(function (err, ledger) {
             if (err) {
+                reject({err: err});
                 console.log('err:', err);
             }
             else if (ledger) {
@@ -89,6 +90,54 @@ jingtumService.queryLedgerByIndex = function (index) {
             }
         });
     })
+};
+
+jingtumService.queryLedgersPaging = function (page, limit) {
+    /**
+     * 思路，首先查询节点服务器中最新账本，然后根据账本index，往下顺延(page-1)*limit个
+     * 账本，获取limit个账本
+     */
+    return new Promise(function (resolve, reject) {
+        jingtumService.getLatestLedger().then(function (result) {
+            jingtumService.queryLedgerByIndex(result.ledger_index).then(async function (ledgerLatest) { // 获取最新的账本完整数据
+                let ledgers = [];
+                ledgers.push(ledgerLatest);
+                let from = ledgerLatest.ledger_index - 1 - (page - 1) * limit;
+                let to = ledgerLatest.ledger_index - page * limit;
+                for (let index = from; index > to; index--) {
+                    let ledger = await jingtumService.queryLedgerByIndex(index);
+                    ledgers.push(ledger);
+                }
+                // logger.info('ledgers.length: ', ledgers.length);
+                resolve(ledgers);
+            }).catch(function (error) {
+                reject(error);
+            })
+        }).catch(function (error) {
+            reject(error);
+        })
+    });
+};
+
+/**
+ * 从节点服务器获取最新账本数据
+ */
+jingtumService.getLatestLedger = function () {
+    return new Promise(function (resolve, reject) {
+        if (!remote || !remote.isConnected()) {
+            logger.error(resultCode.N_REMOTE.msg);
+            return new NetworkError(resultCode.N_REMOTE);
+        }
+        let req = remote.requestLedgerClosed();
+        req.submit(function (err, result) {
+            if (err) {
+                logger.info('err', err);
+                reject({err: err});
+            } else {
+                resolve(result);
+            }
+        })
+    });
 };
 
 jingtumService.queryTxs = function (txHashs) {
@@ -126,7 +175,6 @@ jingtumService.queryTokens = function (page, limit, param) {
                 reject(error);
             })
         } else if (jutils.isValidCurrency(param)) {
-            logger.info('goes to currency')
             localService.getTokensCurrencyPaging(page, limit, param).then(function (tokens) {
                 localService.getTokensCount().then(function (count) {
                     resolve({total: count, tokens: tokens})
@@ -147,6 +195,37 @@ jingtumService.queryTokens = function (page, limit, param) {
                 reject(error);
             })
         }
+    })
+};
+
+/**
+ * 查询token代币的持仓排名s
+ * @param page
+ * @param limit
+ * @param issuer
+ * @param currency
+ * @returns {Promise}
+ */
+jingtumService.queryRankings = function (page, limit, issuer, currency) {
+    return new Promise(function (resolve, reject) {
+        localService.getRankingPaging(page, limit, currency, issuer).then(function (balances) {
+            localService.getToken({currency: currency, issuer: issuer}).then(function (token) {
+                let balancesDataValues = balances.map(function (balance, index, input) {
+                    balance.dataValues.percentage = balance.dataValues.value / token.dataValues.total * 100 + '%';
+                    return balance.dataValues;
+                });
+                localService.getBalanceCount({currency: currency, issuer: issuer}).then(function (count) {
+                    logger.info(balancesDataValues);
+                    resolve({total: count, rankings: balancesDataValues})
+                })
+            }).catch(function (error) {
+                logger.info(error);
+                reject(error);
+            })
+        }).catch(function (error) {
+            logger.info(error);
+            reject(error);
+        })
     })
 };
 

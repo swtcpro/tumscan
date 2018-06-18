@@ -28,20 +28,26 @@ let timeTask = {}
  * 初始化同步：从创世账本开始，同步所有公链账本数据
  */
 timeTask.initSync = function () {
-    getLatestLedger().then(async latest_index => {
-        let savedLedgers = [];
-        for (let ledgerIndex = INIT_LEDGER_INDEX + 1; ledgerIndex <= latest_index; ledgerIndex++) {
-            let savedLedger = await extractAccountsLedger(ledgerIndex);
-            logger.info(ledgerIndex);
-            logger.info(latest_index);
-            savedLedgers.push(savedLedger);
-        }
-        analyseLedgerTransactions(savedLedgers).then(() => {
-            this.countTokenAndBalances().then(() => {
-                logger.info('time_task: 初始化同步完成!');
+    return new Promise(function (resolve, reject) {
+        getLatestLedger().then(async latest_index => {
+            let savedLedgers = [];
+            for (let ledgerIndex = INIT_LEDGER_INDEX + 1; ledgerIndex <= latest_index; ledgerIndex++) {
+                let savedLedger = await extractAccountsLedger(ledgerIndex);
+                logger.info(ledgerIndex);
+                logger.info(latest_index);
+                savedLedgers.push(savedLedger);
+            }
+            analyseLedgerTransactions(savedLedgers).then(() => {
+                this.countTokenAndBalances().then(() => {
+                    logger.info('time_task: 初始化同步完成!');
+                    resolve(savedLedgers);
+                })
+            }).catch(function (error) {
+                reject(error);
             })
         })
     })
+
 };
 
 /**

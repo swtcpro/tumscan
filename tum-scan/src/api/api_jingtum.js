@@ -44,6 +44,16 @@ export default {
     return API.GET('/jingtum/query/tokens', params);
   },
 
+  // 分页查询持仓ranking
+  queryRankings: params => {
+    return API.GET('/jingtum/query/rankings', params);
+  },
+
+  // 分页查询账本
+  queryLedgersPaging: params => {
+    return API.GET('/jingtum/query/ledgers', params);
+  },
+
   // 查询账号下所有交易
   findTranscationsByAddress: address => {
     // return API.GET('/jingtum/accounts/' + address + '/transactions');

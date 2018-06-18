@@ -41,6 +41,10 @@ tumController.homeInit = function (req, res) {
         console.log(error);
         res.status(500);
         return res.json({"success": false, "msg": error});
+    }).catch(function (err) {
+        console.log(err);
+        res.status(500);
+        return res.json({"success": false, "msg": err});
     });
 };
 
@@ -101,17 +105,27 @@ tumController.queryTxLib = function (req, res) {
  * @param res
  */
 tumController.queryTokens = function (req, res) {
-    /**
-     * 代码写到此处，下次继续需要写数据库查询接口
-     * queryByCurrency
-     * queryByIssuer
-     * queryAll
-     */
     let page = parseInt(_.trim(req.query.page || 0));
-    let limit = parseInt(_.trim(req.query.limit || 0));
+    let limit = parseInt(_.trim(req.query.limit || 20));
     let param = _.trim(req.query.param || '');
-    logger.info('param: ', param);
     jingtumService.queryTokens(page, limit, param).then(function (result) {
+        res.json(result);
+    }).catch(function (error) {
+        res.json({error: error})
+    })
+};
+
+/**
+ * 查询代币持仓排名
+ * @param req
+ * @param res
+ */
+tumController.queryRankings = function (req, res) {
+    let page = parseInt(_.trim(req.query.page || 0));
+    let limit = parseInt(_.trim(req.query.limit || 20));
+    let issuer = _.trim(req.query.issuer || '');
+    let currency = _.trim(req.query.currency || '')
+    jingtumService.queryRankings(page, limit, issuer, currency).then(function (result) {
         res.json(result);
     }).catch(function (error) {
         res.json({error: error})
@@ -136,6 +150,31 @@ tumController.queryLedger = function (req, res) {
     }
 };
 
+/**
+ * 分页查询账本列表数据
+ * @param req
+ * @param res
+ */
+tumController.queryLedgersPaging = function (req, res) {
+    let page = parseInt(_.trim(req.query.page || 1));
+    let limit = parseInt(_.trim(req.query.limit || 20));
+    if (page && limit) {
+        jingtumService.queryLedgersPaging(page, limit).then(function (ledgers) {
+            let tempLedgers = ledgers.map(function (ledger, index) {
+                return {
+                    hash: ledger.hash,
+                    index: ledger.ledger_index,
+                    time: ledger.close_time_human,
+                    transNum: ledger.transactions.length
+                }
+            });
+            return res.json({total: ledgers[0].ledger_index, ledgers: tempLedgers});
+        }).catch(function (error) {
+            logger.info(error);
+            return res.json(error);
+        });
+    }
+};
 
 tumController.queryBalancesByAddress = function (req, res, callback) {
     jingtumService.queryBalance(req, res, callback)
@@ -163,4 +202,4 @@ tumController.findTransactionsByAddress = function (req, res) {
     })
 };
 
-module.exports = tumController
+module.exports = tumController;

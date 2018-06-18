@@ -26,7 +26,6 @@ function getAllTokens() {
     })
 }
 
-
 /**
  * 分页查询token
  * @param page
@@ -70,10 +69,10 @@ function getTokensByIssuerPaging(page, limit, issuer) {
     return new Promise(function (resolve, reject) {
         let offset = (page - 1) * limit;
         entities.Token.findAll({
-                where: {
-                    issuer: issuer
-                }
-            }, {limit: limit, offset: offset}
+                where: {issuer: issuer},
+                offset: offset,
+                limit: limit
+            }
         ).then(function (array) {
             resolve(array)
         }).catch(function (error) {
@@ -91,11 +90,12 @@ function getTokensByIssuerPaging(page, limit, issuer) {
  */
 function getTokensCurrencyPaging(page, limit, currency) {
     return new Promise(function (resolve, reject) {
-        let offset = page * limit;
+        let offset = (page - 1) * limit;
         entities.Token.findAll({
-                where: {currency: currency}
+                where: {currency: currency},
+                offset: offset,
+                limit: limit
             },
-            {limit: limit, offset: offset}
         ).then(function (array) {
             resolve(array)
         }).catch(function (error) {
@@ -103,6 +103,30 @@ function getTokensCurrencyPaging(page, limit, currency) {
         })
     })
 }
+
+function getRankingPaging(page, limit, currency, issuer) {
+    return new Promise(function (resolve, reject) {
+        let offset = (page - 1) * limit;
+        entities.Balance.findAll({
+            where: {
+                currency: currency,
+                issuer: issuer
+            },
+            offset: offset,
+            limit: limit,
+            order: [['value', 'DESC']]
+        }).then(function (array) {
+            if (array) {
+                resolve(array);
+            } else {
+                reject('error, can\'t find the correspond balances')
+            }
+        }).catch(function (error) {
+            reject(error);
+        })
+    })
+}
+
 
 /**
  * 根据Id跟新token的属性值
@@ -196,6 +220,17 @@ function saveBalance(balance, account) {
     })
 }
 
+function getBalanceCount(att) {
+    return new Promise(function (resolve, reject) {
+        entities.Balance.count({where: att}).then(function (count) {
+            resolve(count)
+        }).then(function (error) {
+            logger.info(error);
+            reject(error)
+        })
+    })
+}
+
 /**
  * 保存账本
  * @param ledger
@@ -252,6 +287,28 @@ function findOrCreateToken(att) {
     })
 }
 
+/**
+ * 通过属性查询得到单一结果token
+ * @param att
+ * @returns {Promise}
+ */
+function getToken(att) {
+    return new Promise(function (resolve, reject) {
+        entities.Token.findOne({
+            where:
+            att
+        }).then(function (token) {
+            if (token) {
+                resolve(token)
+            } else {
+                reject('cann\' t find this token')
+            }
+        }).catch(function (error) {
+            reject(error)
+        })
+    })
+}
+
 function saveAccountBalances(account, balances) {
     return new Promise((resolve, reject) => {
         Account.hasMany(Balance);
@@ -272,9 +329,12 @@ export default {
     saveAccountBalances: saveAccountBalances,
     findOrCreateToken: findOrCreateToken,
     saveLedger: saveLedger,
-    saveAccount, saveAccount,
-    getTokensPaging, getTokensPaging,
-    getTokensCount, getTokensCount,
-    getTokensByIssuerPaging, getTokensByIssuerPaging,
-    getTokensCurrencyPaging, getTokensCurrencyPaging
+    saveAccount: saveAccount,
+    getTokensPaging: getTokensPaging,
+    getTokensCount: getTokensCount,
+    getTokensByIssuerPaging: getTokensByIssuerPaging,
+    getTokensCurrencyPaging: getTokensCurrencyPaging,
+    getRankingPaging: getRankingPaging,
+    getToken: getToken,
+    getBalanceCount: getBalanceCount
 }

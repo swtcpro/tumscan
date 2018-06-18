@@ -7,7 +7,7 @@ router.use('/api/v1', require('./api/v1/index').router);
 
 /* 服务端主页 */
 router.get('/(|home|dashboard|account|transactions' +
-    '|ledgers|transaction|ledger|chart|forum|tokens)', function (req, res) {
+    '|ledgers|transaction|ledger|chart|forum|tokens|ranking)', function (req, res) {
     res.render('index');
 });
 // router.get('/', function (req, res) {

@@ -11,8 +11,8 @@
               <img src="../assets/icon/浏览器2.png" style="margin-right: 16px"/>
             </el-col>
             <el-col :span="20">
-              <span style="color: white;">总容量$39.055 BILLION</span>
-              <h4>$395.58 @ 0.05867 </h4>
+              <span style="color: white;">总容量￥59.99 BILLION</span>
+              <h4>1 SWT @ 0.03867 CNY</h4>
             </el-col>
           </el-row>
 
@@ -59,7 +59,7 @@
         <el-card shadow="never" :body-style="{ padding: '2px'}">
           <div slot="header">
             <span>账本</span>
-            <el-button style="float: right; padding: 3px 0" size="medium" type="text">查看全部</el-button>
+            <el-button @click="viewAllLedgers" style="float: right; padding: 3px 0" size="medium" type="text">查看全部</el-button>
           </div>
           <div>
             <el-card :body-style="{ padding: '10px',height: '100px' }" shadow="hover" v-for="ledger in data.ledgers" :key="ledger">
@@ -189,7 +189,6 @@
         })
       },
       handleTransaction(hash) {
-        console.log(hash);
         this.$router.push({
           name: 'transaction',
           params: {hash}
@@ -200,6 +199,11 @@
         this.$router.push({
           name: 'ledger',
           params: {ledger_hash}
+        })
+      },
+      viewAllLedgers() {
+        this.$router.push({
+          name: 'ledgers'
         })
       }
     },

@@ -65,11 +65,11 @@
         <el-col :xs="24" :md="8" class="footer-center">
           <el-row style="margin-top: 17px">
             <!--<el-col :span="20">-->
-            <el-col :xs="20">
+            <el-col :md="20" :xs="20">
               <h4 style="color: white">最新讨论</h4>
             </el-col>
             <!--<el-col :span="4">-->
-            <el-col :xs="4">
+            <el-col :md="4" :xs="4">
               <el-button type="text">全部</el-button>
             </el-col>
           </el-row>

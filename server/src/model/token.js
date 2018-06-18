@@ -8,12 +8,6 @@
 import {sequelize, Sequelize} from "./sequelize_helper";
 
 const Token = sequelize.define('token', {
-    // id: {
-    //     type: Sequelize.INTEGER,
-    //     autoIncrement: true,
-    //     primaryKey: true
-    // },
-
     currency: {
         type: Sequelize.STRING,
         primaryKey: true

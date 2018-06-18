@@ -38,8 +38,8 @@ export default new Router({
       label: '区块链',
       menuShow: true,
       children: [
-        {path: '/transactions', component: Transactions, name: 'transactions', label: '交易列表', menuShow: true},
         {path: '/ledgers', component: Ledgers, name: 'ledgers', label: '账本列表', menuShow: true},
+        {path: '/transactions', component: Transactions, name: 'transactions', label: '交易列表', menuShow: true},
         {path: '/transaction', component: Transaction, name: 'transaction', label: '交易详情', menuShow: false},
         {path: '/ledger', component: Ledger, name: 'ledger', label: '账本详情', menuShow: false}
       ]
@@ -55,16 +55,16 @@ export default new Router({
         {path: '/ranking', component: Ranking, name: 'ranking', label: '持仓排名', menuShow: false}
       ]
     },
-    {
-      path: '/',
-      name: 'home',
-      component: Home,
-      leaf: true, // 只有一个节点
-      menuShow: true,
-      children: [
-        {path: '/chart', component: Chart, name: 'chart', label: '图表分析', menuShow: true},
-      ]
-    },
+    // {
+    //   path: '/',
+    //   name: 'home',
+    //   component: Home,
+    //   leaf: true, // 只有一个节点
+    //   menuShow: true,
+    //   children: [
+    //     {path: '/chart', component: Chart, name: 'chart', label: '图表分析', menuShow: true},
+    //   ]
+    // },
     {
       path: '/',
       name: 'home',

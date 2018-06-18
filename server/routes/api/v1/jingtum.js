@@ -29,6 +29,12 @@ router.get('/query/ledger/:hash', tumController.queryLedger);
 // 查询代币相关信息
 router.get('/query/tokens', tumController.queryTokens);
 
+// 查询代币持仓排名
+router.get('/query/rankings', tumController.queryRankings);
+
+// 查询账本列表数据
+router.get('/query/ledgers', tumController.queryLedgersPaging);
+
 // 获取钱包地址的余额相关信息
 router.get('/accounts/:address/balances', tumController.queryBalancesByAddress);
 

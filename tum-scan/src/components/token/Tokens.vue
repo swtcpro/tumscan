@@ -152,7 +152,8 @@
         // go to token ranking
         let token = {
           currency: row.currency,
-          issuer: row.issuer
+          issuer: row.issuer,
+          total: row.total
         };
         this.$router.push({
           name: 'ranking',

@@ -9,11 +9,6 @@
 import {sequelize, Sequelize} from "./sequelize_helper";
 
 const Balance = sequelize.define('balance', {
-    // id: {
-    //     type: Sequelize.INTEGER,
-    //     autoIncrement: true,
-    //     primaryKey: true
-    // },
     address: {
         type: Sequelize.STRING,
         primaryKey: true
@@ -26,7 +21,7 @@ const Balance = sequelize.define('balance', {
         type: Sequelize.STRING,
         primaryKey: true
     },
-    value: Sequelize.STRING,
+    value: Sequelize.FLOAT,
     freezed: Sequelize.STRING
 });
 

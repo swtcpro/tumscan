@@ -22,7 +22,7 @@ const NetworkError = require('../lib/errors').NetworkError;
 
 const INIT_LEDGER_INDEX = 266955;
 
-let timeTask = {}
+let timeTask = {};
 
 /**
  * 初始化同步：从创世账本开始，同步所有公链账本数据
@@ -47,7 +47,6 @@ timeTask.initSync = function () {
             })
         })
     })
-
 };
 
 /**
@@ -63,8 +62,8 @@ timeTask.sync = function () {
             let ledgers = [];
             for (let ledgerIndex = index_local + 1; ledgerIndex <= latest_index; ledgerIndex++) {
                 let ledger = await extractAccountsLedger(ledgerIndex);
-                // logger.info(ledgerIndex);
-                // logger.info(latest_index);
+                logger.info(ledgerIndex);
+                logger.info(latest_index);
                 ledgers.push(ledger);
             }
             analyseLedgerTransactions(ledgers).then(() => {
@@ -73,6 +72,36 @@ timeTask.sync = function () {
                 })
             })
         })
+    })
+};
+
+/**
+ * 人工手动同步，通过指定账本高度区间进行同步
+ * @param from
+ * @param to
+ */
+timeTask.manualSync = function (from, to) {
+    return new Promise(function (resolve, reject) {
+        let ledgers = [];
+        (async function () {
+            for (let ledgerIndex = from + 1; ledgerIndex <= to; ledgerIndex++) {
+                let ledger = await extractAccountsLedger(ledgerIndex);
+                // logger.info(ledgerIndex);
+                // logger.info(to);
+                ledgers.push(ledger);
+            }
+        })();
+
+        analyseLedgerTransactions(ledgers).then(() => {
+            timeTask.countTokenAndBalances().then(() => {
+                logger.info('time_task: 手动同步完成!');
+                resolve(ledgers);
+            }).catch(function (error) {
+                reject(error);
+            });
+        }).catch(function (error) {
+            reject(error);
+        });
     })
 };
 
@@ -219,6 +248,7 @@ function extractAccountsLedger(ledgerIndex) {
         req.submit(function (err, ledger) {
             if (err) {
                 console.log('err:', err);
+                reject(err);
             }
             else if (ledger) {
                 /**
@@ -226,7 +256,7 @@ function extractAccountsLedger(ledgerIndex) {
                  * 只是将增量账本中的交易取出进行账户地址分析
                  */
                 localService.saveLedger(ledger).then(savedLedger => {
-                    // logger.info(savedLedger.dataValues);
+                    logger.info('extractAccountsLedger', ledgerIndex);
                     resolve(ledger);
                 })
             }
@@ -292,12 +322,14 @@ function analyseLedgerTransactions(ledgers) {
                         let affectAccounts = extractAccount(transaction);
                         // 将链上数据库写入本地数据库
                         if (affectAccounts) {
-                            // logger.info('affectAccounts', affectAccounts);
+                            logger.info('affectAccounts', affectAccounts);
                             await
                                 localService.saveAccount({address: affectAccounts.Account}).catch(error => {
+                                    reject(error);
                                 });
                             await
                                 localService.saveAccount({address: affectAccounts.Destination}).catch(error => {
+                                    reject(error);
                                 });
                         }
                     }))

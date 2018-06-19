@@ -61,7 +61,13 @@ describe('#dataOrm()', () => {
         localService.getTokensPaging(1, 20).then(function (tokens) {
             logger.info(tokens.length);
         })
-    })
+    });
+
+    it.only('should return the count of legers', function () {
+        localService.getAllLegersCount().then(function (count) {
+            logger.info(count);
+        })
+    });
 
 });
 

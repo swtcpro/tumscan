@@ -171,10 +171,10 @@ function saveAccount(account) {
         entities.Account.findById(account.address).then(accountFound => {
             if (accountFound) {
                 logger.info('accountFound', accountFound.dataValues);
-                logger.info('find account')
+                logger.info('find account');
                 resolve(accountFound);
             } else {
-                logger.info('created account')
+                logger.info('created account');
                 entities.Account.create(account).then(accountCreated => {
                     logger.info('accountCreated', accountCreated.dataValues);
                     resolve(accountCreated);
@@ -224,6 +224,17 @@ function getBalanceCount(att) {
     return new Promise(function (resolve, reject) {
         entities.Balance.count({where: att}).then(function (count) {
             resolve(count)
+        }).then(function (error) {
+            logger.info(error);
+            reject(error)
+        })
+    })
+}
+
+function getAllLegersCount() {
+    return new Promise(function (resolve, reject) {
+        entities.Ledger.count().then(function (count) {
+            resolve(count);
         }).then(function (error) {
             logger.info(error);
             reject(error)
@@ -336,5 +347,6 @@ export default {
     getTokensCurrencyPaging: getTokensCurrencyPaging,
     getRankingPaging: getRankingPaging,
     getToken: getToken,
-    getBalanceCount: getBalanceCount
+    getBalanceCount: getBalanceCount,
+    getAllLegersCount: getAllLegersCount
 }

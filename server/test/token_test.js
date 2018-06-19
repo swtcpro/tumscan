@@ -37,6 +37,17 @@ describe('token tests', () => {
         })
     });
 
+    it.only('timed_task manualSync test', function () {
+        remote.connect(function (err, result) {
+            if (err) {
+                return console.log('err', err);
+            }
+            TimeTask.manualSync(866498, 9947721).then(function (savedLedgers) {
+                savedLedgers.should.be.a.Array();
+            })
+        })
+    });
+
     it('timed_task countTokenAndBalances test', () => {
         remote.connect((err, result) => {
             if (err) {
@@ -47,3 +58,26 @@ describe('token tests', () => {
     })
 
 });
+
+describe('下载公链中所有账本计划', function () {
+    it.only('7百万-八百万高度账本', function () {
+        remote.connect(function (err, result) {
+            if (err) {
+                return console.log('err', err);
+            }
+            TimeTask.manualSync(7000000, 8000000).then(function (savedLedgers) {
+                savedLedgers.should.be.a.Array();
+            })
+        })
+    });
+    it.only('八百万-九百万高度账本', function () {
+        remote.connect(function (err, result) {
+            if (err) {
+                return console.log('err', err);
+            }
+            TimeTask.manualSync(8000000, 9000000).then(function (savedLedgers) {
+                savedLedgers.should.be.a.Array();
+            })
+        })
+    });
+})

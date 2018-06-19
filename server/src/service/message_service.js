@@ -58,4 +58,28 @@ export default class messageService {
      */
     updateMessage() {
     }
+
+    /**
+     * 分页查询token
+     * @param page
+     * @param limit
+     */
+    getMessagePaging(page, limit) {
+        return new Promise(function (resolve, reject) {
+            let offset = (page - 1) * limit;
+            messageTopic.findAndCountAll({
+                offset,
+                limit,
+                include: [{
+                    model: messageBoard,
+                    as: 'messageitem'
+                }],
+                order: [['lastUpdateTime', 'asc']]
+            }).then(function (array) {
+                resolve(array);
+            }).catch(function (error) {
+                reject(error);
+            })
+        })
+    }
 }

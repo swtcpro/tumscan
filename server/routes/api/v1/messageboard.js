@@ -44,6 +44,20 @@ router.post('/message', function (req, res) {
 // 更新留言
 router.post('/message/:id', function (req, res) {});
 
+//分页获取数据
+router.get('/message', function (req, res) {
+    let page = parseInt(_.trim(req.query.page || 1));
+    let limit = parseInt(_.trim(req.query.limit || 10));
+    message_servie.getMessagePaging(page, limit).then((result) => {
+        return res.json(result);
+    }).catch((error) => {
+        return res.json({
+            'success': false,
+            'msg': error,
+        });
+    });
+});
+
 indexRouter.router = router;
 
 module.exports = indexRouter;

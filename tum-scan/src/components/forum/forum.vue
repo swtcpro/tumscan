@@ -27,7 +27,15 @@
           <el-button type="primary" @click="add()">添加</el-button>
           <el-button @click="handleReset">重置</el-button>
         </el-form-item>
-        <el-table border :data="mydata">
+
+        <el-row class="pagination-row">
+          <el-col :offset="16" :md="8" :xl="8" :xs="12">
+            <el-pagination background layout="prev, pager, next,total" :page-size="pagination.limit" @current-change="flipOver" :total="pagination.total">
+            </el-pagination>
+          </el-col>
+        </el-row>
+
+        <el-table border :data="messagedata">
           <el-table-column label="编号" type="index" :index="indexMethod" width="50">
           </el-table-column>
           <el-table-column prop="title" label="标题">
@@ -62,7 +70,6 @@ export default {
     return {
       title: "",
       content: "",
-      mydata: [],
       dialogVisible: false,
       nowIndex: -100
     };
@@ -80,10 +87,11 @@ export default {
           type: "warning"
         });
       } else {
-        this.mydata.push({
+        const newMessage = {
           title: this.title,
           content: this.content
-        });
+        };
+        this.$store.dispatch("pushMessageFrom", newMessage);
 
         api.addMessage(this.title, this.content).then(data => {
           console.log(data);
@@ -115,7 +123,25 @@ export default {
     },
     indexMethod(index) {
       return index + 1;
+    },
+    flipOver(page) {
+      const params = {
+        page,
+        limit: 10
+      };
+      this.$store.dispatch("getForumMessage", params);
     }
+  },
+  computed: {
+    pagination() {
+      return this.$store.state.forum.pagination;
+    },
+    messagedata() {
+      return this.$store.state.forum.messagedata;
+    }
+  },
+  mounted() {
+    this.flipOver(1);
   }
 };
 </script>

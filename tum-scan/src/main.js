@@ -12,6 +12,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '@/assets/iconfont.css'
 import '@/assets/styles/main.scss'
+import store from "./store";
 
 Vue.config.productionTip = false;
 Vue.use(Uiv, {prefix: 'uiv'});
@@ -21,5 +22,6 @@ new Vue({
   el: '#app',
   router,
   components: { App },
-  template: '<App/>'
+  template: '<App/>',
+  store
 });

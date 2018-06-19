@@ -9,4 +9,7 @@
 
      return API.POST('/messageboard/message', params);
    },
+   getMessage: (params) => {
+     return API.GET('/messageboard/message', params)
+   }
  }

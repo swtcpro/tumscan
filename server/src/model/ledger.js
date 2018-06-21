@@ -8,6 +8,7 @@
 import {sequelize, Sequelize} from "./sequelize_helper";
 
 const Ledger = sequelize.define("ledger", {
+
     hash: {
         type: Sequelize.STRING,
         primaryKey: true
@@ -18,7 +19,9 @@ const Ledger = sequelize.define("ledger", {
     ledger_index: Sequelize.INTEGER,
     parent_hash: Sequelize.STRING, // 上一区块hash值
     total_coins: Sequelize.STRING,
-    transaction_hash: Sequelize.STRING
+    transaction_hash: Sequelize.STRING,
+    // 不添加时间戳属性 (updatedAt, createdAt)
+    // timestamps: false,
 });
 
 export default Ledger;

@@ -11,9 +11,10 @@ import messageTopic from './messageTopic';
 import Account from './account';
 import Balance from './balance';
 import Token from './token';
-import Ledger from './ledger'
+import Ledger from './ledger';
+import Transaction from './transaction';
+import {sequelize,Sequelize} from './sequelize_helper';
 
-import {sequelize,} from './sequelize_helper';
 
 // 设置级联关系
 messageTopic.hasMany(messageBoard, {
@@ -22,6 +23,10 @@ messageTopic.hasMany(messageBoard, {
 
 Account.hasMany(Balance, {
     as: 'balance'
+});
+
+Ledger.hasMany(Transaction, {
+    as: 'transaction'
 });
 
 sequelize.sync();
@@ -33,6 +38,8 @@ const entities = {
     Balance,
     Token,
     Ledger,
-    sequelize
+    Transaction,
+    sequelize,
+    Sequelize
 };
 export default entities;

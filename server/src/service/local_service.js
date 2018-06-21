@@ -266,7 +266,8 @@ function saveLedger(ledger) {
                     ledger_index: ledger.ledger_index,
                     parent_hash: ledger.parent_hash,
                     total_coins: ledger.total_coins,
-                    transaction_hash: ledger.transaction_hash
+                    transaction_hash: ledger.transaction_hash,
+                    transactions: ledger.transactions
                 }).then(ledgerCreated => {
                     resolve(ledgerCreated)
                 })
@@ -276,6 +277,30 @@ function saveLedger(ledger) {
             reject(error);
         })
     });
+}
+
+/**
+ * 通过账本高度范围获取账本
+ * @param from
+ * @param to
+ * @returns {Promise}
+ */
+function getAllLedgers(from, to) {
+    const {gt, lte} = entities.Sequelize.Op;
+    return new Promise(function (resolve, reject) {
+        entities.Ledger.findAll({
+            where:{
+                ledger_index: {[gt]: from},
+                ledger_index: {[lte]: to}
+            }
+        }).then(function (ledgers) {
+            if (ledgers) {
+                resolve(ledgers);
+            }
+        }).catch(function (error) {
+            reject(error);
+        })
+    })
 }
 
 function findOrCreateToken(att) {
@@ -340,6 +365,7 @@ export default {
     saveAccountBalances: saveAccountBalances,
     findOrCreateToken: findOrCreateToken,
     saveLedger: saveLedger,
+    getAllLedgers: getAllLedgers,
     saveAccount: saveAccount,
     getTokensPaging: getTokensPaging,
     getTokensCount: getTokensCount,

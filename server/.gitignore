@@ -60,3 +60,5 @@ typings/
 .env
 
 .eslintrc.js
+
+dist/

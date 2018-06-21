@@ -83,25 +83,29 @@ timeTask.sync = function () {
 timeTask.manualSync = function (from, to) {
     return new Promise(function (resolve, reject) {
         let ledgers = [];
-        (async function () {
+        const extrac = async function (ledgers, from, to) {
             for (let ledgerIndex = from + 1; ledgerIndex <= to; ledgerIndex++) {
                 let ledger = await extractAccountsLedger(ledgerIndex);
                 // logger.info(ledgerIndex);
                 // logger.info(to);
                 ledgers.push(ledger);
             }
-        })();
+            return ledgers;
+        }
 
-        analyseLedgerTransactions(ledgers).then(() => {
-            timeTask.countTokenAndBalances().then(() => {
-                logger.info('time_task: 手动同步完成!');
-                resolve(ledgers);
+        extrac([], from, to).then((ledgers) => {
+            analyseLedgerTransactions(ledgers).then(() => {
+                timeTask.countTokenAndBalances().then(() => {
+                    logger.info('time_task: 手动同步完成!');
+                    resolve(ledgers);
+                }).catch(function (error) {
+                    reject(error);
+                });
             }).catch(function (error) {
                 reject(error);
             });
-        }).catch(function (error) {
-            reject(error);
-        });
+        })
+
     })
 };
 
@@ -111,8 +115,8 @@ function queryBalanceAndSave(account) {
             return new ClientError(resultCode.C_ADDRESS);
         }
         let condition = {};
-        let options = {account: account.address, type: 'trust'};
-        let options2 = {account: account.address, type: 'freeze'};
+        let options = { account: account.address, type: 'trust' };
+        let options2 = { account: account.address, type: 'freeze' };
         async.parallel({
             native: function (callback) {
                 let req1 = remote.requestAccountInfo(options);
@@ -137,7 +141,7 @@ function queryBalanceAndSave(account) {
                         }
                         else if (result.marker) {
                             offers = offers.concat(result.offers);
-                            options = {account: address, marker: result.marker};
+                            options = { account: address, marker: result.marker };
                             getOffers(options);
                         } else {
                             offers = offers.concat(result.offers);
@@ -196,7 +200,7 @@ timeTask.countTokenAndBalances = function () {
                     await localService.updateToken({
                         currency: token.currency,
                         issuer: token.issuer
-                    }, {total: 0});
+                    }, { total: 0 });
                 })
             }
             localService.getAllAccounts().then(async function (accounts) {
@@ -218,7 +222,7 @@ timeTask.countTokenAndBalances = function () {
                         await localService.updateToken({
                             currency: balance.currency,
                             issuer: balance.issuer
-                        }, {total: token.total});
+                        }, { total: token.total });
                     })
                 }
                 resolve();
@@ -324,11 +328,11 @@ function analyseLedgerTransactions(ledgers) {
                         if (affectAccounts) {
                             logger.info('affectAccounts', affectAccounts);
                             await
-                                localService.saveAccount({address: affectAccounts.Account}).catch(error => {
+                                localService.saveAccount({ address: affectAccounts.Account }).catch(error => {
                                     reject(error);
                                 });
                             await
-                                localService.saveAccount({address: affectAccounts.Destination}).catch(error => {
+                                localService.saveAccount({ address: affectAccounts.Destination }).catch(error => {
                                     reject(error);
                                 });
                         }
@@ -347,7 +351,7 @@ function analyseLedgerTransactions(ledgers) {
  */
 function extractAccount(transaction) {
     if (transaction.TransactionType === 'Payment' || transaction.TransactionType === 'received') {
-        return {'Account': transaction.Account, 'Destination': transaction.Destination}
+        return { 'Account': transaction.Account, 'Destination': transaction.Destination }
     } else {
         return null;
     }

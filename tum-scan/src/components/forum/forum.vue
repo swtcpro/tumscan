@@ -1,9 +1,10 @@
 <template>
   <el-row class="warp-body">
     <el-row class="breadcrumb">
-      <el-col :span="20">
+      <el-col :md="20" :xl="20" :xs="20">
+        <h4>讨论留言</h4>
       </el-col>
-      <el-col :span="4">
+      <el-col :md="4" :xl="4" :xs="4">
         <el-breadcrumb separator="/" style="margin-top: 12px">
           <el-breadcrumb-item :to="{ path: '/' }">
             <b>首页</b>
@@ -23,19 +24,21 @@
         <el-form-item label="内容">
           <el-input type="textarea" :rows="3" v-model="content" placeholder="请输入内容"></el-input>
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="add()">添加</el-button>
-          <el-button @click="handleReset">重置</el-button>
-        </el-form-item>
+        <el-row type="flex" class="row-bg" justify="center">
+          <el-form-item>
+            <el-button type="primary" @click="add()">添加</el-button>
+            <el-button @click="handleReset">重置</el-button>
+          </el-form-item>
+        </el-row>
 
-        <el-row class="pagination-row">
+        <el-row class="pagination-row" v-show="pageShow">
           <el-col :offset="16" :md="8" :xl="8" :xs="12">
-            <el-pagination background layout="prev, pager, next,total" :page-size="pagination.limit" @current-change="flipOver" :total="pagination.total">
+            <el-pagination background layout="prev, pager, next,total" :page-size="pagination.limit" @current-change="flipOver" :total="pagination.total" :current-page="pagination.page">
             </el-pagination>
           </el-col>
         </el-row>
 
-        <el-table border :data="messagedata">
+        <el-table border :data="messagedata" highlight-current-row @row-click="openDetails">
           <el-table-column label="编号" type="index" :index="indexMethod" width="50">
           </el-table-column>
           <el-table-column prop="title" label="标题">
@@ -87,17 +90,11 @@ export default {
           type: "warning"
         });
       } else {
-        const newMessage = {
-          title: this.title,
-          content: this.content
-        };
-        this.$store.dispatch("pushMessageFrom", newMessage);
-
         api.addMessage(this.title, this.content).then(data => {
-          console.log(data);
           this.$message("增加信息成功");
           this.title = "";
           this.content = "";
+          this.flipOver(this.pagination.total / this.pagination.limit + 1);
         });
       }
     },
@@ -130,6 +127,9 @@ export default {
         limit: 10
       };
       this.$store.dispatch("getForumMessage", params);
+    },
+    openDetails(row) {
+      console.log(row);
     }
   },
   computed: {
@@ -138,6 +138,15 @@ export default {
     },
     messagedata() {
       return this.$store.state.forum.messagedata;
+    },
+    pageShow() {
+      if (
+        this.$store.state.forum.pagination.total > 0 ||
+        this.$store.state.forum.messagedata.length > 0
+      ) {
+        return true;
+      }
+      return false;
     }
   },
   mounted() {

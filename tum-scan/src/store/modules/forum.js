@@ -23,7 +23,8 @@ const actions = {
     api.getMessage(params).then((result) => {
       const pagination = {
         page: params.page,
-        total: result.count
+        total: result.count,
+        limit: params.limit
       }
       commit("setMessagePaginfo", pagination);
 
@@ -52,7 +53,7 @@ const mutations = {
   setMessagePaginfo(state, entity) {
     const pagination = state.pagination;
     state.pagination = {
-      pagination,
+      ...pagination,
       ...entity
     };
   },

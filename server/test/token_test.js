@@ -62,8 +62,8 @@ describe('token tests', () => {
             if (err) {
                 return console.log('err', err);
             }
-            TimeTask.localSync(266955, 300000).then(function () {
-                logger.info('266955-300000本地统计完成!');
+            TimeTask.localSync(9000000, 9500000).then(function () {
+                logger.info('9000000-9500000本地统计完成!');
             }).catch(function (error) {
                 logger.info(error);
             })
@@ -83,17 +83,25 @@ describe('下载公链中所有账本计划', function () {
             })
         })
     });
-    it.only('八百万-九百万高度账本', function () {
+    it.only('九百万-一千万高度账本', function () {
         remote.connect(function (err, result) {
             if (err) {
                 return console.log('err', err);
             }
-            TimeTask.manualSync(8475857, 9000000).then(function (savedLedgers) {
+            // TimeTask.manualSync(9000000, 10000000).then(function (savedLedgers) {
+            //     savedLedgers.should.be.a.Array();
+            // }).catch(function (error) {
+            //     logger.info(error)
+            // })
+            Promise.all([
+                TimeTask.manualSync(9001952, 9500000),
+                TimeTask.manualSync(9501952, 10000000),
+            ]).then(function (savedLedgers) {
                 savedLedgers.should.be.a.Array();
             })
         })
     });
-    it.only("五百万-六百万， 七百万-九百万高度账本", function () {
+    it("五百万-六百万， 七百万-九百万高度账本", function () {
         remote.connect(function (err, result) {
             if (err) {
                 return console.log("err", err);

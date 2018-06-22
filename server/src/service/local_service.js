@@ -170,13 +170,13 @@ function saveAccount(account) {
     return new Promise((resolve, reject) => {
         entities.Account.findById(account.address).then(accountFound => {
             if (accountFound) {
-                logger.info('accountFound', accountFound.dataValues);
-                logger.info('find account');
+                // logger.info('accountFound', accountFound.dataValues);
+                // logger.info('find account');
                 resolve(accountFound);
             } else {
                 logger.info('created account');
                 entities.Account.create(account).then(accountCreated => {
-                    logger.info('accountCreated', accountCreated.dataValues);
+                    // logger.info('accountCreated', accountCreated.dataValues);
                     resolve(accountCreated);
                 })
             }
@@ -249,6 +249,8 @@ function getAllLegersCount() {
  */
 function saveLedger(ledger) {
     return new Promise((resolve, reject) => {
+        // 将transactions转为字符串
+        ledger.transactions = ledger.transactions.join(',');
         entities.Ledger.findOne({
             where: {
                 hash: ledger.ledger_hash
@@ -278,6 +280,8 @@ function saveLedger(ledger) {
         })
     });
 }
+
+
 
 /**
  * 通过账本高度范围获取账本

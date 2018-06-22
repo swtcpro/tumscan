@@ -20,6 +20,7 @@ const Ledger = sequelize.define("ledger", {
     parent_hash: Sequelize.STRING, // 上一区块hash值
     total_coins: Sequelize.STRING,
     transaction_hash: Sequelize.STRING,
+    transactions: Sequelize.TEXT
     // 不添加时间戳属性 (updatedAt, createdAt)
     // timestamps: false,
 });

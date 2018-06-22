@@ -118,8 +118,8 @@ timeTask.manualSync = function (from, to) {
 timeTask.localSync = function (from, to) {
     return new Promise(function (resolve, reject) {
         localService.getAllLedgers(from, to).then(function (ledgers) {
-            logger.info(ledgers.length);
             analyseLedgerTransactions(ledgers).then(() => {
+                logger.info('完成了analyseLedgerTransactions:');
                 timeTask.countTokenAndBalances().then(() => {
                     resolve(ledgers);
                 }).catch(function (error) {
@@ -286,7 +286,7 @@ function extractAccountsLedger(ledgerIndex) {
                  */
                 localService.saveLedger(ledger).then(savedLedger => {
                     logger.info('extractAccountsLedger', ledgerIndex);
-                    resolve(ledger);
+                    resolve(savedLedger);
                 })
             }
         });
@@ -339,32 +339,27 @@ function saveLedger(ledger) {
  * @param ledgers
  */
 function analyseLedgerTransactions(ledgers) {
-
     return new Promise(async (resolve, reject) => {
-        for (let ledger of ledgers) {
-            await (async function () {
+        await (async function () {
+            for (let ledger of ledgers) {
+                ledger.transactions = ledger.transactions.split(',');
                 for (let transactionHash of ledger.transactions) {
-                    jingtumService.queryTx(transactionHash).then((async transaction => {
-                        // logger.info(transaction);
-                        let affectAccounts = extractAccount(transaction);
-                        // 将链上数据库写入本地数据库
-                        if (affectAccounts) {
-                            logger.info('affectAccounts', affectAccounts);
-                            await
-                                localService.saveAccount({address: affectAccounts.Account}).catch(error => {
-                                    reject(error);
-                                });
-                            await
-                                localService.saveAccount({address: affectAccounts.Destination}).catch(error => {
-                                    reject(error);
-                                });
-                        }
-                    })).catch(function (error) {
-                        reject(error)
-                    })
+                    if (transactionHash) {
+                        await jingtumService.queryTx(transactionHash).then((transaction => {
+                            let affectAccounts = extractAccount(transaction);
+                            // 将链上数据库写入本地数据库
+                            if (affectAccounts) {
+                                // logger.info('affectAccounts', affectAccounts);
+                                localService.saveAccount({address: affectAccounts.Account});
+                                localService.saveAccount({address: affectAccounts.Destination});
+                            }
+                        })).catch(function (error) {
+                            reject(error)
+                        })
+                    }
                 }
-            })()
-        }
+            }
+        })();
         resolve();
     })
 }

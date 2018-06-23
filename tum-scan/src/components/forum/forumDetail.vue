@@ -27,6 +27,9 @@
                 <div class="text item">
                     {{content}}
                 </div>
+                <el-row type="flex" justify="end">
+                    {{time}}
+                </el-row>
             </el-card>
         </el-row>
     </el-row>
@@ -48,14 +51,13 @@
 
 
 <script>
+import util from "../../common/util";
 export default {
   data: function() {
     return {
       title: "人工智能贸易革命！准备计划！软帽到了！ 去拿麦克斯奖金！",
       content:
-        "确保在任何垃圾邮件中使用“拒绝投票”按钮，对有趣的对话使用“向上投票”按钮。",
-      dialogVisible: false,
-      nowIndex: -100
+        "确保在任何垃圾邮件中使用“拒绝投票”按钮，对有趣的对话使用“向上投票”按钮。"
     };
   },
   mounted() {
@@ -66,6 +68,7 @@ export default {
       const { row } = this.$route.params;
       this.title = row.title;
       this.content = row.content;
+      this.time = "发表于" + util.formatDate.format(new Date(row.time));
     }
   }
 };

@@ -31,6 +31,19 @@
           </el-form-item>
         </el-row>
 
+        <el-row class="pagination-row" type="flex" align="middle">
+          <el-col :md="8" :xl="6" :xs="12">
+            <el-input placeholder="请输入关键词" class="input-with-button">
+              <el-button slot="append" icon="el-icon-search"></el-button>
+            </el-input>
+          </el-col>
+
+          <el-col v-show="pageShow" :md="8" :xl="8" :xs="12">
+            <el-pagination background layout="prev, pager, next,total" :page-size="pagination.limit" @current-change="flipOver" :total="pagination.total" :current-page="pagination.page">
+            </el-pagination>
+          </el-col>
+        </el-row>
+
         <el-table border :data="messagedata" highlight-current-row @row-click="openDetails">
           <el-table-column label="编号" type="index" :index="indexMethod" width="50">
           </el-table-column>
@@ -46,13 +59,6 @@
         </el-table>
       </el-form>
 
-      <el-row class="pagination-row" v-show="pageShow">
-        <el-col :offset="16" :md="8" :xl="8" :xs="12">
-          <el-pagination background layout="prev, pager, next,total" :page-size="pagination.limit" @current-change="flipOver" :total="pagination.total" :current-page="pagination.page">
-          </el-pagination>
-        </el-col>
-      </el-row>
-
       <el-dialog title="提示" v-model="dialogVisible" size="tiny">
         <span v-if="nowIndex==-2">删除全部条留言</span>
         <span v-else>删除此条留言</span>
@@ -64,6 +70,12 @@
     </el-row>
   </el-row>
 </template>
+
+<style>
+.pagination-row {
+  margin-bottom: 20px;
+}
+</style>
 
 <script>
 import api from "../../api/api_message";

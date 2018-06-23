@@ -31,19 +31,12 @@
           </el-form-item>
         </el-row>
 
-        <el-row class="pagination-row" v-show="pageShow">
-          <el-col :offset="16" :md="8" :xl="8" :xs="12">
-            <el-pagination background layout="prev, pager, next,total" :page-size="pagination.limit" @current-change="flipOver" :total="pagination.total" :current-page="pagination.page">
-            </el-pagination>
-          </el-col>
-        </el-row>
-
         <el-table border :data="messagedata" highlight-current-row @row-click="openDetails">
           <el-table-column label="编号" type="index" :index="indexMethod" width="50">
           </el-table-column>
           <el-table-column prop="title" label="标题">
           </el-table-column>
-          <el-table-column prop="content" label="内容">
+          <el-table-column prop="content" label="内容" :show-overflow-tooltip="true">
           </el-table-column>
           <!-- <el-table-column label="操作">
             <span>
@@ -52,6 +45,13 @@
           </el-table-column> -->
         </el-table>
       </el-form>
+
+      <el-row class="pagination-row" v-show="pageShow">
+        <el-col :offset="16" :md="8" :xl="8" :xs="12">
+          <el-pagination background layout="prev, pager, next,total" :page-size="pagination.limit" @current-change="flipOver" :total="pagination.total" :current-page="pagination.page">
+          </el-pagination>
+        </el-col>
+      </el-row>
 
       <el-dialog title="提示" v-model="dialogVisible" size="tiny">
         <span v-if="nowIndex==-2">删除全部条留言</span>
@@ -129,7 +129,11 @@ export default {
       this.$store.dispatch("getForumMessage", params);
     },
     openDetails(row) {
-      console.log(row);
+      //console.log(row);
+      this.$router.push({
+        name: "forumdetail",
+        params: { row }
+      });
     }
   },
   computed: {

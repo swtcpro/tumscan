@@ -11,6 +11,7 @@ import Chart from '@/components/Chart'
 import Forum from '@/components/forum/forum'
 import Tokens from '@/components/token/Tokens'
 import Ranking from '@/components/token/Ranking'
+import ForumDetail from '@/components/forum/forumDetail';
 
 Vue.use(Router);
 
@@ -73,6 +74,7 @@ export default new Router({
       menuShow: true,
       children: [
         {path: '/forum', component: Forum, name: 'forum', label: '讨论', menuShow: true},
+        {path: '/forum/detail', component: ForumDetail, name: 'forumdetail', label: '留言详情', menuShow: true},
       ]
     }
   ]

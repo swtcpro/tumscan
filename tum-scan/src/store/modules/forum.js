@@ -48,6 +48,58 @@ const actions = {
     messagedata.push(newMessage);
     commit("setMessageData", messagedata);
   },
+  getMessageByTime({
+    commit,
+    state
+  }, params) {
+    api.getMessageByTime(params).then((result) => {
+      const pagination = {
+        page: params.page,
+        total: result.count,
+        limit: params.limit
+      }
+      commit("setMessagePaginfo", pagination);
+
+      if (result.count == 0) {
+        return
+      }
+
+      const messagedata = result.rows.map((item) => {
+        return {
+          title: item.title,
+          content: item.messageitem.length > 0 ? item.messageitem[item.messageitem.length - 1].description : '',
+          time: item.lastUpdateTime
+        }
+      });
+      commit("setMessageData", messagedata);
+    })
+  },
+  getMessageByTitle({
+    commit,
+    state
+  }, params) {
+    api.getMessageByTitle(params).then((result) => {
+      const pagination = {
+        page: params.page,
+        total: result.count,
+        limit: params.limit
+      }
+      commit("setMessagePaginfo", pagination);
+
+      if (result.count == 0) {
+        return
+      }
+
+      const messagedata = result.rows.map((item) => {
+        return {
+          title: item.title,
+          content: item.messageitem.length > 0 ? item.messageitem[item.messageitem.length - 1].description : '',
+          time: item.lastUpdateTime
+        }
+      });
+      commit("setMessageData", messagedata);
+    })
+  }
 };
 
 const mutations = {

@@ -58,6 +58,22 @@ router.get('/message', function (req, res) {
     });
 });
 
+//分页按照时间获取数据
+router.get('/messagetime', function (req, res) {
+    let page = parseInt(_.trim(req.query.page || 1));
+    let limit = parseInt(_.trim(req.query.limit || 10));
+    let startTime = parseInt(_.trim(req.query.startTime)) || new Date();
+    let endTime =  parseInt(_.trim(req.query.endTime)) || new Date();
+    message_servie.getMessageByTime(page, limit, startTime, endTime).then((result) => {
+        return res.json(result);
+    }).catch((error) => {
+        return res.json({
+            'success': false,
+            'msg': error,
+        });
+    });
+});
+
 indexRouter.router = router;
 
 module.exports = indexRouter;

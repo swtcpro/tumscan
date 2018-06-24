@@ -1,9 +1,12 @@
 import entities from '../model/entities';
+import {Sequelize} from '../model/sequelize_helper';
 
 const {
     messageBoard,
     messageTopic
 } = entities
+
+const Op = Sequelize.Op
 /**
  * 留言业务类
  */
@@ -74,7 +77,60 @@ export default class messageService {
                     model: messageBoard,
                     as: 'messageitem'
                 }],
-                order: [['lastUpdateTime', 'asc']]
+                order: [['lastUpdateTime', 'DESC']]
+            }).then(function (array) {
+                resolve(array);
+            }).catch(function (error) {
+                reject(error);
+            })
+        })
+    }
+
+    getMessageByTitle(page, limit, title) {
+        return new Promise(function (resolve, reject) {
+            let offset = (page - 1) * limit;
+            messageTopic.findAndCountAll({
+                where: {
+                    title: {
+                        [Op.like]: "%" + title + "%"
+                    }
+                },
+                offset,
+                limit,
+                include: [{
+                    model: messageBoard,
+                    as: 'messageitem'
+                }],
+                order: [
+                    ['lastUpdateTime', 'DESC']
+                ]
+            }).then(function (array) {
+                resolve(array);
+            }).catch(function (error) {
+                reject(error);
+            })
+        })
+    }
+
+    getMessageByTime(page, limit, startTime, endTime) {
+        return new Promise(function (resolve, reject) {
+            let offset = (page - 1) * limit;
+            messageTopic.findAndCountAll({
+                where: {
+                    lastUpdateTime: {
+                        [Op.lte]: new Date(endTime),
+                        [Op.gte]: new Date(startTime)
+                    }
+                },
+                offset,
+                limit,
+                include: [{
+                    model: messageBoard,
+                    as: 'messageitem'
+                }],
+                order: [
+                    ['lastUpdateTime', 'DESC']
+                ]
             }).then(function (array) {
                 resolve(array);
             }).catch(function (error) {

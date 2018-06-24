@@ -11,5 +11,11 @@
    },
    getMessage: (params) => {
      return API.GET('/messageboard/message', params)
+   },
+   getMessageByTime: (params) => {
+     return API.GET('/messageboard/messagetime', params)
+   },
+   getMessageByTitle: (params) => {
+     return API.GET('/messageboard/message/title', params)
    }
  }

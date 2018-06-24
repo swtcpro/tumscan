@@ -32,7 +32,21 @@
         </el-row>
 
         <el-row class="pagination-row" type="flex" align="middle">
-          <el-col :md="8" :xl="6" :xs="12">
+          <el-col :span="3" :md="3" :xl="3" :xs="12">
+            <el-select v-model="queryType" placeholder="请选择查询方式" @change="queryTypeChange">
+              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+          </el-col>
+
+          <el-date-picker class="search" v-show="searchTimeShow" v-model="dateValue" type="daterange" align="right" unlink-panels range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="dateOptions">
+          </el-date-picker>
+
+          <el-col :span="2" :md="3" :xl="4" :xs="8" v-show="searchTimeShow">
+            <el-button icon="el-icon-search" @click="searchButton"></el-button>
+          </el-col>
+
+          <el-col class="search" :md="6" :xl="6" :xs="12" v-show="searchTextShow">
             <el-input placeholder="请输入关键词" class="input-with-button">
               <el-button slot="append" icon="el-icon-search"></el-button>
             </el-input>
@@ -75,10 +89,15 @@
 .pagination-row {
   margin-bottom: 20px;
 }
+
+.search {
+  margin-left: 10px;
+}
 </style>
 
 <script>
 import api from "../../api/api_message";
+import util from "../../common/util";
 
 export default {
   data: function() {
@@ -86,7 +105,52 @@ export default {
       title: "",
       content: "",
       dialogVisible: false,
-      nowIndex: -100
+      nowIndex: -100,
+      options: [
+        {
+          value: 0,
+          label: "按照时间"
+        },
+        {
+          value: 1,
+          label: "按照标题"
+        }
+      ],
+      queryType: 0,
+      searchTextShow: false,
+      dateOptions: {
+        shortcuts: [
+          {
+            text: "最近一周",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
+            }
+          },
+          {
+            text: "最近一个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
+            }
+          },
+          {
+            text: "最近三个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit("pick", [start, end]);
+            }
+          }
+        ]
+      },
+      searchTimeShow: true,
+      dateValue: ""
     };
   },
   methods: {
@@ -146,6 +210,40 @@ export default {
         name: "forumdetail",
         params: { row }
       });
+    },
+    queryTypeChange(value) {
+      if (value === this.options[0].value) {
+        this.searchTextShow = false;
+        this.searchTimeShow = true;
+      } else if (value === this.options[1].value) {
+        this.searchTextShow = true;
+        this.searchTimeShow = false;
+      }
+    },
+    searchButton() {
+      this.queryMessage(1);
+    },
+    queryMessage(page) {
+      let params;
+      if (this.queryType === this.options[0].value) {
+        //按照时间
+        params = {
+          page,
+          limit: 10,
+          startTime: this.dateValue[0].getTime(),
+          endTime: this.dateValue[1].getTime()
+        };
+        console.log(params);
+        this.$store.dispatch("getMessageByTime", params);
+      } else if (this.queryType === this.options[1].value) {
+        //按照标题
+        params = {
+          page,
+          limit: 10,
+          title: ""
+        };
+        this.$store.dispatch("getMessageByTitle", params);
+      }
     }
   },
   computed: {

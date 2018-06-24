@@ -124,7 +124,7 @@ tumController.queryRankings = function (req, res) {
     let page = parseInt(_.trim(req.query.page || 0));
     let limit = parseInt(_.trim(req.query.limit || 20));
     let issuer = _.trim(req.query.issuer || '');
-    let currency = _.trim(req.query.currency || '')
+    let currency = _.trim(req.query.currency || '');
     jingtumService.queryRankings(page, limit, issuer, currency).then(function (result) {
         res.json(result);
     }).catch(function (error) {
@@ -168,7 +168,8 @@ tumController.queryLedgersPaging = function (req, res) {
                     transNum: ledger.transactions.length
                 }
             });
-            return res.json({total: ledgers[0].ledger_index, ledgers: tempLedgers});
+            let total = Number(ledgers[0].ledger_index);
+            return res.json({total: total, ledgers: tempLedgers});
         }).catch(function (error) {
             logger.info(error);
             return res.json(error);
@@ -176,8 +177,31 @@ tumController.queryLedgersPaging = function (req, res) {
     }
 };
 
-tumController.queryBalancesByAddress = function (req, res, callback) {
-    jingtumService.queryBalance(req, res, callback)
+tumController.queryBalancesByAddress = function (req, res) {
+    jingtumService.queryBalance(req, res)
+};
+
+/**
+ * 通过钱包地址查询余额交易（基于lib库）
+ * @param req
+ * @param res
+ */
+tumController.queryWalletLib = function (req, res) {
+    let address = _.trim(req.query.address || '');
+    let page = parseInt(_.trim(req.query.page || 1));
+    let limit = parseInt(_.trim(req.query.limit || 20));
+    jingtumService.queryWalletLib(address).then(function (result) {
+        // 处理分页
+        let offset = (page - 1) * limit;
+        if ((offset + limit) > result.total) {
+        } else {
+            result.transactions = result.transactions.slice(offset, offset + limit);
+        }
+        res.json(result);
+    }).catch(function (error) {
+        res.status(500);
+        res.json('error', error);
+    })
 };
 
 tumController.findTransactionsByAddress = function (req, res) {

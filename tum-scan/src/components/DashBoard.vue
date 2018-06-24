@@ -62,7 +62,7 @@
             <el-button @click="viewAllLedgers" style="float: right; padding: 3px 0" size="medium" type="text">查看全部</el-button>
           </div>
           <div>
-            <el-card :body-style="{ padding: '10px',height: '100px' }" shadow="hover" v-for="ledger in data.ledgers" :key="ledger">
+            <el-card :body-style="{ padding: '10px',height: '100px' }" shadow="hover" v-for="ledger in data.ledgers" :key="ledger.ledger_index">
               <el-col :span="8" class="block">
                 <el-row style="height: 65px" type="flex" justify="center">
                   <a href="javascript:void(0);" v-on:click="handleLedger(ledger.ledger_hash)"
@@ -72,7 +72,7 @@
               </el-col>
               <el-col :span="16">
                 <el-row style="height: 65px" type="flex" justify="center">
-                  <el-col span="16">
+                  <el-col :span="16">
                     <div style="text-align: center">交易数：{{ledger.txn_count}}</div>
                     <div style="text-align: center; margin-top: 5%">创建时间：{{ledger.ledger_time}}</div>
                   </el-col>
@@ -93,8 +93,8 @@
           </div>
 
           <el-card :body-style="{  padding: '10px',height: '100px' }" shadow="hover" v-for="transaction in data.transactions"
-                   :key="transaction">
-            <el-col span="24">
+                   :key="transaction.hash">
+            <el-col :span="24">
               <div class="transaction-item">
                 <div class="text-overflow">哈希：
                   <a href="javascript:void(0)"

@@ -88,11 +88,6 @@ describe('下载公链中所有账本计划', function () {
             if (err) {
                 return console.log('err', err);
             }
-            // TimeTask.manualSync(9000000, 10000000).then(function (savedLedgers) {
-            //     savedLedgers.should.be.a.Array();
-            // }).catch(function (error) {
-            //     logger.info(error)
-            // })
             Promise.all([
                 TimeTask.manualSync(9001952, 9500000),
                 TimeTask.manualSync(9501952, 10000000),
@@ -116,7 +111,7 @@ describe('下载公链中所有账本计划', function () {
             });
         });
     });
-})
+});
 
 describe("测试并行下载", function () {
 

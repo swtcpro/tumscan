@@ -17,10 +17,19 @@ const ClientError = require('../lib/errors').ClientError;
 const NetworkError = require('../lib/errors').NetworkError;
 const resultCode = require('../lib/resultCode');
 const jutils = require('jingtum-lib').utils;
-const respond = require('../lib/respond');
 const CURRENCY = config.get('base_currency') || 'SWT';
 
 let jingtumService = {};
+
+String.prototype.startWith = function (str) {
+    var reg = new RegExp("^" + str);
+    return reg.test(this);
+}
+
+String.prototype.endWith = function (str) {
+    var reg = new RegExp(str + "$");
+    return reg.test(this);
+}
 
 jingtumService.queryLedger = function (hash) {
     return new Promise(((resolve, reject) => {
@@ -199,7 +208,7 @@ jingtumService.queryTokens = function (page, limit, param) {
 };
 
 /**
- * 查询token代币的持仓排名s
+ * 查询token代币的持仓排名
  * @param page
  * @param limit
  * @param issuer
@@ -250,84 +259,132 @@ jingtumService.queryTx = function (hash) {
     })
 };
 
-
-jingtumService.queryBalance = function (req, res, callback) {
-    let address = _.trim(req.params.address || '');
-    console.log(address);
-    if (!address || !jutils.isValidAddress(address)) {
-        return callback(new ClientError(resultCode.C_ADDRESS));
-    }
-    if (!remote || !remote.isConnected()) {
-        logger.error(resultCode.N_REMOTE.msg);
-        return callback(new NetworkError(resultCode.N_REMOTE));
-    }
-    let condition = {};
-    if (req.query.currency) {
-        if (!jutils.isValidCurrency(req.query.currency)) {
-            return callback(new ClientError(resultCode.C_CURRENCY));
-        }
-        condition.currency = req.query.currency;
-    }
-    if (req.query.issuer) {
-        if (!jutils.isValidAddress(req.query.issuer)) {
-            return callback(new ClientError(resultCode.C_ISSUER));
-        }
-        condition.issuer = req.query.issuer;
-    }
-
-    let options = {account: address, type: 'trust'};
-    let options2 = {account: address, type: 'freeze'};
-    async.parallel({
-        native: function (callback) {
-            let req1 = remote.requestAccountInfo(options);
-            req1.submit(callback);
-        },
-        lines: function (callback) {
-            let req2 = remote.requestAccountRelations(options);
-            req2.submit(callback);
-        },
-        lines2: function (callback) { //关系中设置的冻结
-            let req2 = remote.requestAccountRelations(options2);
-            req2.submit(callback);
-        },
-        orders: function (callback) {
-            let offers = [];
-
-            function getOffers() {
-                let req3 = remote.requestAccountOffers(options);
-                req3.submit(function (err, result) {
-                    if (err) {
-                        callback(err)
-                    }
-                    else if (result.marker) {
-                        offers = offers.concat(result.offers);
-                        options = {account: address, marker: result.marker};
-                        getOffers(options);
+jingtumService.queryWalletLib = function (address) {
+    return new Promise(function (resolve, reject) {
+        jingtumService.queryBalance(address).then(function (balances) {
+            jingtumService.queryAccountTx(address).then(function (transactions) {
+                let wallet = balances;
+                wallet.transactions = transactions.transactions;
+                wallet.total = transactions.transactions.length;
+                /**
+                 * 处理交易信息，将不同类型的交易sent,received,offernew,offercancel,offereffect
+                 * 做归一化处理
+                 */
+                wallet.transactions = [];
+                transactions.transactions.forEach(function (tx) {
+                    let transaction = {};
+                    if (tx.type === 'offereffect') {
+                        transaction.counterparty = tx.effects[0].counterparty.account;
+                        transaction.amount = tx.effects[0].paid.value + tx.effects[0].paid.currency + '--->' +
+                            tx.effects[0].got.value + tx.effects[0].got.currency;
+                    } else if (tx.type.startWith('offer')) {
+                        transaction.amount = tx.pays.value + tx.pays.currency + '--->' + tx.gets.value + tx.gets.currency;
+                        transaction.counterparty = '';
                     } else {
-                        offers = offers.concat(result.offers);
-                        result.offers = offers;
-                        callback(null, result);
+                        transaction.amount = tx.amount.value;
+                        transaction.counterparty = tx.counterparty;
                     }
+                    transaction.date = tx.date;
+                    transaction.type = tx.type;
+                    transaction.hash = tx.hash;
+                    wallet.transactions.push(transaction);
                 });
-            }
+                resolve(wallet);
+            }).catch(function (error) {
+                reject(error);
+            });
+        }).catch(function (error) {
+            reject(error);
+        })
+    })
+};
 
-            getOffers(options);
+/**
+ * 通过账户地址获取账户交易
+ * @param address
+ */
+jingtumService.queryAccountTx = function (address) {
+    return new Promise(function (resolve, reject) {
+        if (!remote || !remote.isConnected()) {
+            logger.error(resultCode.N_REMOTE.msg);
+            return new NetworkError(resultCode.N_REMOTE);
         }
-
-    }, function (err, results) {
-        if (err) {
-            let error = {};
-            if (err.msg) {
-                error = err;
+        let req = remote.requestAccountTx({account: address});
+        req.submit(function (err, transactions) {
+            if (err) {
+                logger.info('err', err);
+                reject(err);
             } else {
-                error.msg = err;
+                resolve(transactions);
             }
-            logger.error('fail to get balance: ' + err);
-            respond.transactionError(res, error);
-        } else {
-            respond.success(res, process_balance(results, condition));
+        })
+    })
+};
+
+jingtumService.queryBalance = function (address) {
+    return new Promise(function (resolve, reject) {
+        if (!address || !jutils.isValidAddress(address)) {
+            return new ClientError(resultCode.C_ADDRESS);
         }
-    });
+        if (!remote || !remote.isConnected()) {
+            logger.error(resultCode.N_REMOTE.msg);
+            return new NetworkError(resultCode.N_REMOTE);
+        }
+        let condition = {};
+        let options = {account: address, type: 'trust'};
+        let options2 = {account: address, type: 'freeze'};
+        async.parallel({
+            native: function (callback) {
+                let req1 = remote.requestAccountInfo(options);
+                req1.submit(callback);
+            },
+            lines: function (callback) {
+                let req2 = remote.requestAccountRelations(options);
+                req2.submit(callback);
+            },
+            lines2: function (callback) { //关系中设置的冻结
+                let req2 = remote.requestAccountRelations(options2);
+                req2.submit(callback);
+            },
+            orders: function (callback) {
+                let offers = [];
+
+                function getOffers() {
+                    let req3 = remote.requestAccountOffers(options);
+                    req3.submit(function (err, result) {
+                        if (err) {
+                            callback(err)
+                        }
+                        else if (result.marker) {
+                            offers = offers.concat(result.offers);
+                            options = {account: address, marker: result.marker};
+                            getOffers(options);
+                        } else {
+                            offers = offers.concat(result.offers);
+                            result.offers = offers;
+                            callback(null, result);
+                        }
+                    });
+                }
+
+                getOffers(options);
+            }
+
+        }, function (err, results) {
+            if (err) {
+                let error = {};
+                if (err.msg) {
+                    error = err;
+                } else {
+                    error.msg = err;
+                }
+                logger.error('fail to get balance: ' + err);
+                reject(err);
+            } else {
+                resolve(jingtumService.process_balance(results, condition));
+            }
+        });
+    })
 };
 
 jingtumService.process_balance = function (data, condition) {

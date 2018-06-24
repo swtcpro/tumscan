@@ -71,7 +71,7 @@ function changeTwoDecimal(x) {
 const util = {
     unique: unique,
     promiseAll: promiseAll,
-    changeTwoDecimal, changeTwoDecimal
+    changeTwoDecimal: changeTwoDecimal
 }
 
 export default util;

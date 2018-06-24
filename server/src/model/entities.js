@@ -13,7 +13,7 @@ import Balance from './balance';
 import Token from './token';
 import Ledger from './ledger';
 import Transaction from './transaction';
-import {sequelize,Sequelize} from './sequelize_helper';
+import {sequelize, Sequelize} from './sequelize_helper';
 
 
 // 设置级联关系

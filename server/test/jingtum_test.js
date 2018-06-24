@@ -27,6 +27,29 @@ describe('#jingtumLib()', function () {
 
     });
 
+    it.only('通过钱包地址返回钱包余额', function () {
+        remote.connect(function (err, result) {
+            if (err) {
+                return console.log('err', err);
+            }
+            jingtumService.queryWalletLib('j4Zdsk3tQSvQ4aEiaN1BD2Wk3ztzBBRWHc').then(function (result) {
+                result.should.be.a.Object();
+            })
+        })
+    });
+
+    it.only('通过钱包地址返回钱包余额和交易', function () {
+        remote.connect(function (err, result) {
+            if (err) {
+                return console.log('err', err);
+            }
+            jingtumService.queryWalletLib('j4Zdsk3tQSvQ4aEiaN1BD2Wk3ztzBBRWHc').then(function (wallet) {
+                logger.info(wallet)
+                wallet.should.be.a.Object();
+            })
+        })
+    });
+
     describe('tum tests', function () {
         it('query tums test', () => {
             jingtumService.queryTokens('jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or').then(result => {

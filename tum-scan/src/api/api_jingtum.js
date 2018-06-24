@@ -20,8 +20,8 @@ export default {
   },
 
   // 查询钱包相关信息（余额交易）
-  queryWallet: address => {
-    return API.GET('/jingtum/query/wallet/' + address);
+  queryWallet: params => {
+    return API.GET('/jingtum/query/wallet_lib' , params);
   },
 
   // 查询交易相关信息

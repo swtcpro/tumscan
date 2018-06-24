@@ -20,6 +20,9 @@ router.get('/init', tumController.homeInit);
 // 查询钱包相关信息
 router.get('/query/wallet/:address', tumController.queryWallet);
 
+// 通过lib库查询钱包相关信息
+router.get('/query/wallet_lib', tumController.queryWalletLib);
+
 // 查询单个交易相关信息
 router.get('/query/tx/:hash', tumController.queryTx);
 

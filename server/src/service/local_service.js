@@ -322,6 +322,7 @@ function findOrCreateToken(att) {
                 })
             }
         }).catch(error => {
+            reject(error);
             logger.info(error);
         })
     })

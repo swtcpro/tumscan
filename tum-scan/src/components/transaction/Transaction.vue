@@ -112,22 +112,39 @@
         </el-col>
       </el-row>
 
+      <!--<el-row>-->
+      <!--<el-row class="label-row">-->
+      <!--<h3>交易效果</h3>-->
+      <!--</el-row>-->
+      <!--<template v-for="effect in tx.effects">-->
+      <!--<div v-if="effect.effect === 'offer_bought'">-->
+      <!--您以{{effect.pays.value}}的价格买了{{effect.got.value}}{{effect.got.currency}}-->
+      <!--</div>-->
+      <!--<div v-else-if="effect.effect === 'offer_created'">-->
+      <!--您以{{effect.pays.value}} {{effect.pays.currency}}的价格创建了挂单-->
+      <!--</div>-->
+      <!--<div v-else></div>-->
+      <!--</template>-->
+      <!--<div v-if="!tx.effects">暂无说明</div>-->
+      <!--</el-row>-->
+
       <el-row>
         <el-row class="label-row">
-          <h3>交易效果</h3>
+          <h3>交易备注</h3>
         </el-row>
-        <!--<template v-for="effect in tx.effects">-->
-        <!--<div v-if="effect.effect === 'offer_bought'">-->
-        <!--您以{{effect.pays.value}}的价格买了{{effect.got.value}}{{effect.got.currency}}-->
-        <!--</div>-->
-        <!--<div v-else-if="effect.effect === 'offer_created'">-->
-        <!--您以{{effect.pays.value}} {{effect.pays.currency}}的价格创建了挂单-->
-        <!--</div>-->
-        <!--<div v-else></div>-->
-        <!--</template>-->
-        <!--<div v-if="!tx.effects">暂无说明</div>-->
+
+        <div v-if="tx.memos">
+          <div v-for="memo in tx.memos" :key="memo">
+            {{memo.MemoData}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </div>
+        </div>
+        <div v-else>
+          该交易无备注
+        </div>
       </el-row>
     </el-row>
+
+
   </div>
 </template>
 

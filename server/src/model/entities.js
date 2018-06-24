@@ -25,9 +25,9 @@ Account.hasMany(Balance, {
     as: 'balance'
 });
 
-Ledger.hasMany(Transaction, {
-    as: 'transaction'
-});
+// Ledger.hasMany(Transaction, {
+//     as: 'transaction'
+// });
 
 sequelize.sync();
 

@@ -151,7 +151,7 @@
       return {
         loading: false,
         // 钱包的基本信息
-        address: 'j4Zdsk3tQSvQ4aEiaN1BD2Wk3ztzBBRWHc',
+        address: '',
         // 账户相关信息
         wallet: {},
         pagination: {
@@ -162,13 +162,13 @@
       }
     },
     methods: {
-      // getParams() {
-      //   let pathVariable = this.$route.params.pathVariable;
-      //   if (pathVariable) {
-      //     this.address = pathVariable;
-      //   }
-      //   return pathVariable;
-      // },
+      getParams() {
+        let pathVariable = this.$route.params.pathVariable;
+        if (pathVariable) {
+          this.address = pathVariable;
+        }
+        return pathVariable;
+      },
       filterTransactionType: function (value, row) {
         return row.type === value;
       },
@@ -213,19 +213,19 @@
       }
     },
     mounted() {
-      // this.getParams();
+      this.getParams();
       this.dataInit();
     },
     watch: {
       // 监测路由变化,只要变化了就调用获取路由参数方法将数据存储本组件即可
-      '$route': function () {
-        // this.$route.params.pathVariable
-        // this.$store.dispatch('updatePathVariable', this.$route.params.pathVariable);
-        // console.log('pathVariable: ', this.$route.params.pathVariable)
-        this.address = this.$route.params.pathVariable;
-        // 通过更新Vuex中的store的数据，让数据发生变化
-        this.dataInit();
-      }
+      '$route': this.getParams
+      // this.$route.params.pathVariable
+      // this.$store.dispatch('updatePathVariable', this.$route.params.pathVariable);
+      // console.log('pathVariable: ', this.$route.params.pathVariable)
+      //   this.address = this.$route.params.pathVariable;
+      //   // 通过更新Vuex中的store的数据，让数据发生变化
+      //   this.dataInit();
+      // }
     }
   }
 </script>

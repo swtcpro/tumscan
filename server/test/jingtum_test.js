@@ -50,8 +50,16 @@ describe('#jingtumLib()', function () {
         })
     });
 
+    it.only('分页查询代币列表', function () {
+        jingtumService.queryTokens(1, 20, '').then(function (tokens) {
+            tokens.should.be.an.Object();
+        }).catch(function (error) {
+            logger.error(error);
+        })
+    });
+
     describe('tum tests', function () {
-        it('query tums test', () => {
+        it.only('query tums test', () => {
             jingtumService.queryTokens('jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or').then(result => {
                 console.log(result);
             });

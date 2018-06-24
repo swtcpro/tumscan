@@ -97,7 +97,9 @@
         that.loading = true;
         API.queryLedgersPaging(params).then(result => {
           that.loading = false;
-          if (result) {
+          if (result.err) {
+            that.$message.error({showClose: true, message: result.err, duration: 3000});
+          } else {
             // 填充分页数据
             that.pagination.total = result.total;
             that.ledgers = result.ledgers;

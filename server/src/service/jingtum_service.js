@@ -22,14 +22,14 @@ const CURRENCY = config.get('base_currency') || 'SWT';
 let jingtumService = {};
 
 String.prototype.startWith = function (str) {
-    var reg = new RegExp("^" + str);
+    let reg = new RegExp("^" + str);
     return reg.test(this);
-}
+};
 
 String.prototype.endWith = function (str) {
-    var reg = new RegExp(str + "$");
+    let reg = new RegExp(str + "$");
     return reg.test(this);
-}
+};
 
 jingtumService.queryLedger = function (hash) {
     return new Promise(((resolve, reject) => {
@@ -44,7 +44,7 @@ jingtumService.queryLedger = function (hash) {
         req.submit(function (err, ledger) {
             if (err) {
                 console.log('err:', err);
-                return {success: false, msg: err}
+                reject({success: false, msg: err});
             }
             else if (ledger) {
                 // 获取账本相关交易列表
@@ -176,11 +176,14 @@ jingtumService.queryTokens = function (page, limit, param) {
         if (!param) {
             localService.getTokensPaging(page, limit).then(function (tokens) {
                 localService.getTokensCount().then(function (count) {
+                    logger.info('{total: count, tokens: tokens}: ', {total: count, tokens: tokens})
                     resolve({total: count, tokens: tokens})
                 }).catch(function (error) {
+                    logger.error(error);
                     reject(error);
                 })
             }).catch(function (error) {
+                logger.error(error);
                 reject(error);
             })
         } else if (jutils.isValidCurrency(param)) {
@@ -188,9 +191,11 @@ jingtumService.queryTokens = function (page, limit, param) {
                 localService.getTokensCount().then(function (count) {
                     resolve({total: count, tokens: tokens})
                 }).catch(function (error) {
+                    logger.error(error);
                     reject(error);
                 })
             }).catch(function (error) {
+                logger.error(error);
                 reject(error);
             })
         } else {
@@ -198,9 +203,11 @@ jingtumService.queryTokens = function (page, limit, param) {
                 localService.getTokensCount().then(function (count) {
                     resolve({total: count, tokens: tokens})
                 }).catch(function (error) {
+                    logger.error(error);
                     reject(error);
                 })
             }).catch(function (error) {
+                logger.error(error);
                 reject(error);
             })
         }

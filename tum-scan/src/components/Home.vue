@@ -220,6 +220,7 @@
               name: 'account',
               params: {pathVariable}
             });
+
           } else {
             // 此处应该是跳转到单个交易详情的页面
             let hash = pathVariable;

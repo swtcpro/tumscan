@@ -47,8 +47,8 @@
           </el-col>
 
           <el-col class="search" :md="6" :xl="6" :xs="12" v-show="searchTextShow">
-            <el-input placeholder="请输入关键词" class="input-with-button">
-              <el-button slot="append" icon="el-icon-search"></el-button>
+            <el-input v-model="titleSearch" placeholder="请输入关键词" class="input-with-button">
+              <el-button slot="append" icon="el-icon-search" @click="searchButton"></el-button>
             </el-input>
           </el-col>
 
@@ -150,7 +150,8 @@ export default {
         ]
       },
       searchTimeShow: true,
-      dateValue: ""
+      dateValue: "",
+      titleSearch: ""
     };
   },
   methods: {
@@ -240,7 +241,7 @@ export default {
         params = {
           page,
           limit: 10,
-          title: ""
+          title: this.titleSearch
         };
         this.$store.dispatch("getMessageByTitle", params);
       }

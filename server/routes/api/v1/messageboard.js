@@ -12,7 +12,7 @@ const utils = require('../../../src/lib/utils');
 
 const message_servie = new messageService()
 // 获取留言
-router.get('/message/:id', function (req, res) {
+router.get('/message/:id(\\d+)', function (req, res) {
     let id = _.trim(req.params.id || '');
     message_servie.getMessage(id).then((result) => {
         return res.json(result);
@@ -65,6 +65,21 @@ router.get('/messagetime', function (req, res) {
     let startTime = parseInt(_.trim(req.query.startTime)) || new Date();
     let endTime =  parseInt(_.trim(req.query.endTime)) || new Date();
     message_servie.getMessageByTime(page, limit, startTime, endTime).then((result) => {
+        return res.json(result);
+    }).catch((error) => {
+        return res.json({
+            'success': false,
+            'msg': error,
+        });
+    });
+});
+
+//分页按照时间获取数据
+router.get('/message/title', function (req, res) {
+    let page = parseInt(_.trim(req.query.page || 1));
+    let limit = parseInt(_.trim(req.query.limit || 10));
+    let title = _.trim(req.query.title) || '';
+    message_servie.getMessageByTitle(page, limit, title).then((result) => {
         return res.json(result);
     }).catch((error) => {
         return res.json({

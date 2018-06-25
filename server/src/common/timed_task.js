@@ -11,6 +11,7 @@ import entities from '../model/entities'
 import Balance from "../model/balance";
 import util from '../common/utils'
 import localService from '../service/local_service'
+
 const jutils = require('jingtum-lib').utils;
 const remote = require('../lib/remote');
 const async = require('async');
@@ -130,6 +131,32 @@ timeTask.localSync = function (from, to) {
         });
     });
 };
+
+timeTask.getAccountsRealTime = function () {
+    return new Promise(function (resolve, reject) {
+        getLatestLedger().then(function (ledger_index) {
+            extractAccountsLedger(ledger_index).then(function (savedLedger) {
+                analyseSingleledger(savedLedger).then(async function (accounts) {
+                    logger.info('accounts', accounts);
+                    let balances = [];
+                    await (async function () {
+                        for (let account of accounts) {
+                            let balancesAssos = await queryBalanceAndSave(account);
+                            balances = balances.concat(balancesAssos);
+                        }
+                    })();
+                    resolve(balances);
+                }).catch(function (error) {
+                    reject(error);
+                })
+            }).catch(function (error) {
+                reject(error);
+            })
+        }).catch(function (error) {
+            reject(error);
+        })
+    })
+}
 
 function queryBalanceAndSave(account) {
     return new Promise((resolve, reject) => {
@@ -337,6 +364,7 @@ function saveLedger(ledger) {
  */
 function analyseLedgerTransactions(ledgers) {
     return new Promise(async (resolve, reject) => {
+        let accounts = [];
         await (async function () {
             for (let ledger of ledgers) {
                 ledger.transactions = ledger.transactions.split(',');
@@ -349,6 +377,8 @@ function analyseLedgerTransactions(ledgers) {
                                 // logger.info('affectAccounts', affectAccounts);
                                 localService.saveAccount({address: affectAccounts.Account});
                                 localService.saveAccount({address: affectAccounts.Destination});
+                                accounts.push(affectAccounts.Account);
+                                accounts.push(affectAccounts.Destination);
                             }
                         })).catch(function (error) {
                             reject(error)
@@ -357,7 +387,39 @@ function analyseLedgerTransactions(ledgers) {
                 }
             }
         })();
-        resolve();
+        resolve(accounts);
+    })
+}
+
+/**
+ * 从单个账本中提取参与交易的账户
+ * @param ledger
+ * @returns {Promise}
+ */
+function analyseSingleledger(ledger) {
+    return new Promise(async function (resolve, reject) {
+        ledger.transactions = ledger.transactions.split(',');
+        let accounts = [];
+        await (async function () {
+            for (let transactionHash of ledger.transactions) {
+                if (transactionHash) {
+                    await jingtumService.queryTx(transactionHash).then((transaction => {
+                        let affectAccounts = extractAccount(transaction);
+                        // 将链上数据库写入本地数据库
+                        if (affectAccounts) {
+                            // logger.info('affectAccounts', affectAccounts);
+                            localService.saveAccount({address: affectAccounts.Account});
+                            localService.saveAccount({address: affectAccounts.Destination});
+                            accounts.push(affectAccounts.Account);
+                            accounts.push(affectAccounts.Destination);
+                        }
+                    })).catch(function (error) {
+                        reject(error)
+                    })
+                }
+            }
+        })();
+        resolve(accounts);
     })
 }
 

@@ -206,11 +206,10 @@ export default {
       this.$store.dispatch("getForumMessage", params);
     },
     openDetails(row) {
-      //console.log(row);
       this.$router.push({
         name: "forumdetail",
-        params: { row }
       });
+      this.$store.dispatch("setMessage", row);
     },
     queryTypeChange(value) {
       if (value === this.options[0].value) {

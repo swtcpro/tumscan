@@ -10,7 +10,8 @@ const state = {
     limit: 10,
     total: 0,
   },
-  messagedata:[]
+  messagedata:[],
+  messageList:[]
 };
 
 const getters = {};
@@ -99,6 +100,25 @@ const actions = {
       });
       commit("setMessageData", messagedata);
     })
+  },
+  getMessageList({commit,state}, params) {
+    api.getMessage(params).then((result) => {
+      if (result.count == 0) {
+        return
+      }
+
+      const messagedata = result.rows.map((item) => {
+        return {
+          title: item.title,
+          content: item.messageitem.length > 0 ? item.messageitem[item.messageitem.length - 1].description : '',
+          time: item.lastUpdateTime
+        }
+      });
+      commit("setMessageList", messagedata);
+    })
+  },
+  setMessage({commit,state}, newMessage){
+    commit("setMessage", newMessage);
   }
 };
 
@@ -112,7 +132,13 @@ const mutations = {
   },
   setMessageData(state, entity) {
     state.messagedata = entity
-  }
+  },
+  setMessageList(state, entity) {
+    state.messageList = entity
+  },
+  setMessage(state, entity) {
+    state.message = entity
+  },
 };
 
 export default {

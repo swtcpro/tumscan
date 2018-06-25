@@ -12,7 +12,7 @@
       </el-col>
     </el-row>
     <el-row class="content" v-loading="loading" element-loading-text="拼命加载中">
-      <el-row gutter="40" style="height: 300px">
+      <el-row :gutter="40" style="height: 300px">
         <el-col :xs="24" :md="12">
           <el-card shadow="never" :body-style="{ padding: '0px', height: '260px'}" v-model="tx">
             <div style="height: 50px; padding: 15px">
@@ -112,21 +112,23 @@
         </el-col>
       </el-row>
 
-      <!--<el-row>-->
-      <!--<el-row class="label-row">-->
-      <!--<h3>交易效果</h3>-->
-      <!--</el-row>-->
-      <!--<template v-for="effect in tx.effects">-->
-      <!--<div v-if="effect.effect === 'offer_bought'">-->
-      <!--您以{{effect.pays.value}}的价格买了{{effect.got.value}}{{effect.got.currency}}-->
-      <!--</div>-->
-      <!--<div v-else-if="effect.effect === 'offer_created'">-->
-      <!--您以{{effect.pays.value}} {{effect.pays.currency}}的价格创建了挂单-->
-      <!--</div>-->
-      <!--<div v-else></div>-->
-      <!--</template>-->
-      <!--<div v-if="!tx.effects">暂无说明</div>-->
-      <!--</el-row>-->
+      <el-row>
+        <el-row class="label-row">
+          <h3>交易效果</h3>
+        </el-row>
+        <template v-for="effect in tx.effects">
+
+          <div v-if="effect.effect === 'offer_bought'">
+            您以{{effect.pays.value}}的价格买了{{effect.got.value}}{{effect.got.currency}}
+          </div>
+          <div v-else-if="effect.effect === 'offer_created'">
+            您以{{effect.pays.value}} {{effect.pays.currency}}的价格创建了挂单
+          </div>
+          <div v-else></div>
+
+        </template>
+        <div v-if="!tx.effects">暂无说明</div>
+      </el-row>
 
       <el-row>
         <el-row class="label-row">

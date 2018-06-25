@@ -117,7 +117,6 @@ jingtumService.queryLedgersPaging = function (page, limit) {
                     let ledger = await jingtumService.queryLedgerByIndex(index);
                     ledgers.push(ledger);
                 }
-                // logger.info('ledgers.length: ', ledgers.length);
                 resolve(ledgers);
             }).catch(function (error) {
                 reject(error);

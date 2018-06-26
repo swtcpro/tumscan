@@ -6,11 +6,11 @@
  \* Description: 该文件中定时任务用户同步井通区块链中账本数据
  \*/
 import Account from "../model/account";
-import jingtumService from '../service/jingtum_service'
-import entities from '../model/entities'
+import jingtumService from '../service/jingtum_service';
+import entities from '../model/entities';
 import Balance from "../model/balance";
-import util from '../common/utils'
-import localService from '../service/local_service'
+import util from '../common/utils';
+import localService from '../service/local_service';
 
 const jutils = require('jingtum-lib').utils;
 const remote = require('../lib/remote');
@@ -132,15 +132,20 @@ timeTask.localSync = function (from, to) {
     });
 };
 
+/**
+ * 实时从公链中下载账本数据，并从账本交易中提取账户和账户余额信息，存入数据库
+ * @returns {Promise}
+ */
 timeTask.getAccountsRealTime = function () {
     return new Promise(function (resolve, reject) {
         getLatestLedger().then(function (ledger_index) {
             extractAccountsLedger(ledger_index).then(function (savedLedger) {
                 analyseSingleledger(savedLedger).then(async function (accounts) {
-                    logger.info('accounts', accounts);
                     let balances = [];
                     await (async function () {
                         for (let account of accounts) {
+                            logger.info('account: ', account.dataValues);
+
                             let balancesAssos = await queryBalanceAndSave(account);
                             balances = balances.concat(balancesAssos);
                         }
@@ -156,8 +161,46 @@ timeTask.getAccountsRealTime = function () {
             reject(error);
         })
     })
-}
+};
 
+/**
+ * 统计账户持仓排名，对数据库中账户和账户余额数据进行统计
+ * countTokenAndBalances不同的是不更新余额，只是统计代币持仓
+ * 可能应用于非实时的代币统计
+ */
+timeTask.countTokenRanking = function () {
+    return new Promise(function (resolve, reject) {
+        localService.setAllTokens0().then(function () {
+            localService.getAllBalances().then(async function (allBalances) {
+                // 获取全部的余额进行代币统计
+                for (let balance of allBalances) {
+                    await localService.findOrCreateToken({
+                        currency: balance.currency,
+                        issuer: balance.issuer
+                    }).then(async token => {
+                        token.total = token.total + util.changeTwoDecimal(balance.value);
+                        logger.info('total: ' + token.total, 'balance: ' + balance.value);
+                        await localService.updateToken({
+                            currency: balance.currency,
+                            issuer: balance.issuer
+                        }, {total: token.total});
+                    })
+                }
+                resolve();
+            }).catch(function (error) {
+                reject(error);
+            })
+        }).catch(function (error) {
+            reject(error);
+        })
+    })
+};
+
+/**
+ * 查询指定账户的余额，设置余额账户相互关联，并将其存入数据库
+ * @param account
+ * @returns {Promise}
+ */
 function queryBalanceAndSave(account) {
     return new Promise((resolve, reject) => {
         if (!account.address || !jutils.isValidAddress(account.address)) {
@@ -211,24 +254,32 @@ function queryBalanceAndSave(account) {
                     error.msg = err;
                 }
                 logger.error('fail to get balance: ' + err);
+                reject(err);
             } else {
+                logger.info('goes here');
                 let result = jingtumService.process_balance(results, condition);
                 // 将各个账户的balances存入到数据库
                 if (result && result.balances) {
-                    let balancesAssociated = [];
-                    (async function () {
-                        for (let balance of result.balances) {
-                            balance = await localService.saveBalance(balance, account);
-                            balancesAssociated.push(balance);
-                        }
+                    const saveBalances = async function () {
+                        let balancesAssociated = [];
+                        await(async function () {
+                            for (let balance of result.balances) {
+                                balance = await localService.saveBalance(balance, account);
+                                logger.info('balance: ', balance.dataValues)
+                                balancesAssociated.push(balance);
+                            }
+                        })();
+                        return balancesAssociated;
+                    };
+                    saveBalances().then(function (balancesAssociated) {
                         localService.saveAccountBalances(account, balancesAssociated).then(() => {
                             resolve(balancesAssociated);
                         })
-                    })();
+                    });
                 }
             }
         });
-    })
+    });
 }
 
 /**
@@ -338,26 +389,6 @@ function getLatestLedger() {
 }
 
 /**
- * 将账本存在tumscan数据库
- * @param ledger
- */
-function saveLedger(ledger) {
-    new Promise((resolve, reject) => {
-        entities.Ledger.create({
-            hash: ledger.ledger_hash,
-            account_hash: ledger.account_hash,
-            close_time_human: ledger.close_time_human,
-            close_time_resolution: ledger.close_time_resolution,
-            ledger_index: ledger.ledger_index,
-            parent_hash: ledger.parent_hash,
-            total_coins: ledger.total_coins,
-            transaction_hash: ledger.transaction_hash
-        })
-        resolve();
-    })
-}
-
-/**
  * 分析账本中交易，将其sent和received类型交易中交易双方
  * 的地址分析、抽取出来，写入本地数据库
  * @param ledgers
@@ -403,17 +434,17 @@ function analyseSingleledger(ledger) {
         await (async function () {
             for (let transactionHash of ledger.transactions) {
                 if (transactionHash) {
-                    await jingtumService.queryTx(transactionHash).then((transaction => {
+                    await jingtumService.queryTx(transactionHash).then(async function (transaction) {
                         let affectAccounts = extractAccount(transaction);
                         // 将链上数据库写入本地数据库
                         if (affectAccounts) {
                             // logger.info('affectAccounts', affectAccounts);
-                            localService.saveAccount({address: affectAccounts.Account});
-                            localService.saveAccount({address: affectAccounts.Destination});
-                            accounts.push(affectAccounts.Account);
-                            accounts.push(affectAccounts.Destination);
+                            let account = await localService.saveAccount({address: affectAccounts.Account});
+                            let destination = await localService.saveAccount({address: affectAccounts.Destination});
+                            accounts.push(account);
+                            accounts.push(destination);
                         }
-                    })).catch(function (error) {
+                    }).catch(function (error) {
                         reject(error)
                     })
                 }

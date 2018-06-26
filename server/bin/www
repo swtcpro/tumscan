@@ -7,22 +7,22 @@ require('./global');
 import TimeTask from "../src/common/timed_task";
 const logger = require("../src/lib/logger");
 const schedule = require("node-schedule");
-var app = require('../app');
-var debug = require('debug')('empty:server');
-var http = require('http');
+const app = require('../app');
+const debug = require('debug')('empty:server');
+const http = require('http');
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '80');
+let port = normalizePort(process.env.PORT || '80');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+let server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -37,7 +37,7 @@ server.on('listening', onListening);
  */
 
 function normalizePort(val) {
-    var port = parseInt(val, 10);
+    let port = parseInt(val, 10);
 
     if (isNaN(port)) {
         // named pipe
@@ -61,7 +61,7 @@ function onError(error) {
         throw error;
     }
 
-    var bind = typeof port === 'string'
+    let bind = typeof port === 'string'
         ? 'Pipe ' + port
         : 'Port ' + port;
 
@@ -85,22 +85,35 @@ function onError(error) {
  */
 
 function onListening() {
-    var addr = server.address();
-    var bind = typeof addr === 'string'
+    let addr = server.address();
+    let bind = typeof addr === 'string'
         ? 'pipe ' + addr
         : 'port ' + addr.port;
     debug('Listening on ' + bind);
     console.log('server is runing... Listening on ' + bind)
     if (bind.indexOf("port") > -1) {
-        var uri = 'http://0.0.0.0:' + addr.port;
+        let uri = 'http://0.0.0.0:' + addr.port;
         console.log('> Listening at ' + uri + '\n')
     }
 
 }
 
-var rule = new schedule.RecurrenceRule();
-var times = [0, 10, 20, 30, 40, 50];
+/**
+ * 实时抓取账本交易中的账户数据
+ */
+let rule = new schedule.RecurrenceRule();
+let times = [0, 10, 20, 30, 40, 50];
 rule.second = times;
-var j = schedule.scheduleJob(rule, function () {
+let j = schedule.scheduleJob(rule, function () {
     TimeTask.getAccountsRealTime();
 });
+
+/**
+ * 每天凌晨1点进行代币统计，不更新账户余额
+ */
+function dailyCountToken() {
+    schedule.scheduleJob('* * 1 * * *', function () {
+        TimeTask.countTokenRanking();
+    })
+}
+dailyCountToken();

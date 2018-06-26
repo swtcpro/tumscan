@@ -36,12 +36,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('dist'));
 
 if (app.get('env') === 'development') {
-    // const cors = require('cors');
-    // //跨域问题处理
-    // app.use(cors({
-    //     credentials: true,
-    //     origin: 'http://localhost:8080'
-    // }));
+    const cors = require('cors');
+    //跨域问题处理
+    app.use(cors({
+        credentials: true,
+        origin: 'http://tumscan.bbswtc.com'
+    }));
     // app.all('*', function (req, res, next) {
     //     res.header('Access-Control-Allow-Origin', "http://tumscan.bbswtc.com:8081");
     //     res.header("Access-Control-Allow-Headers", "X-Requested-With");

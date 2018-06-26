@@ -171,7 +171,7 @@ function saveAccount(account) {
         entities.Account.findById(account.address).then(accountFound => {
             if (accountFound) {
                 // logger.info('accountFound', accountFound.dataValues);
-                // logger.info('find account');
+                logger.info('find account');
                 resolve(accountFound);
             } else {
                 logger.info('created account');
@@ -207,6 +207,7 @@ function saveBalance(balance, account) {
             }
         }).then(balanceFind => {
             if (balanceFind) {
+                logger.info('balanceFind: ');
                 resolve(balanceFind);
             } else {
                 entities.Balance.create(balance).then(balanceCreated => {
@@ -216,6 +217,7 @@ function saveBalance(balance, account) {
 
         }).catch(error => {
             logger.info(error);
+            reject(error);
         })
     })
 }
@@ -282,7 +284,6 @@ function saveLedger(ledger) {
 }
 
 
-
 /**
  * 通过账本高度范围获取账本
  * @param from
@@ -293,7 +294,7 @@ function getAllLedgers(from, to) {
     const {gt, lte} = entities.Sequelize.Op;
     return new Promise(function (resolve, reject) {
         entities.Ledger.findAll({
-            where:{
+            where: {
                 ledger_index: {[gt]: from},
                 ledger_index: {[lte]: to}
             }
@@ -362,6 +363,51 @@ function saveAccountBalances(account, balances) {
     })
 }
 
+function setAllTokens0() {
+    return new Promise(function (resolve, reject) {
+        getAllTokens().then(async tokens => {
+            if (tokens) {
+                for (let token of tokens) {
+                    await updateToken({
+                        currency: token.currency,
+                        issuer: token.issuer
+                    }, {total: 0});
+                }
+            }
+            resolve();
+        }).catch(function (error) {
+            reject(error);
+        })
+    })
+}
+
+/**
+ * 查询所有余额，参数为空全部查询，加入分页参数则分页查询
+ * @param limit
+ * @param page
+ * @returns {Promise}
+ */
+function getAllBalances(limit, page) {
+    return new Promise(function (resolve, reject) {
+        if (limit && page) {    // 分页查询
+            let offset = (page - 1) * limit;
+            entities.Balance.findAll({offset: offset, limit: limit}).then(function (pagedBalances) {
+                resolve(pagedBalances);
+            }).catch(function (error) {
+                logger.info(error);
+                reject(error);
+            })
+        } else {
+            entities.Balance.findAll().then(function (allBalances) {
+                resolve(allBalances);
+            }).catch(function (error) {
+                logger.info(error);
+                reject(error);
+            })
+        }
+    })
+}
+
 export default {
     getAllTokens: getAllTokens,
     updateToken: updateToken,
@@ -379,5 +425,7 @@ export default {
     getRankingPaging: getRankingPaging,
     getToken: getToken,
     getBalanceCount: getBalanceCount,
-    getAllLegersCount: getAllLegersCount
+    getAllLegersCount: getAllLegersCount,
+    setAllTokens0: setAllTokens0,
+    getAllBalances: getAllBalances
 }

@@ -1,7 +1,7 @@
 <template>
   <ul style="padding-left: 0px">
     <li v-for="item in messagedata" :key="item.id">
-      <el-col :span="23">
+      <el-col :span="23" class="title">
         <img src="../../assets/icon/comment-white.png" />
         <a href="javascript:void(0)" @click="openDetails(item)" style="margin-left:5px;color: white">{{item.title}}</a>
       </el-col>
@@ -13,6 +13,11 @@
 </template>
 
 <style>
+.title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 </style>
 
 <script>

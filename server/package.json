@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "script-name": "babel-node script.js",
-    "start": "nodemon ./bin/www --exec babel-node --presets es2015,stage-2",
+    "start": "set NODE_ENV=production&& nodemon ./bin/www --exec babel-node --presets es2015,stage-2",
     "dev": "nodemon ./bin/www --exec babel-node --presets es2015,stage-2",
     "test": "mocha --compilers js:babel-core/register"
   },
@@ -25,6 +25,7 @@
     "morgan": "~1.8.1",
     "mysql2": "^1.5.3",
     "nconf": "^0.10.0",
+    "node-schedule": "^1.3.0",
     "reflect-metadata": "^0.1.12",
     "request": "^2.81.0",
     "sequelize": "^4.37.10",

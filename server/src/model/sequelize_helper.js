@@ -6,8 +6,9 @@
  \* Description: orm框架sequelize帮助文件，用于数据库相关配置信息
  \*/
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize('temp', 'root', 'm7315202', {
-    host: 'localhost',
+const sequelize = new Sequelize('tempbk', 'root', '', {
+    host: '106.14.65.102',
+    //host: 'localhost',
     dialect: 'mysql',
     port: 3306,
     logging: false,

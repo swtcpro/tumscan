@@ -112,8 +112,12 @@ let j = schedule.scheduleJob(rule, function () {
  * 每天凌晨1点进行代币统计，不更新账户余额
  */
 function dailyCountToken() {
-    schedule.scheduleJob('* * 1 * * *', function () {
-        TimeTask.countTokenRanking();
+    schedule.scheduleJob('0 0 1 * * *', function () {
+        try {
+            TimeTask.countTokenRanking();
+        }catch (e) {
+            console.log(e);
+        }
     })
 }
 dailyCountToken();

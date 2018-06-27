@@ -173,13 +173,14 @@ timeTask.countTokenRanking = function () {
         localService.setAllTokens0().then(function () {
             localService.getAllBalances().then(async function (allBalances) {
                 // 获取全部的余额进行代币统计
+                logger.info('allBalances length: ', allBalances.length);
                 for (let balance of allBalances) {
                     await localService.findOrCreateToken({
                         currency: balance.currency,
                         issuer: balance.issuer
                     }).then(async token => {
                         token.total = token.total + util.changeTwoDecimal(balance.value);
-                        logger.info('total: ' + token.total, 'balance: ' + balance.value);
+                        logger.info('token: ' + token.currency + 'total: ' + token.total, 'balance: ' + balance.value);
                         await localService.updateToken({
                             currency: balance.currency,
                             issuer: balance.issuer
@@ -309,7 +310,7 @@ timeTask.countTokenAndBalances = function () {
                     let balancesAssociated = await queryBalanceAndSave(account);
                     allBalances = allBalances.concat(balancesAssociated)
                 }
-                logger.info('allBalances length: ', allBalances.length);
+                logger.info('token: ' + token.currency + 'total: ' + token.total, 'balance: ' + balance.value);
                 // 获取全部的余额进行代币统计
                 for (let balance of allBalances) {
                     // logger.info(balance.dataValues);

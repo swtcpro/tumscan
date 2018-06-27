@@ -7,7 +7,7 @@ let bodyParser = require('body-parser');
 let lessMiddleware = require('less-middleware');
 let session = require('express-session');
 // var cors = require('cors');
-
+const cors = require('cors');
 let index = require('./routes/index');
 
 let app = express();
@@ -36,12 +36,15 @@ app.use(lessMiddleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('dist'));
 
-if (app.get('env') === 'development') {
-    const cors = require('cors');
+
+var env = process.env.NODE_ENV || 'development';
+
+if (env === 'development') {
     //跨域问题处理
+    // console.log(env);
     app.use(cors({
         credentials: true,
-        origin: 'http://tumscan.bbswtc.com'
+        origin: 'http://localhost:8080'
     }));
     // app.all('*', function (req, res, next) {
     //     res.header('Access-Control-Allow-Origin', "http://tumscan.bbswtc.com:8081");
@@ -53,6 +56,12 @@ if (app.get('env') === 'development') {
     //     res.header('Access-Control-Allow-Credentials', 'true'); //告诉客户端可以在HTTP请求中带上Cookie
     //     next();
     // });
+} else {
+    // console.log(env);
+    app.use(cors({
+        credentials: true,
+        origin: 'http://tumscan.bbswtc.com'
+    }));
 }
 
 app.use('/', index.router);

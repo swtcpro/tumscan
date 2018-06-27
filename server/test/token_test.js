@@ -4,27 +4,35 @@ const logger = require("../src/lib/logger");
 const remote = require("../src/lib/remote");
 import TimeTask from "../src/common/timed_task";
 
-// describe('token tests', () => {
-//     it('should return a set of account', function () {
-//         remote.connect((err, result) => {
-//             if (err) {
-//                 return console.log(err);
-//             }
-//             // TimeTask.traverseLedgers('266955', '9826175').then(ledgers => {
-//             TimeTask.traverseLedgers('9826155', '9826175').then(ledgers => {
-//                 ledgers.should.be.an.instanceOf(Array);
-//                 ledgers.should.have.length(21)
-//             })
-//         });
-//     });
-//     it('timed_task sync test', () => {
-//         remote.connect((err, result) => {
-//             if (err) {
-//                 return console.log('err', err);
-//             }
-//             TimeTask.sync();
-//         });
-//     });
+describe('token tests', () => {
+    it('should return a set of account', function () {
+        remote.connect((err, result) => {
+            if (err) {
+                return console.log(err);
+            }
+            // TimeTask.traverseLedgers('266955', '9826175').then(ledgers => {
+            TimeTask.traverseLedgers('9826155', '9826175').then(ledgers => {
+                ledgers.should.be.an.instanceOf(Array);
+                ledgers.should.have.length(21)
+            })
+        });
+    });
+    it('timed_task sync test', () => {
+        remote.connect((err, result) => {
+            if (err) {
+                return console.log('err', err);
+            }
+            TimeTask.sync();
+        });
+    });
+
+    it.only('timeTask countTokenRanking 测试', function () {
+        TimeTask.countTokenRanking().then(function () {
+            logger.info('完成测试')
+        }).catch(function (error) {
+            logger.info(error);
+        })
+    });
 
 //     it.only('timed_task initSync test', function () {
 //         remote.connect((err, result) => {
@@ -70,7 +78,7 @@ import TimeTask from "../src/common/timed_task";
 //         });
 //     })
 
-// });
+});
 
 // describe('下载公链中所有账本计划', function () {
 //     it.only('7百万-八百万高度账本', function () {
@@ -131,7 +139,7 @@ describe('下载公链中所有账本计划', function () {
                 //TimeTask.manualSync(8700000, 8800000),
             ]).then(function (savedLedgers) {
                 savedLedgers.should.be.a.Array();
-            }).catch(function(r){
+            }).catch(function (r) {
                 console.log("err");
                 console.log(r);
             })

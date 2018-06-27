@@ -5,11 +5,13 @@ let env = process.env.NODE_ENV || 'development';
 //接口访问
 router.use('/api/v1', require('./api/v1/index').router);
 
+
+console.log(env);
 /* 服务端主页 */
 router.get('/(|home|dashboard|account|transactions' +
     '|ledgers|transaction|ledger|chart|forum|tokens|ranking)', function (req, res) {
     if(_.trim(env) == 'production'){
-        res.render('dist/index')
+        res.render('dist/index');
         return;
     }
     res.render('views/index');

@@ -70,7 +70,7 @@
       return {
         loading: false,
         pagination: {
-          limit: 50,
+          limit: 20,
           page: 1,
           total: 100
         },

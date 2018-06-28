@@ -6,9 +6,21 @@
  \* Description: orm框架sequelize帮助文件，用于数据库相关配置信息
  \*/
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize('temp', 'root', 'm7315202', {
+let env = process.env.NODE_ENV || 'development';
+let passwd = 'm7315202';
+let host = 'localhost';
+if (env === 'production') {
+    passwd = '';
+    host = '10.28.65.53'
+}
+const logger = require('../lib/logger');
+logger.info('host: ', host);
+logger.info('passwd: ', passwd);
+
+
+const sequelize = new Sequelize('temp', 'root', passwd, {
     // host: '106.14.65.102',
-    host: 'localhost',
+    host: host,
     dialect: 'mysql',
     port: 3306,
     logging: false,

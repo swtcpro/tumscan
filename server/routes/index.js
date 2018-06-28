@@ -5,15 +5,15 @@ let env = process.env.NODE_ENV || 'development';
 //接口访问
 router.use('/api/v1', require('./api/v1/index').router);
 
-
-console.log(env);
 /* 服务端主页 */
 router.get('/(|home|dashboard|account|transactions' +
     '|ledgers|transaction|ledger|chart|forum|tokens|ranking)', function (req, res) {
-    if(_.trim(env) == 'production'){
+    if(_.trim(env) === 'production'){
+        console.log('render dist/index')
         res.render('dist/index');
         return;
     }
+    console.log(' render view/index')
     res.render('views/index');
 });
 // router.get('/', function (req, res) {

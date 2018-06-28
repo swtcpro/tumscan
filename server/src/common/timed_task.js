@@ -257,7 +257,6 @@ function queryBalanceAndSave(account) {
                 logger.error('fail to get balance: ' + err);
                 reject(err);
             } else {
-                logger.info('goes here');
                 let result = jingtumService.process_balance(results, condition);
                 // 将各个账户的balances存入到数据库
                 if (result && result.balances) {

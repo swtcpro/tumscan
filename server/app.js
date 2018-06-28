@@ -41,7 +41,7 @@ var env = process.env.NODE_ENV || 'development';
 
 if (env === 'development') {
     //跨域问题处理
-    // console.log(env);
+    console.log(env);
     app.use(cors({
         credentials: true,
         origin: 'http://localhost:8080'
@@ -57,7 +57,7 @@ if (env === 'development') {
     //     next();
     // });
 } else {
-    // console.log(env);
+    console.log(env);
     app.use(cors({
         credentials: true,
         origin: 'http://tumscan.bbswtc.com'

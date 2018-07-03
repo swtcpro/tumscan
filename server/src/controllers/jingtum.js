@@ -187,10 +187,11 @@ tumController.queryBalancesByAddress = function (req, res) {
  * @param res
  */
 tumController.queryWalletLib = function (req, res) {
+
     let address = _.trim(req.query.address || '');
     let page = parseInt(_.trim(req.query.page || 1));
     let limit = parseInt(_.trim(req.query.limit || 20));
-    jingtumService.queryWalletLib(address).then(function (result) {
+    jingtumService.queryWalletLib(address, page , limit).then(function (result) {
         // 处理分页
         let offset = (page - 1) * limit;
         if ((offset + limit) > result.total) {

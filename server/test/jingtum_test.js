@@ -34,6 +34,7 @@ describe('#jingtumLib()', function () {
             }
             jingtumService.queryWalletLib('j4Zdsk3tQSvQ4aEiaN1BD2Wk3ztzBBRWHc').then(function (result) {
                 result.should.be.a.Object();
+                logger.info(result);
             })
         })
     });

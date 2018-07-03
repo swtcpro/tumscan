@@ -34,6 +34,20 @@ describe('token tests', () => {
         })
     });
 
+    it.only('generateBalances 测试', function () {
+        remote.connect(function (err, result) {
+            if (err) {
+                return console.log('err', err);
+            }
+            TimeTask.generateBalances().then(function () {
+                logger.info('generateBalances 测试完成')
+            }).catch(function (error) {
+                logger.info(error);
+            })
+        });
+
+    })
+
 //     it.only('timed_task initSync test', function () {
 //         remote.connect((err, result) => {
 //             if (err) {
@@ -134,8 +148,8 @@ describe('下载公链中所有账本计划', function () {
             }
             Promise.all([
                 //TimeTask.manualSync(8344064, 8400000),
-                TimeTask.manualSync(8485027, 8500000),
-                //TimeTask.manualSync(8643369, 8700000),
+                TimeTask.manualSync(8126141, 8500000, 8000000, 8500000),
+                TimeTask.manualSync(8625847, 9000000, 8500000, 9000000),
                 //TimeTask.manualSync(8700000, 8800000),
             ]).then(function (savedLedgers) {
                 savedLedgers.should.be.a.Array();

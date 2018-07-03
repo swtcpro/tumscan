@@ -267,10 +267,11 @@ jingtumService.queryTx = function (hash) {
 
 jingtumService.queryWalletLib = function (address) {
     return new Promise(function (resolve, reject) {
+        // let count = page * limit;
         jingtumService.queryBalance(address).then(function (balances) {
+
             jingtumService.queryAccountTx(address).then(function (transactions) {
                 let wallet = balances;
-                wallet.transactions = transactions.transactions;
                 wallet.total = transactions.transactions.length;
                 /**
                  * 处理交易信息，将不同类型的交易sent,received,offernew,offercancel,offereffect
@@ -308,14 +309,15 @@ jingtumService.queryWalletLib = function (address) {
 /**
  * 通过账户地址获取账户交易
  * @param address
+ * @param count 交易返回数量
  */
 jingtumService.queryAccountTx = function (address) {
     return new Promise(function (resolve, reject) {
         if (!remote || !remote.isConnected()) {
             logger.error(resultCode.N_REMOTE.msg);
-            return new NetworkError(resultCode.N_REMOTE);
+            reject(NetworkError(resultCode.N_REMOTE));
         }
-        let req = remote.requestAccountTx({account: address});
+        let req = remote.requestAccountTx({account: address, limit: 100});
         req.submit(function (err, transactions) {
             if (err) {
                 logger.info('err', err);

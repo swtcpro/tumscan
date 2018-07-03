@@ -79,8 +79,10 @@ timeTask.sync = function () {
  * 人工手动同步，通过指定账本高度区间进行同步
  * @param from
  * @param to
+ * @param from2
+ * @param to2
  */
-timeTask.manualSync = function (from, to) {
+timeTask.manualSync = function (from, to, from2, to2) {
     return new Promise(function (resolve, reject) {
         const extrac = async function (ledgers, from, to) {
             for (let ledgerIndex = from + 1; ledgerIndex <= to; ledgerIndex++) {
@@ -95,10 +97,14 @@ timeTask.manualSync = function (from, to) {
             return ledgers;
         };
         extrac([], from, to).then((ledgers) => {
-            analyseLedgerTransactions(ledgers).then(() => {
-                timeTask.countTokenAndBalances().then(() => {
-                    logger.info('time_task: 手动同步完成!');
-                    resolve(ledgers);
+            localService.getAllLedgers(from2, to2).then(function (assignedLedgers) {
+                analyseLedgerTransactions(assignedLedgers).then(() => {
+                    timeTask.countTokenAndBalances().then(() => {
+                        logger.info('time_task: 手动同步完成!');
+                        resolve(assignedLedgers);
+                    }).catch(function (error) {
+                        reject(error);
+                    });
                 }).catch(function (error) {
                     reject(error);
                 });
@@ -198,18 +204,38 @@ timeTask.countTokenRanking = function () {
 };
 
 /**
+ * 根据本地已经下载的账户查询余额
+ */
+timeTask.generateBalances = function () {
+    return new Promise(function (resolve, reject) {
+        localService.getAllAccounts().then(async function (accounts) {
+            for (let account of accounts) {
+                let balancesAssoci;
+                try {
+                    balancesAssoci = await queryBalanceAndSave(account);
+                } catch (e) {
+                    logger.info(e);
+                }
+            }
+            resolve();
+        })
+    })
+};
+
+/**
  * 查询指定账户的余额，设置余额账户相互关联，并将其存入数据库
  * @param account
  * @returns {Promise}
  */
 function queryBalanceAndSave(account) {
     return new Promise((resolve, reject) => {
-        if (!account.address || !jutils.isValidAddress(account.address)) {
+        let address = account.address;
+        if (!address || !jutils.isValidAddress(address)) {
             return new ClientError(resultCode.C_ADDRESS);
         }
         let condition = {};
-        let options = {account: account.address, type: 'trust'};
-        let options2 = {account: account.address, type: 'freeze'};
+        let options = {account: address, type: 'trust'};
+        let options2 = {account: address, type: 'freeze'};
         async.parallel({
             native: function (callback) {
                 let req1 = remote.requestAccountInfo(options);
@@ -401,13 +427,13 @@ function analyseLedgerTransactions(ledgers) {
                 ledger.transactions = ledger.transactions.split(',');
                 for (let transactionHash of ledger.transactions) {
                     if (transactionHash) {
-                        await jingtumService.queryTx(transactionHash).then((transaction => {
+                        await jingtumService.queryTx(transactionHash).then((async transaction => {
                             let affectAccounts = extractAccount(transaction);
                             // 将链上数据库写入本地数据库
                             if (affectAccounts) {
                                 // logger.info('affectAccounts', affectAccounts);
-                                localService.saveAccount({address: affectAccounts.Account});
-                                localService.saveAccount({address: affectAccounts.Destination});
+                                await localService.saveAccount({address: affectAccounts.Account});
+                                await localService.saveAccount({address: affectAccounts.Destination});
                                 accounts.push(affectAccounts.Account);
                                 accounts.push(affectAccounts.Destination);
                             }

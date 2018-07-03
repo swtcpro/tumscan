@@ -285,8 +285,10 @@ jingtumService.queryWalletLib = function (address) {
                         transaction.amount = tx.effects[0].paid.value + tx.effects[0].paid.currency + '--->' +
                             tx.effects[0].got.value + tx.effects[0].got.currency;
                     } else if (tx.type.startWith('offer')) {
-                        transaction.amount = tx.pays.value + tx.pays.currency + '--->' + tx.gets.value + tx.gets.currency;
-                        transaction.counterparty = '';
+                        if (tx.pays && tx.gets) {
+                            transaction.amount = tx.pays.value + tx.pays.currency + '--->' + tx.gets.value + tx.gets.currency;
+                            transaction.counterparty = '';
+                        }
                     } else {
                         transaction.amount = tx.amount.value;
                         transaction.counterparty = tx.counterparty;
@@ -317,7 +319,7 @@ jingtumService.queryAccountTx = function (address) {
             logger.error(resultCode.N_REMOTE.msg);
             reject(NetworkError(resultCode.N_REMOTE));
         }
-        let req = remote.requestAccountTx({account: address, limit: 100});
+        let req = remote.requestAccountTx({account: address, limit: 1000});
         req.submit(function (err, transactions) {
             if (err) {
                 logger.info('err', err);

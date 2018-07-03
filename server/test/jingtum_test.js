@@ -32,9 +32,11 @@ describe('#jingtumLib()', function () {
             if (err) {
                 return console.log('err', err);
             }
-            jingtumService.queryWalletLib('j4Zdsk3tQSvQ4aEiaN1BD2Wk3ztzBBRWHc').then(function (result) {
+            jingtumService.queryWalletLib('jsMwaJ7EA4y7QgdvQzaD2CqzQQN4v7vLFK').then(function (result) {
                 result.should.be.a.Object();
-                logger.info(result);
+                logger.info(result.transactions.length);
+            }).catch(function (error) {
+                logger.info(error);
             })
         })
     });

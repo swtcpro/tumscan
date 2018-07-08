@@ -25,10 +25,10 @@
                 <div class="transaction-item">
                   交易类型：
                   <el-tag v-if="tx.type === 'sent'"
-                          type="danger">卖出
+                          type="success">卖出
                   </el-tag>
                   <el-tag v-else-if="tx.type === 'received'"
-                          type="success">买入
+                          type="danger">买入
                   </el-tag>
                   <el-tag v-else-if="tx.type === 'offernew'"
                           type="info">挂单
@@ -51,10 +51,10 @@
               </li>
               <li>
                 <div class="transaction-item" v-if="tx.type === 'sent'">
-                  交易金额：{{tx.amount.value}} SWT
+                  交易金额：{{tx.amount.value}} {{tx.amount.currency}}
                 </div>
                 <div class="transaction-item" v-else-if="tx.type === 'received'">
-                  交易金额：{{tx.amount.value}} SWT
+                  交易金额：{{tx.amount.value}} {{tx.amount.currency}}
                 </div>
                 <div class="transaction-item" v-else>
                   交易金额：{{tx.pays.value}} {{tx.pays.currency}} <-->
@@ -90,7 +90,7 @@
               </li>
               <li>
                 <div class="transaction-item">
-                  交易费用：{{tx.fee}} SWT
+                  交易费用：{{tx.fee}} <span v-if="tx.amount">{{tx.amount.currency}}</span>
                 </div>
               </li>
               <li>
@@ -119,7 +119,7 @@
         <template v-for="effect in tx.effects">
 
           <div v-if="effect.effect === 'offer_bought'">
-            您以{{effect.pays.value}}的价格买了{{effect.got.value}}{{effect.got.currency}}
+            您以{{effect.paid.value}}的价格买了{{effect.got.value}}{{effect.got.currency}}
           </div>
           <div v-else-if="effect.effect === 'offer_created'">
             您以{{effect.pays.value}} {{effect.pays.currency}}的价格创建了挂单
@@ -136,7 +136,7 @@
         </el-row>
 
         <div v-if="tx.memos">
-          <div v-for="memo in tx.memos" :key="memo">
+          <div v-for="memo in tx.memos" :key="memo.MemoData">
             {{memo.MemoData}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           </div>
         </div>
@@ -145,8 +145,6 @@
         </div>
       </el-row>
     </el-row>
-
-
   </div>
 </template>
 
@@ -214,7 +212,6 @@
     methods: {
       getParams() {
         this.hash = this.$route.params.hash;
-        console.log(this.hash);
         return this.hash;
       },
       goToAccount(address) {

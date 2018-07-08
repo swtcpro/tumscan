@@ -98,15 +98,19 @@ function onListening() {
 
 }
 
-/**
- * 实时抓取账本交易中的账户数据
- */
-let rule = new schedule.RecurrenceRule();
-let times = [0, 10, 20, 30, 40, 50];
-rule.second = times;
-let j = schedule.scheduleJob(rule, function () {
-    TimeTask.getAccountsRealTime();
-});
+let env = process.env.NODE_ENV || 'development';
+if(_.trim(env) === 'production'){
+    /**
+     * 每隔10秒抓取账本交易中的账户数据
+     */
+    let rule = new schedule.RecurrenceRule();
+    let times = [0, 10, 20, 30, 40, 50];
+    rule.second = times;
+    let j = schedule.scheduleJob(rule, function () {
+        TimeTask.getAccountsRealTime();
+    });
+}
+
 
 /**
  * 每天凌晨1点进行代币统计，不更新账户余额
@@ -115,9 +119,26 @@ function dailyCountToken() {
     schedule.scheduleJob('0 0 1 * * *', function () {
         try {
             TimeTask.countTokenRanking();
-        }catch (e) {
-            console.log(e);
+        } catch (e) {
+            console.log('dailyCountToken: ', e);
         }
     })
 }
+
 dailyCountToken();
+
+/**
+ * 每周星期天凌晨3点进行所有账户最新余额的清算，并
+ * 计算代币统计
+ */
+function weeklyCountBalances() {
+    schedule.scheduleJob('0 0 3 * * 1', function () {
+        try {
+            TimeTask.countTokenAndBalances();
+        } catch (e) {
+            console.log('weeklyCountBalances: ', e);
+        }
+    })
+}
+
+weeklyCountBalances();

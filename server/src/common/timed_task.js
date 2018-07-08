@@ -11,7 +11,6 @@ import entities from '../model/entities';
 import Balance from "../model/balance";
 import util from '../common/utils';
 import localService from '../service/local_service';
-
 const jutils = require('jingtum-lib').utils;
 const remote = require('../lib/remote');
 const async = require('async');

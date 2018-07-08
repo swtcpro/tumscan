@@ -16,7 +16,8 @@ const Token = sequelize.define('token', {
         type: Sequelize.STRING,
         primaryKey: true
     },
-    total: Sequelize.FLOAT  // 代币总量
+    total: Sequelize.FLOAT,  // 代币总量
+    value: Sequelize.FLOAT   // 代币价格
 });
 
 export default Token;

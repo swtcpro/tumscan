@@ -20,15 +20,15 @@
       </el-col>
     </el-row>
 
-    <el-row class="pagination-row">
-      <el-col :offset="16" :md="8" :xl="8" :xs="12">
-        <el-pagination
-          background
-          layout="prev, pager, next" :page-size="pagination.limit" @current-change="flipOver"
-          :total="pagination.total">
-        </el-pagination>
-      </el-col>
-    </el-row>
+    <!--<el-row class="pagination-row">-->
+      <!--<el-col :offset="16" :md="8" :xl="8" :xs="12">-->
+        <!--<el-pagination-->
+          <!--background-->
+          <!--layout="prev, pager, next" :page-size="pagination.limit" @current-change="flipOver"-->
+          <!--:total="pagination.total">-->
+        <!--</el-pagination>-->
+      <!--</el-col>-->
+    <!--</el-row>-->
 
     <el-row class="token-table">
 
@@ -58,7 +58,7 @@
       <el-col :offset="16" :md="8" :xl="8" :xs="12">
         <el-pagination
           background
-          layout="prev, pager, next" :page-size="pagination.limit" @current-change="flipOver"
+          layout="prev, pager, sizes, next, jumper" :page-size="pagination.limit" @current-change="flipOver"
           :total="pagination.total">
         </el-pagination>
       </el-col>
@@ -169,5 +169,7 @@
 </script>
 
 <style scoped>
-
+  .token-table{
+    margin-top: 20px;
+  }
 </style>

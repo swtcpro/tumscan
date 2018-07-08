@@ -54,6 +54,11 @@ export default {
     return API.GET('/jingtum/query/ledgers', params);
   },
 
+  // 分页查询交易
+  queryTransactionsPaging: params => {
+    return API.GET('/jingtum/query/transactions', params);
+  },
+
   // 查询账号下所有交易
   findTranscationsByAddress: address => {
     // return API.GET('/jingtum/accounts/' + address + '/transactions');

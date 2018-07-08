@@ -44,6 +44,34 @@ function getTokensPaging(page, limit) {
 }
 
 /**
+ * 分页查询transaction
+ * @param page
+ * @param limit
+ */
+function getTransactionsPaging(page, limit) {
+    return new Promise(function (resolve, reject) {
+        let offset = (page - 1) * limit;
+        entities.Transaction.findAll({offset: offset, limit: limit}).then(function (array) {
+            resolve(array);
+        }).catch(function (error) {
+            logger.info(error);
+            reject(error);
+        })
+    })
+}
+
+function getTransactionsCount() {
+    return new Promise(function (resolve, reject) {
+        entities.Transaction.count().then(function (count) {
+            resolve(count)
+        }).then(function (error) {
+            logger.info(error);
+            reject(error)
+        })
+    })
+}
+
+/**
  * 获取代币种类数量
  * @returns {Promise}
  */
@@ -408,6 +436,30 @@ function getAllBalances(limit, page) {
     })
 }
 
+function saveTransaction(transaction) {
+    return new Promise(function (resolve, reject) {
+        entities.Transaction.findOne({
+            where: {
+                hash: transaction.hash,
+            }
+        }).then(transactionFind => {
+            if (transactionFind) {
+                logger.info('transactionFind: ');
+                resolve(transactionFind);
+            } else {
+
+                // logger.info('transaction: ', transaction);
+                entities.Transaction.create(transaction).then(transactionCreated => {
+                    resolve(transactionCreated);
+                })
+            }
+        }).catch(error => {
+            logger.info(error);
+            reject(error);
+        })
+    })
+}
+
 export default {
     getAllTokens: getAllTokens,
     updateToken: updateToken,
@@ -427,5 +479,8 @@ export default {
     getBalanceCount: getBalanceCount,
     getAllLegersCount: getAllLegersCount,
     setAllTokens0: setAllTokens0,
-    getAllBalances: getAllBalances
+    getAllBalances: getAllBalances,
+    saveTransaction: saveTransaction,
+    getTransactionsCount: getTransactionsCount,
+    getTransactionsPaging: getTransactionsPaging
 }

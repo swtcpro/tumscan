@@ -101,12 +101,16 @@
                    href="javascript:void(0)"> {{scope.row.hash}}</a>
               </template>
             </el-table-column>
-            <el-table-column prop="date" width="100" label="日期" sortable></el-table-column>
-            <el-table-column prop="Amount" label="交易金额" width="150" sortable></el-table-column>
-            <el-table-column prop="Account" label="交易本家"></el-table-column>
+            <el-table-column prop="date" width="200" label="日期" sortable></el-table-column>
+            <el-table-column label="交易金额" sortable>
+              <template slot-scope="scope">
+                <span v-if="scope.row.Amount.value">{{scope.row.Amount.value}} {{scope.row.Amount.currency}}</span>
+                <span v-else>{{scope.row.Amount}} SWT</span>
+              </template>
+            </el-table-column>
+            <!--<el-table-column prop="Account" label="交易本家"></el-table-column>-->
             <el-table-column
               prop="TransactionType"
-              width="100"
               :filters="[{ text: '买入', value: 'received'}, { text: '卖出', value: 'sent'},
           {text: '挂单', value: 'OfferCreate'}, {text: '取消挂单', value: 'offercancel'},
           {text: '成交挂单', value: 'offereffect'}, {text: '兑换', value: 'convert'}]"
@@ -114,10 +118,10 @@
               filter-placement="bottom-end">
               <template slot-scope="scope">
                 <el-tag v-if="scope.row.TransactionType === 'Payment'"
-                        type="danger">卖出
+                        type="success">卖出
                 </el-tag>
                 <el-tag v-else-if="scope.row.TransactionType === 'received'"
-                        type="success">买入
+                        type="danger">买入
                 </el-tag>
                 <el-tag v-else-if="scope.row.TransactionType === 'OfferCreate'"
                         type="info">挂单

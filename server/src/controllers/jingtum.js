@@ -7,6 +7,7 @@
  \*/
 import API from '../api/api_jingtum';
 import jingtumService from '../service/jingtum_service'
+import util from '../common/utils'
 
 const logger = require('../lib/logger');
 
@@ -161,6 +162,7 @@ tumController.queryLedgersPaging = function (req, res) {
     if (page && limit) {
         jingtumService.queryLedgersPaging(page, limit).then(function (ledgers) {
             let tempLedgers = ledgers.map(function (ledger, index) {
+                ledger.close_time_human = util.format(new Date(ledger.close_time_human));
                 return {
                     hash: ledger.hash,
                     index: ledger.ledger_index,
@@ -170,6 +172,24 @@ tumController.queryLedgersPaging = function (req, res) {
             });
             let total = Number(ledgers[0].ledger_index);
             return res.json({total: total, ledgers: tempLedgers});
+        }).catch(function (error) {
+            logger.info(error);
+            return res.json(error);
+        });
+    }
+};
+
+/**
+ * 分页查询交易列表数据
+ * @param req
+ * @param res
+ */
+tumController.queryTransactionsPaging = function (req, res) {
+    let page = parseInt(_.trim(req.query.page || 1));
+    let limit = parseInt(_.trim(req.query.limit || 20));
+    if (page && limit) {
+        jingtumService.queryTransactionsPaging(page, limit).then(function (result) {
+            return res.json(result);
         }).catch(function (error) {
             logger.info(error);
             return res.json(error);
@@ -191,7 +211,7 @@ tumController.queryWalletLib = function (req, res) {
     let address = _.trim(req.query.address || '');
     let page = parseInt(_.trim(req.query.page || 1));
     let limit = parseInt(_.trim(req.query.limit || 20));
-    jingtumService.queryWalletLib(address, page , limit).then(function (result) {
+    jingtumService.queryWalletLib(address, page, limit).then(function (result) {
         // 处理分页
         let offset = (page - 1) * limit;
         if ((offset + limit) > result.total) {

@@ -1,9 +1,10 @@
 import 'babel-polyfill';
-import TimeTask from "../src/common/timed_task"; // mocha 支持es6的需要的设置
+import tumUtils from "../src/common/tum_utils"; // mocha 支持es6的需要的设置
 let jingtumService = require('../src/service/jingtum_service');
 const logger = require('../src/lib/logger');
 const should = require('should');
 const remote = require('../src/lib/remote');
+import {sequelize, Sequelize} from '../src/model/sequelize_helper';
 
 describe('#jingtumLib()', function () {
     describe('ledger tests', function () {
@@ -27,6 +28,24 @@ describe('#jingtumLib()', function () {
 
     });
 
+    it.only('测试新生成的交易', function () {
+        sequelize.sync().then(function () {
+            remote.connect(function (err, result) {
+                if (err) {
+                    return console.log('err', err);
+                }
+                remote.on('transactions', function (tx) {
+                    // logger.info('remote get transactions:',tx);
+                    tumUtils.processTx(tx).then(function (transaction) {
+                        logger.info('processTx完成!')
+                    }).catch(function (error) {
+                        logger.info(error)
+                    })
+                });
+            })
+        })
+    });
+
     it.only('通过钱包地址返回钱包余额', function () {
         remote.connect(function (err, result) {
             if (err) {
@@ -42,7 +61,7 @@ describe('#jingtumLib()', function () {
     });
 
     it.only('通过钱包地址返回钱包余额和交易', function () {
-        remote.connect(function (err, result) {
+        remote.connect( function (err, result) {
             if (err) {
                 return console.log('err', err);
             }

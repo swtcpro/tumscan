@@ -13,16 +13,16 @@
     </el-row>
 
     <el-row class="pagination-row">
-      <el-col :md="16" :xl="16" :xs="12">
+      <el-col :md="10" :xl="10" :xs="12">
         <span style="margin: 1em">账本总量：{{pagination.total}}</span>
       </el-col>
-      <el-col :md="8" :xl="8" :xs="12">
-        <el-pagination
-          background
-          layout="prev, pager, next" :page-size="pagination.limit" @current-change="flipOver"
-          :total="pagination.total">
-        </el-pagination>
-      </el-col>
+      <!--<el-col :md="14" :xl="14" :xs="12">-->
+        <!--<el-pagination-->
+          <!--background-->
+          <!--layout="prev, pager, sizes, next, jumper" :page-size="pagination.limit" @current-change="flipOver"-->
+          <!--:total="pagination.total">-->
+        <!--</el-pagination>-->
+      <!--</el-col>-->
     </el-row>
 
     <el-row class="ledgers-row">
@@ -31,7 +31,7 @@
         <el-table-column
           label="账本hash">
           <template slot-scope="scope">
-            <a style="width: 15em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" href="javascript:void(0)">{{scope.row.hash}}</a>
+            <a style="width: 15em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" href="javascript:void(0)" v-on:click="handleLedger(scope.row.hash)">{{scope.row.hash}}</a>
           </template>
         </el-table-column>
         <el-table-column
@@ -50,10 +50,13 @@
     </el-row>
 
     <el-row class="pagination-row">
-      <el-col :offset="16" :md="8" :xl="8" :xs="12">
+      <el-col :md="10" :xl="10" :xs="12">
+        <span style="margin: 1em"></span>
+      </el-col>
+      <el-col :md="14" :xl="14" :xs="12">
         <el-pagination
           background
-          layout="prev, pager, next" :page-size="pagination.limit" @current-change="flipOver"
+          layout="prev, pager, sizes, next, jumper" :page-size="pagination.limit" @current-change="flipOver"
           :total="pagination.total">
         </el-pagination>
       </el-col>
@@ -121,6 +124,12 @@
           limit: this.pagination.limit
         };
         this.queryLedgers(params);
+      },
+      handleLedger(ledger_hash) {
+        this.$router.push({
+          name: 'ledger',
+          params: {ledger_hash}
+        })
       }
     },
     mounted() {

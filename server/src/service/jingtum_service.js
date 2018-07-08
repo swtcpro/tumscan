@@ -6,6 +6,7 @@
  \* Description:
  \*/
 import localService from "./local_service";
+import util from "../common/utils";
 
 const jlib = require('jingtum-lib');
 const Remote = jlib.Remote;
@@ -125,6 +126,28 @@ jingtumService.queryLedgersPaging = function (page, limit) {
             reject(error);
         })
     });
+};
+
+jingtumService.queryTransactionsPaging = function (page, limit) {
+    return new Promise(function (resolve, reject) {
+        localService.getTransactionsPaging(page, limit).then(function (transactions) {
+            localService.getTransactionsCount().then(function (count) {
+                let tempTransactions = transactions.map(function (transaction, index) {
+                    let date = util.generate2000(new Number(transaction.date), 'yyyy-MM-dd hh:mm:ss');
+                    return {
+                        hash: transaction.hash,
+                        Amount: transaction.Amount,
+                        date: date,
+                        TransactionType: transaction.TransactionType,
+                        Destination: transaction.Destination
+                    }
+                });
+                resolve({total: count, transactions: tempTransactions})
+            })
+        }).catch(function (error) {
+            reject(error)
+        })
+    })
 };
 
 /**

@@ -6,6 +6,7 @@ const logger = require('./logger');
 const utils = require('./utils');
 const Remote = require('jingtum-lib').Remote;
 const remote = new Remote(config.get('skywelld_servers'));
+import tumUtils from '../common/tum_utils'
 
 
 remote.connect(function (err, data) {
@@ -23,7 +24,12 @@ remote.connect(function (err, data) {
         });
 
         remote.on('transactions', function (tx) {
-            //logger.info('remote get transactions:',tx);
+            // logger.info('remote get transactions:',tx);
+            tumUtils.processTx(tx).then(function (result) {
+                logger.info('processTx完成!')
+            }).catch(function (error) {
+                logger.info(error)
+            })
         });
     }
 });

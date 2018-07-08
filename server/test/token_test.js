@@ -159,4 +159,23 @@ describe('下载公链中所有账本计划', function () {
             })
         })
     });
+    it.only('6百万-7百万高度账本', function () {
+        remote.connect(function (err, result) {
+            if (err) {
+                return console.log('err', err);
+            }
+            Promise.all([
+                //TimeTask.manualSync(8344064, 8400000),
+                TimeTask.manualSync(6383044, 6500000, 6000000, 6500000),
+                TimeTask.manualSync(6882310, 7000000, 6500000, 7000000),
+                //TimeTask.manualSync(8700000, 8800000),
+            ]).then(function (savedLedgers) {
+                savedLedgers.should.be.a.Array();
+                logger.info('6百万-7百万高度账本下载完成')
+            }).catch(function (r) {
+                console.log("err");
+                console.log(r);
+            })
+        })
+    });
 })

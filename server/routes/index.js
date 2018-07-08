@@ -13,7 +13,6 @@ router.get('/(|home|dashboard|account|transactions' +
         res.render('dist/index');
         return;
     }
-    console.log(' render view/index')
     res.render('views/index');
 });
 // router.get('/', function (req, res) {

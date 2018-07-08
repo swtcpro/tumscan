@@ -59,10 +59,12 @@
         <el-card shadow="never" :body-style="{ padding: '2px'}">
           <div slot="header">
             <span>账本</span>
-            <el-button @click="viewAllLedgers" style="float: right; padding: 3px 0" size="medium" type="text">查看全部</el-button>
+            <el-button @click="viewAllLedgers" style="float: right; padding: 3px 0" size="medium" type="text">查看全部
+            </el-button>
           </div>
           <div>
-            <el-card :body-style="{ padding: '10px',height: '100px' }" shadow="hover" v-for="ledger in data.ledgers" :key="ledger.ledger_index">
+            <el-card :body-style="{ padding: '10px',height: '100px' }" shadow="hover" v-for="ledger in data.ledgers"
+                     :key="ledger.ledger_index">
               <el-col :span="8" class="block">
                 <el-row style="height: 65px" type="flex" justify="center">
                   <a href="javascript:void(0);" v-on:click="handleLedger(ledger.ledger_hash)"
@@ -89,10 +91,11 @@
         <el-card class="transaction" shadow="never" :body-style="{ padding: '2px'}">
           <div slot="header">
             <span>交易</span>
-            <el-button style="float: right; padding: 3px 0" type="text">查看全部</el-button>
+            <el-button @click="viewAllTransactions" style="float: right; padding: 3px 0" type="text">查看全部</el-button>
           </div>
 
-          <el-card :body-style="{  padding: '10px',height: '100px' }" shadow="hover" v-for="transaction in data.transactions"
+          <el-card :body-style="{  padding: '10px',height: '100px' }" shadow="hover"
+                   v-for="transaction in data.transactions"
                    :key="transaction.hash">
             <el-col :span="24">
               <div class="transaction-item">
@@ -101,8 +104,8 @@
                      v-on:click="handleTransaction(transaction.hash)"> {{transaction.hash}}</a>
                 </div>
                 <div>交易类型：
-                  <el-tag v-if="transaction.type === 'sent'" type="danger">买入</el-tag>
-                  <el-tag v-else-if="transaction.type === 'received'" type="success">卖出</el-tag>
+                  <el-tag v-if="transaction.type === 'sent'" type="success">卖出</el-tag>
+                  <el-tag v-else-if="transaction.type === 'received'" type="danger">买入</el-tag>
                   <el-tag v-else-if="transaction.type === 'offernew'" type="info">挂单</el-tag>
                   <el-tag v-else-if="transaction.type === 'offercancel'" type="primary">取消挂单</el-tag>
                   <el-tag v-else-if="transaction.type === 'offereffect'" type="success">成交挂单</el-tag>
@@ -195,7 +198,6 @@
         })
       },
       handleLedger(ledger_hash) {
-        console.log(ledger_hash);
         this.$router.push({
           name: 'ledger',
           params: {ledger_hash}
@@ -204,6 +206,11 @@
       viewAllLedgers() {
         this.$router.push({
           name: 'ledgers'
+        })
+      },
+      viewAllTransactions() {
+        this.$router.push({
+          name: 'transactions'
         })
       }
     },

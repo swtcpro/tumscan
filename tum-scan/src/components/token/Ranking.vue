@@ -78,15 +78,15 @@
 
         <el-tab-pane label="账户排名" name="holders">
           <!-- 账户排名内容 -->
-          <el-row class="pagination-row">
-            <el-col :offset="16" :md="8" :xl="8" :xs="12">
-              <el-pagination
-                background
-                layout="prev, pager, next" :page-size="pagination.limit" @current-change="flipOver"
-                :total="pagination.total">
-              </el-pagination>
-            </el-col>
-          </el-row>
+          <!--<el-row class="pagination-row">-->
+            <!--<el-col :offset="16" :md="8" :xl="8" :xs="12">-->
+              <!--<el-pagination-->
+                <!--background-->
+                <!--layout="prev, pager, next" :page-size="pagination.limit" @current-change="flipOver"-->
+                <!--:total="pagination.total">-->
+              <!--</el-pagination>-->
+            <!--</el-col>-->
+          <!--</el-row>-->
 
           <el-row class="ranking-table">
             <el-table :data="rankings" border style="width: 100%">
@@ -109,10 +109,10 @@
           </el-row>
 
           <el-row class="pagination-row">
-            <el-col :offset="16" :md="8" :xl="8" :xs="12">
+            <el-col :offset="14" :md="10" :xl="10" :xs="12">
               <el-pagination
                 background
-                layout="prev, pager, next" :page-size="pagination.limit" @current-change="flipOver"
+                layout="prev, pager, sizes, next, jumper" :page-size="pagination.limit" @current-change="flipOver"
                 :total="pagination.total">
               </el-pagination>
             </el-col>

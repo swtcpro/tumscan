@@ -70,14 +70,14 @@ describe('token tests', () => {
 //         })
 //     });
 
-//     it('timed_task countTokenAndBalances test', () => {
-//         remote.connect((err, result) => {
-//             if (err) {
-//                 return console.log('err', err);
-//             }
-//             TimeTask.countTokenAndBalances();
-//         });
-//     })
+    it.only('timed_task countTokenAndBalances test', () => {
+        remote.connect((err, result) => {
+            if (err) {
+                return console.log('err', err);
+            }
+            TimeTask.countTokenAndBalances();
+        });
+    })
 
 //     it.only('从本地数据库中账本统计代币', function () {
 //         remote.connect((err, result) => {

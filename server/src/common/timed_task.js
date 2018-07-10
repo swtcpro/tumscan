@@ -336,7 +336,7 @@ timeTask.countTokenAndBalances = function () {
                         let balancesAssociated = await queryBalanceAndSave(account);
                         allBalances = allBalances.concat(balancesAssociated)
                     } catch (e) {
-                        
+
                     }
                 }
                 logger.info('token: ' + token.currency + 'total: ' + token.total, 'balance: ' + balance.value);
@@ -434,28 +434,45 @@ function getLatestLedger() {
 function analyseLedgerTransactions(ledgers) {
     return new Promise(async (resolve, reject) => {
         let accounts = [];
-        await (async function () {
-            for (let ledger of ledgers) {
-                ledger.transactions = ledger.transactions.split(',');
-                for (let transactionHash of ledger.transactions) {
-                    if (transactionHash) {
-                        await jingtumService.queryTx(transactionHash).then((async transaction => {
-                            let affectAccounts = extractAccount(transaction);
-                            // 将链上数据库写入本地数据库
-                            if (affectAccounts) {
-                                // logger.info('affectAccounts', affectAccounts);
-                                await localService.saveAccount({address: affectAccounts.Account});
-                                await localService.saveAccount({address: affectAccounts.Destination});
-                                accounts.push(affectAccounts.Account);
-                                accounts.push(affectAccounts.Destination);
-                            }
-                        })).catch(function (error) {
-                            reject(error)
-                        })
+        for (let ledger of ledgers) {
+            ledger.transactions = ledger.transactions.split(',');
+            for (let transactionHash of ledger.transactions) {
+                if (transactionHash) {
+                    let transaction = await jingtumService.queryTx(transactionHash);
+                    let affectAccounts = extractAccount(transaction);
+                    // 将链上数据库写入本地数据库
+                    if (affectAccounts) {
+                        await localService.saveAccount({address: affectAccounts.Account});
+                        await localService.saveAccount({address: affectAccounts.Destination});
+                        accounts.push(affectAccounts.Account);
+                        accounts.push(affectAccounts.Destination);
                     }
                 }
             }
-        })();
+            // await (async function () {
+            //     for (let ledger of ledgers) {
+            //         ledger.transactions = ledger.transactions.split(',');
+            //         for (let transactionHash of ledger.transactions) {
+            //             if (transactionHash) {
+            //                 await jingtumService.queryTx(transactionHash).then((async transaction => {
+            //                     let affectAccounts = extractAccount(transaction);
+            //                     // 将链上数据库写入本地数据库
+            //                     if (affectAccounts) {
+            //                         // logger.info('affectAccounts', affectAccounts);
+            //                         await localService.saveAccount({address: affectAccounts.Account});
+            //                         await localService.saveAccount({address: affectAccounts.Destination});
+            //                         accounts.push(affectAccounts.Account);
+            //                         accounts.push(affectAccounts.Destination);
+            //                     }
+            //                 })).catch(function (error) {
+            //                     reject(error)
+            //                 })
+            //             }
+            //         }
+            //     }
+            // })();
+
+        }
         resolve(accounts);
     })
 }
@@ -476,7 +493,6 @@ function analyseSingleledger(ledger) {
                         let affectAccounts = extractAccount(transaction);
                         // 将链上数据库写入本地数据库
                         if (affectAccounts) {
-                            // logger.info('affectAccounts', affectAccounts);
                             let account = await localService.saveAccount({address: affectAccounts.Account});
                             let destination = await localService.saveAccount({address: affectAccounts.Destination});
                             accounts.push(account);

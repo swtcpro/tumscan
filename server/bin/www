@@ -105,7 +105,7 @@ setTimeout(function () {
     }).catch(function (error) {
         logger.info(error)
     });
-}, 100)
+}, 10)
 
 
 let env = process.env.NODE_ENV || 'development';

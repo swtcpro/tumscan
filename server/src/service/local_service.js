@@ -236,7 +236,20 @@ function saveBalance(balance, account) {
         }).then(balanceFind => {
             if (balanceFind) {
                 logger.info('balanceFind: ');
-                resolve(balanceFind);
+                entities.Balance.update({
+                    value: balance.value,
+                    freezed: balance.freezed
+                }, {
+                    where: {
+                        address: balance.address,
+                        currency: balance.currency,
+                        issuer: balance.issuer
+                    }
+                }).then(function (array) {
+                    resolve(balanceFind);
+                }).catch(error => {
+                    reject(error);
+                });
             } else {
                 entities.Balance.create(balance).then(balanceCreated => {
                     resolve(balanceCreated);
@@ -244,7 +257,7 @@ function saveBalance(balance, account) {
             }
 
         }).catch(error => {
-            logger.info(error);
+
             reject(error);
         })
     })

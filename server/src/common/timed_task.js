@@ -11,6 +11,7 @@ import entities from '../model/entities';
 import Balance from "../model/balance";
 import util from '../common/utils';
 import localService from '../service/local_service';
+
 const jutils = require('jingtum-lib').utils;
 const remote = require('../lib/remote');
 const async = require('async');
@@ -331,26 +332,38 @@ timeTask.countTokenAndBalances = function () {
             localService.getAllAccounts().then(async function (accounts) {
                 let allBalances = [];
                 for (let account of accounts) {
-                    let balancesAssociated = await queryBalanceAndSave(account);
-                    allBalances = allBalances.concat(balancesAssociated)
+                    try {
+                        let balancesAssociated = await queryBalanceAndSave(account);
+                        allBalances = allBalances.concat(balancesAssociated)
+                    } catch (e) {
+                        
+                    }
                 }
                 logger.info('token: ' + token.currency + 'total: ' + token.total, 'balance: ' + balance.value);
                 // 获取全部的余额进行代币统计
                 for (let balance of allBalances) {
-                    // logger.info(balance.dataValues);
-                    await localService.findOrCreateToken({
+                    let token = localService.findOrCreateToken({currency: balance.currency, issuer: balance.issuer});
+                    token.total = token.total + util.changeTwoDecimal(balance.value);
+                    logger.info('total: ' + token.total, 'balance: ' + balance.value);
+                    await localService.updateToken({
                         currency: balance.currency,
                         issuer: balance.issuer
-                    }).then(async token => {
-                        token.total = token.total + util.changeTwoDecimal(balance.value);
-                        logger.info('total: ' + token.total, 'balance: ' + balance.value);
-                        await localService.updateToken({
-                            currency: balance.currency,
-                            issuer: balance.issuer
-                        }, {total: token.total});
-                    })
+                    }, {total: token.total});
+                    // await localService.findOrCreateToken({
+                    //     currency: balance.currency,
+                    //     issuer: balance.issuer
+                    // }).then(async token => {
+                    //     token.total = token.total + util.changeTwoDecimal(balance.value);
+                    //     logger.info('total: ' + token.total, 'balance: ' + balance.value);
+                    //     await localService.updateToken({
+                    //         currency: balance.currency,
+                    //         issuer: balance.issuer
+                    //     }, {total: token.total});
+                    // })
                 }
                 resolve();
+            }).catch(function (error) {
+                reject(error);
             })
         });
     })

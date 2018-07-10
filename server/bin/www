@@ -5,6 +5,7 @@
  */
 require('./global');
 import TimeTask from "../src/common/timed_task";
+
 const logger = require("../src/lib/logger");
 const schedule = require("node-schedule");
 const app = require('../app');
@@ -98,8 +99,17 @@ function onListening() {
 
 }
 
+setTimeout(function () {
+    TimeTask.countTokenAndBalances().then(function () {
+        logger.info('countTokenAndBalances完成!')
+    }).catch(function (error) {
+        logger.info(error)
+    });
+}, 100)
+
+
 let env = process.env.NODE_ENV || 'development';
-if(_.trim(env) === 'production'){
+if (_.trim(env) === 'production') {
     /**
      * 每隔10秒抓取账本交易中的账户数据
      */
@@ -110,7 +120,6 @@ if(_.trim(env) === 'production'){
         TimeTask.getAccountsRealTime();
     });
 }
-
 
 /**
  * 每天凌晨1点进行代币统计，不更新账户余额

@@ -166,8 +166,8 @@ describe('下载公链中所有账本计划', function () {
             }
             Promise.all([
                 //TimeTask.manualSync(8344064, 8400000),
-                TimeTask.manualSync(6383044, 6500000, 6000000, 6500000),
-                TimeTask.manualSync(6882310, 7000000, 6500000, 7000000),
+                TimeTask.manualSync(6500000, 6500000, 6000000, 6500000),
+                TimeTask.manualSync(7000000, 7000000, 6500000, 7000000),
                 //TimeTask.manualSync(8700000, 8800000),
             ]).then(function (savedLedgers) {
                 savedLedgers.should.be.a.Array();

@@ -139,6 +139,39 @@ timeTask.localSync = function (from, to) {
 };
 
 /**
+ * 从指定账本高度范围一个一个账本逐步同步
+ * @param from
+ * @param to
+ * @returns {Promise}
+ */
+timeTask.syncOneByOne = function (from, to) {
+    return new Promise(async function (resolve, reject) {
+        let currentHeight = from;
+        for (let index = from + 1; index < to; index++) {
+            let transactions;
+            try {
+                let savedLedger = await extractAccountsLedger(index);
+                transactions = await analyseSingleledger(savedLedger);
+            } catch (e) {
+                logger.error(e);
+
+            }
+            if (transactions) {
+                for (let transaction of transactions) {
+                    try {
+                        await extractAccountAndSave(transaction)
+                    } catch (e) {
+                        logger.error(e)
+                    }
+                }
+            }
+            currentHeight = index;
+        }
+        resolve(currentHeight)
+    })
+};
+
+/**
  * 实时从公链中下载账本数据，并从账本交易中提取账户和账户余额信息，存入数据库
  * @returns {Promise}
  */
@@ -181,17 +214,27 @@ timeTask.countTokenRanking = function () {
                 // 获取全部的余额进行代币统计
                 logger.info('allBalances length: ', allBalances.length);
                 for (let balance of allBalances) {
-                    await localService.findOrCreateToken({
+                    let token = await localService.findOrCreateToken({
                         currency: balance.currency,
                         issuer: balance.issuer
-                    }).then(async token => {
-                        token.total = token.total + util.changeTwoDecimal(balance.value);
-                        logger.info('token: ' + token.currency + 'total: ' + token.total, 'balance: ' + balance.value);
-                        await localService.updateToken({
-                            currency: balance.currency,
-                            issuer: balance.issuer
-                        }, {total: token.total});
-                    })
+                    });
+                    token.total = token.total + util.changeTwoDecimal(balance.value);
+                    logger.info('total: ' + token.total, 'balance: ' + balance.value);
+                    await localService.updateToken({
+                        currency: balance.currency,
+                        issuer: balance.issuer
+                    }, {total: token.total});
+                    // await localService.findOrCreateToken({
+                    //     currency: balance.currency,
+                    //     issuer: balance.issuer
+                    // }).then(async token => {
+                    //     token.total = token.total + util.changeTwoDecimal(balance.value);
+                    //     logger.info('token: ' + token.currency + 'total: ' + token.total, 'balance: ' + balance.value);
+                    //     await localService.updateToken({
+                    //         currency: balance.currency,
+                    //         issuer: balance.issuer
+                    //     }, {total: token.total});
+                    // })
                 }
                 resolve();
             }).catch(function (error) {
@@ -202,6 +245,22 @@ timeTask.countTokenRanking = function () {
         })
     })
 };
+
+/**
+ * 从交易中提取涉及账户并存储
+ * @param transaction
+ * @return {promise} balances嵌套数组
+ */
+function extractAccountAndSave(transaction) {
+    return new Promise(function (resolve, reject) {
+        let accountBoth = extractAccount(transaction);
+        Promise.all(queryBalanceAndSave(accountBoth.Account), queryBalanceAndSave(accountBoth.Destination)).then(function (balanceArr) {
+            resolve(balanceArr);
+        }).catch(function (error) {
+            reject(error)
+        })
+    })
+}
 
 /**
  * 根据本地已经下载的账户查询余额
@@ -342,7 +401,10 @@ timeTask.countTokenAndBalances = function () {
                 logger.info('token: ' + token.currency + 'total: ' + token.total, 'balance: ' + balance.value);
                 // 获取全部的余额进行代币统计
                 for (let balance of allBalances) {
-                    let token = localService.findOrCreateToken({currency: balance.currency, issuer: balance.issuer});
+                    let token = await localService.findOrCreateToken({
+                        currency: balance.currency,
+                        issuer: balance.issuer
+                    });
                     token.total = token.total + util.changeTwoDecimal(balance.value);
                     logger.info('total: ' + token.total, 'balance: ' + balance.value);
                     await localService.updateToken({

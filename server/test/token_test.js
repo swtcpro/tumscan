@@ -79,6 +79,18 @@ describe('token tests', () => {
         });
     })
 
+    it.only('根据本地数据库中账户余额统计代币', function () {
+        TimeTask.countTokenRanking().then(function () {
+            logger.info('根据本地数据库中账户余额统计代币完成')
+        }).catch(function (error) {
+            logger.info(error)
+        })
+    })
+
+    it('测试账本高度五百万+ 1000', function () {
+
+    });
+
 //     it.only('从本地数据库中账本统计代币', function () {
 //         remote.connect((err, result) => {
 //             if (err) {

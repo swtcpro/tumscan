@@ -77,7 +77,7 @@ describe('token tests', () => {
             }
             TimeTask.countTokenAndBalances();
         });
-    })
+    });
 
     it.only('根据本地数据库中账户余额统计代币', function () {
         TimeTask.countTokenRanking().then(function () {
@@ -85,10 +85,18 @@ describe('token tests', () => {
         }).catch(function (error) {
             logger.info(error)
         })
-    })
+    });
 
-    it('测试账本高度五百万+ 1000', function () {
-
+    it.only('测试账本高度九百万+ 1000', function () {
+        remote.connect((err, result) => {
+            if (err) {
+                return console.log('err', err);
+            }
+            TimeTask.syncOneByOne(10000000, 10001000).then(function () {
+                logger.info('指定同步范围syncOneByOne完成!')
+                return
+            })
+        });
     });
 
 //     it.only('从本地数据库中账本统计代币', function () {

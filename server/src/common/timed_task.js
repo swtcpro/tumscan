@@ -148,18 +148,18 @@ timeTask.syncOneByOne = function (from, to) {
     return new Promise(async function (resolve, reject) {
         let currentHeight = from;
         for (let index = from + 1; index < to; index++) {
-            let transactions;
+            let accounts;
             try {
                 let savedLedger = await extractAccountsLedger(index);
-                transactions = await analyseSingleledger(savedLedger);
+                accounts = await analyseSingleledger(savedLedger);
+                logger.info('accounts: ', accounts)
             } catch (e) {
                 logger.error(e);
-
             }
-            if (transactions) {
-                for (let transaction of transactions) {
+            if (accounts) {
+                for (let account of accounts) {
                     try {
-                        await extractAccountAndSave(transaction)
+                       await queryBalanceAndSave(account)
                     } catch (e) {
                         logger.error(e)
                     }
@@ -254,6 +254,7 @@ timeTask.countTokenRanking = function () {
 function extractAccountAndSave(transaction) {
     return new Promise(function (resolve, reject) {
         let accountBoth = extractAccount(transaction);
+
         Promise.all(queryBalanceAndSave(accountBoth.Account), queryBalanceAndSave(accountBoth.Destination)).then(function (balanceArr) {
             resolve(balanceArr);
         }).catch(function (error) {

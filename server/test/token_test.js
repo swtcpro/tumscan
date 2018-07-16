@@ -26,7 +26,7 @@ describe('token tests', () => {
         });
     });
 
-    it.only('timeTask countTokenRanking 测试', function () {
+    it('timeTask countTokenRanking 测试', function () {
         TimeTask.countTokenRanking().then(function () {
             logger.info('完成测试')
         }).catch(function (error) {
@@ -34,7 +34,7 @@ describe('token tests', () => {
         })
     });
 
-    it.only('generateBalances 测试', function () {
+    it('generateBalances 测试', function () {
         remote.connect(function (err, result) {
             if (err) {
                 return console.log('err', err);
@@ -70,7 +70,7 @@ describe('token tests', () => {
 //         })
 //     });
 
-    it.only('timed_task countTokenAndBalances test', () => {
+    it('timed_task countTokenAndBalances test', () => {
         remote.connect((err, result) => {
             if (err) {
                 return console.log('err', err);
@@ -79,7 +79,7 @@ describe('token tests', () => {
         });
     });
 
-    it.only('根据本地数据库中账户余额统计代币', function () {
+    it('根据本地数据库中账户余额统计代币', function () {
         TimeTask.countTokenRanking().then(function () {
             logger.info('根据本地数据库中账户余额统计代币完成')
         }).catch(function (error) {
@@ -88,15 +88,20 @@ describe('token tests', () => {
     });
 
     it.only('测试账本高度九百万+ 1000', function () {
-        remote.connect((err, result) => {
+        remote.connect(function (err, result) {
             if (err) {
                 return console.log('err', err);
             }
+            logger.info("goes here")
             TimeTask.syncOneByOne(10000000, 10001000).then(function () {
                 logger.info('指定同步范围syncOneByOne完成!')
-                return
+            }).catch(function (error) {
+                logger.info(error);
             })
         });
+        // TimeTask.syncOneByOne(10000000, 10001000).then(function () {
+        //     logger.info('指定同步范围syncOneByOne完成!')
+        // })
     });
 
 //     it.only('从本地数据库中账本统计代币', function () {
@@ -197,5 +202,17 @@ describe('下载公链中所有账本计划', function () {
                 console.log(r);
             })
         })
+    });
+    it.only('5百万-6百万高度账本', function () {
+        remote.connect(function (err, result) {
+            if (err) {
+                return console.log('err', err);
+            }
+             TimeTask.syncOneByOne(5000000, 6000000).then(function () {
+                logger.info('指定同步范围syncOneByOne完成!')
+            }).catch(function (error) {
+                logger.info(error);
+            })
+        });
     });
 })

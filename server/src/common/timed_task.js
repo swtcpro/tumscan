@@ -20,10 +20,10 @@ const resultCode = require('../lib/resultCode');
 const ClientError = require('../lib/errors').ClientError;
 const NetworkError = require('../lib/errors').NetworkError;
 
-const INIT_LEDGER_INDEX = 266955;
+
 
 let timeTask = {};
-
+const INIT_LEDGER_INDEX = 266955;
 /**
  * 初始化同步：从创世账本开始，同步所有公链账本数据
  */
@@ -152,14 +152,13 @@ timeTask.syncOneByOne = function (from, to) {
             try {
                 let savedLedger = await extractAccountsLedger(index);
                 accounts = await analyseSingleledger(savedLedger);
-                logger.info('accounts: ', accounts)
             } catch (e) {
                 logger.error(e);
             }
             if (accounts) {
                 for (let account of accounts) {
                     try {
-                       await queryBalanceAndSave(account)
+                        await queryBalanceAndSave(account)
                     } catch (e) {
                         logger.error(e)
                     }
@@ -332,7 +331,7 @@ function queryBalanceAndSave(account) {
 
                 getOffers(options);
             }
-        }, function (err, results) {
+        }, async function (err, results) {
             if (err) {
                 let error = {};
                 if (err.msg) {
@@ -343,25 +342,46 @@ function queryBalanceAndSave(account) {
                 logger.error('fail to get balance: ' + err);
                 reject(err);
             } else {
+                // let result = jingtumService.process_balance(results, condition);
+                // // 将各个账户的balances存入到数据库
+                // if (result && result.balances) {
+                //     const saveBalances = async function () {
+                //         let balancesAssociated = [];
+                //         await(async function () {
+                //             for (let balance of result.balances) {
+                //                 balance = await localService.saveBalance(balance, account);
+                //                 logger.info('balance: ', balance.dataValues)
+                //                 balancesAssociated.push(balance);
+                //             }
+                //         })();
+                //         return balancesAssociated;
+                //     };
+                //     saveBalances().then(function (balancesAssociated) {
+                //         localService.saveAccountBalances(account, balancesAssociated).then(() => {
+                //             resolve(balancesAssociated);
+                //         })
+                //     });
+                // }
                 let result = jingtumService.process_balance(results, condition);
                 // 将各个账户的balances存入到数据库
                 if (result && result.balances) {
                     const saveBalances = async function () {
                         let balancesAssociated = [];
-                        await(async function () {
-                            for (let balance of result.balances) {
+                        for (let balance of result.balances) {
+                            try {
                                 balance = await localService.saveBalance(balance, account);
-                                logger.info('balance: ', balance.dataValues)
+                                // logger.info('balance: ', balance.dataValues)
                                 balancesAssociated.push(balance);
+                            } catch (e) {
+                                logger.error("saveBalance error: ", e);
+                                continue;
                             }
-                        })();
+                        }
                         return balancesAssociated;
                     };
-                    saveBalances().then(function (balancesAssociated) {
-                        localService.saveAccountBalances(account, balancesAssociated).then(() => {
-                            resolve(balancesAssociated);
-                        })
-                    });
+                    let balancesAssociated = await saveBalances();
+                    await localService.saveAccountBalances(account, balancesAssociated);
+                    resolve(balancesAssociated);
                 }
             }
         });

@@ -105,9 +105,9 @@ setTimeout(function () {
     }).catch(function (error) {
         logger.info(error)
     });
-}, 10)
+}, 5000)
 
-
+const INIT_LEDGER_INDEX = 266955;
 let env = process.env.NODE_ENV || 'development';
 if (_.trim(env) === 'production') {
     /**
@@ -119,6 +119,17 @@ if (_.trim(env) === 'production') {
     let j = schedule.scheduleJob(rule, function () {
         TimeTask.getAccountsRealTime();
     });
+
+    /**
+     * 从创始区块同步到五百万高度账本
+     */
+    setTimeout(function () {
+        TimeTask.syncOneByOne(INIT_LEDGER_INDEX, 5000000).then(function () {
+            logger.info("从创始区块同步到五百万高度账本同步完成!")
+        }).catch(function (error) {
+            logger.info(error);
+        })
+    }, 10000)
 }
 
 /**

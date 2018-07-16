@@ -10,7 +10,7 @@
         </el-col>
         <el-col :xs="0" :md="4" :xl="4">
         </el-col>
-        <el-col :md="6" :xl="6" :xs="24">
+        <el-col :md="8" :xl="8" :xs="24">
           <el-input placeholder="请输入钱包地址/交易哈希" v-model="searchInput" class="input-with-button">
             <el-button slot="append" icon="el-icon-search" v-on:click="handleSearch"></el-button>
           </el-input>

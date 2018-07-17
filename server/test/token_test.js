@@ -203,15 +203,18 @@ describe('下载公链中所有账本计划', function () {
             })
         })
     });
-    it.only('5百万-6百万高度账本', function () {
+    it.only('5百万-6百万高度账本', function (done) {
+        this.timeout(0);
         remote.connect(function (err, result) {
             if (err) {
                 return console.log('err', err);
             }
-             TimeTask.syncOneByOne(5000000, 6000000).then(function () {
+            TimeTask.syncOneByOne(5238784, 6000000).then(function () {
                 logger.info('指定同步范围syncOneByOne完成!')
+                done();
             }).catch(function (error) {
                 logger.info(error);
+                done(error);
             })
         });
     });

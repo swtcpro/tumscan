@@ -79,11 +79,14 @@ describe('token tests', () => {
         });
     });
 
-    it('根据本地数据库中账户余额统计代币', function () {
+    it.only('根据本地数据库中账户余额统计代币', function (done) {
+        this.timeout(0);
         TimeTask.countTokenRanking().then(function () {
             logger.info('根据本地数据库中账户余额统计代币完成')
+            done()
         }).catch(function (error) {
-            logger.info(error)
+            logger.error(error)
+            done();
         })
     });
 

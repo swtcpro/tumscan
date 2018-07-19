@@ -212,7 +212,7 @@ describe('下载公链中所有账本计划', function () {
             if (err) {
                 return console.log('err', err);
             }
-            TimeTask.syncOneByOne(5238784, 6000000).then(function () {
+            TimeTask.syncOneByOne(5924096, 6000000).then(function () {
                 logger.info('指定同步范围syncOneByOne完成!')
                 done();
             }).catch(function (error) {

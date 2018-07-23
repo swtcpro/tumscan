@@ -32,6 +32,8 @@ String.prototype.endWith = function (str) {
     return reg.test(this);
 };
 
+
+
 jingtumService.queryLedger = function (hash) {
     return new Promise(((resolve, reject) => {
         if (!remote || !remote.isConnected()) {

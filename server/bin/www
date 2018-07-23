@@ -99,14 +99,6 @@ function onListening() {
 
 }
 
-setTimeout(function () {
-    TimeTask.countTokenAndBalances().then(function () {
-        logger.info('countTokenAndBalances完成!')
-    }).catch(function (error) {
-        logger.info(error)
-    });
-}, 5000)
-
 const INIT_LEDGER_INDEX = 266955;
 let env = process.env.NODE_ENV || 'development';
 if (_.trim(env) === 'production') {
@@ -130,13 +122,21 @@ if (_.trim(env) === 'production') {
             logger.info(error);
         })
     }, 10000)
+
+    setTimeout(function () {
+        TimeTask.countTokenAndBalances().then(function () {
+            logger.info('countTokenAndBalances完成!')
+        }).catch(function (error) {
+            logger.info(error)
+        });
+    }, 5000)
 }
 
 /**
- * 每天凌晨1点进行代币统计，不更新账户余额
+ * 每天凌晨7点进行代币统计，不更新账户余额
  */
 function dailyCountToken() {
-    schedule.scheduleJob('0 0 1 * * *', function () {
+    schedule.scheduleJob('0 0 7 * * *', function () {
         try {
             TimeTask.countTokenRanking();
         } catch (e) {
@@ -148,11 +148,11 @@ function dailyCountToken() {
 dailyCountToken();
 
 /**
- * 每周星期天凌晨3点进行所有账户最新余额的清算，并
+ * 每周星期天凌晨1点进行所有账户最新余额的清算，并
  * 计算代币统计
  */
 function weeklyCountBalances() {
-    schedule.scheduleJob('0 0 3 * * 1', function () {
+    schedule.scheduleJob('0 0 1 * * 1', function () {
         try {
             TimeTask.countTokenAndBalances();
         } catch (e) {

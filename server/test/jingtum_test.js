@@ -65,12 +65,28 @@ describe('#jingtumLib()', function () {
             if (err) {
                 return console.log('err', err);
             }
-            jingtumService.queryWalletLib('j4Zdsk3tQSvQ4aEiaN1BD2Wk3ztzBBRWHc').then(function (wallet) {
+            jingtumService.queryWalletLib('jEkffY8XtkEtkUKyYQT1Fv7MDp3grAtwdH').then(function (wallet) {
                 logger.info(wallet)
                 wallet.should.be.a.Object();
             })
         })
     });
+
+    it.only('通过hash查询指定交易', function (done) {
+        remote.connect( function (err, result) {
+            if (err) {
+                return console.error('err', err);
+            }
+            jingtumService.queryTx('B40C0B37273FAE892573146882F806CA90E475CB69062D62AF3FAEA9E2D7783C').then(function (tx) {
+                logger.info(tx)
+                tx.should.be.a.Object();
+                done()
+            }).catch(function (error) {
+                logger.error(error);
+                done();
+            })
+        })
+    })
 
     it.only('分页查询代币列表', function () {
         jingtumService.queryTokens(1, 20, '').then(function (tokens) {

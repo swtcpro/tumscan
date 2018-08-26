@@ -39,7 +39,9 @@
             </el-select>
           </el-col>
 
-          <el-date-picker class="search" v-show="searchTimeShow" v-model="dateValue" type="daterange" align="right" unlink-panels range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="dateOptions">
+          <el-date-picker class="search" v-show="searchTimeShow" v-model="dateValue" type="daterange" align="right"
+                          unlink-panels range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"
+                          :picker-options="dateOptions">
           </el-date-picker>
 
           <el-col :span="2" :md="3" :xl="4" :xs="8" v-show="searchTimeShow">
@@ -53,7 +55,8 @@
           </el-col>
 
           <el-col v-show="pageShow" :md="8" :xl="8" :xs="12">
-            <el-pagination background layout="prev, pager, next,total" :page-size="pagination.limit" @current-change="flipOver" :total="pagination.total" :current-page="pagination.page">
+            <el-pagination background layout="prev, pager, next,total" :page-size="pagination.limit"
+                           @current-change="flipOver" :total="pagination.total" :current-page="pagination.page">
             </el-pagination>
           </el-col>
         </el-row>
@@ -86,186 +89,186 @@
 </template>
 
 <style>
-.pagination-row {
-  margin-bottom: 20px;
-}
+  .pagination-row {
+    margin-bottom: 20px;
+  }
 
-.search {
-  margin-left: 10px;
-}
+  .search {
+    margin-left: 10px;
+  }
 </style>
 
 <script>
-import api from "../../api/api_message";
-import util from "../../common/util";
+  import api from "../../api/api_message";
+  import util from "../../common/util";
 
-export default {
-  data: function() {
-    return {
-      title: "",
-      content: "",
-      dialogVisible: false,
-      nowIndex: -100,
-      options: [
-        {
-          value: 0,
-          label: "按照时间"
-        },
-        {
-          value: 1,
-          label: "按照标题"
-        }
-      ],
-      queryType: 0,
-      searchTextShow: false,
-      dateOptions: {
-        shortcuts: [
+  export default {
+    data: function () {
+      return {
+        title: "",
+        content: "",
+        dialogVisible: false,
+        nowIndex: -100,
+        options: [
           {
-            text: "最近一周",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit("pick", [start, end]);
-            }
+            value: 0,
+            label: "按照时间"
           },
           {
-            text: "最近一个月",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit("pick", [start, end]);
-            }
-          },
-          {
-            text: "最近三个月",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit("pick", [start, end]);
-            }
+            value: 1,
+            label: "按照标题"
           }
-        ]
-      },
-      searchTimeShow: true,
-      dateValue: "",
-      titleSearch: ""
-    };
-  },
-  methods: {
-    add() {
-      if (this.title == "") {
-        this.$message({
-          message: "请填写标题",
-          type: "warning"
-        });
-      } else if (this.content == "") {
-        this.$message({
-          message: "请填写内容",
-          type: "warning"
-        });
-      } else {
-        api.addMessage(this.title, this.content).then(data => {
-          this.$message("增加信息成功");
-          this.title = "";
-          this.content = "";
-          this.flipOver(this.pagination.total / this.pagination.limit + 1);
-        });
-      }
-    },
-    showDialog() {
-      this.dialogVisible = true;
-    },
-    showDelallDialog() {
-      this.dialogVisible = true;
-      this.nowIndex = -2;
-    },
-    del(n) {
-      if (n == -2) {
-        this.mydata = [];
-      } else {
-        this.mydata.splice(n, 1);
-      }
-      this.nowIndex = -100;
-      this.dialogVisible = false;
-    },
-    handleReset() {
-      this.title = "";
-      this.content = "";
-    },
-    indexMethod(index) {
-      return index + 1;
-    },
-    flipOver(page) {
-      const params = {
-        page,
-        limit: 10
+        ],
+        queryType: 0,
+        searchTextShow: false,
+        dateOptions: {
+          shortcuts: [
+            {
+              text: "最近一周",
+              onClick(picker) {
+                const end = new Date();
+                const start = new Date();
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                picker.$emit("pick", [start, end]);
+              }
+            },
+            {
+              text: "最近一个月",
+              onClick(picker) {
+                const end = new Date();
+                const start = new Date();
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                picker.$emit("pick", [start, end]);
+              }
+            },
+            {
+              text: "最近三个月",
+              onClick(picker) {
+                const end = new Date();
+                const start = new Date();
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                picker.$emit("pick", [start, end]);
+              }
+            }
+          ]
+        },
+        searchTimeShow: true,
+        dateValue: "",
+        titleSearch: ""
       };
-      this.$store.dispatch("getForumMessage", params);
     },
-    openDetails(row) {
-      this.$router.push({
-        name: "forumdetail",
-      });
-      this.$store.dispatch("setMessage", row);
-    },
-    queryTypeChange(value) {
-      if (value === this.options[0].value) {
-        this.searchTextShow = false;
-        this.searchTimeShow = true;
-      } else if (value === this.options[1].value) {
-        this.searchTextShow = true;
-        this.searchTimeShow = false;
-      }
-    },
-    searchButton() {
-      this.queryMessage(1);
-    },
-    queryMessage(page) {
-      let params;
-      if (this.queryType === this.options[0].value) {
-        //按照时间
-        params = {
+    methods: {
+      add() {
+        if (this.title == "") {
+          this.$message({
+            message: "请填写标题",
+            type: "warning"
+          });
+        } else if (this.content == "") {
+          this.$message({
+            message: "请填写内容",
+            type: "warning"
+          });
+        } else {
+          api.addMessage(this.title, this.content).then(data => {
+            this.$message("增加信息成功");
+            this.title = "";
+            this.content = "";
+            this.flipOver(this.pagination.total / this.pagination.limit + 1);
+          });
+        }
+      },
+      showDialog() {
+        this.dialogVisible = true;
+      },
+      showDelallDialog() {
+        this.dialogVisible = true;
+        this.nowIndex = -2;
+      },
+      del(n) {
+        if (n == -2) {
+          this.mydata = [];
+        } else {
+          this.mydata.splice(n, 1);
+        }
+        this.nowIndex = -100;
+        this.dialogVisible = false;
+      },
+      handleReset() {
+        this.title = "";
+        this.content = "";
+      },
+      indexMethod(index) {
+        return index + 1;
+      },
+      flipOver(page) {
+        const params = {
           page,
-          limit: 10,
-          startTime: this.dateValue[0].getTime(),
-          endTime: this.dateValue[1].getTime()
+          limit: 10
         };
-        console.log(params);
-        this.$store.dispatch("getMessageByTime", params);
-      } else if (this.queryType === this.options[1].value) {
-        //按照标题
-        params = {
-          page,
-          limit: 10,
-          title: this.titleSearch
-        };
-        this.$store.dispatch("getMessageByTitle", params);
+        this.$store.dispatch("getForumMessage", params);
+      },
+      openDetails(row) {
+        this.$router.push({
+          name: "forumdetail",
+        });
+        this.$store.dispatch("setMessage", row);
+      },
+      queryTypeChange(value) {
+        if (value === this.options[0].value) {
+          this.searchTextShow = false;
+          this.searchTimeShow = true;
+        } else if (value === this.options[1].value) {
+          this.searchTextShow = true;
+          this.searchTimeShow = false;
+        }
+      },
+      searchButton() {
+        this.queryMessage(1);
+      },
+      queryMessage(page) {
+        let params;
+        if (this.queryType === this.options[0].value) {
+          //按照时间
+          params = {
+            page,
+            limit: 10,
+            startTime: this.dateValue[0].getTime(),
+            endTime: this.dateValue[1].getTime()
+          };
+          console.log(params);
+          this.$store.dispatch("getMessageByTime", params);
+        } else if (this.queryType === this.options[1].value) {
+          //按照标题
+          params = {
+            page,
+            limit: 10,
+            title: this.titleSearch
+          };
+          this.$store.dispatch("getMessageByTitle", params);
+        }
       }
-    }
-  },
-  computed: {
-    pagination() {
-      return this.$store.state.forum.pagination;
     },
-    messagedata() {
-      return this.$store.state.forum.messagedata;
-    },
-    pageShow() {
-      if (
-        this.$store.state.forum.pagination.total > 0 ||
-        this.$store.state.forum.messagedata.length > 0
-      ) {
-        return true;
+    computed: {
+      pagination() {
+        return this.$store.state.forum.pagination;
+      },
+      messagedata() {
+        return this.$store.state.forum.messagedata;
+      },
+      pageShow() {
+        if (
+          this.$store.state.forum.pagination.total > 0 ||
+          this.$store.state.forum.messagedata.length > 0
+        ) {
+          return true;
+        }
+        return false;
       }
-      return false;
+    },
+    mounted() {
+      this.flipOver(1);
     }
-  },
-  mounted() {
-    this.flipOver(1);
-  }
-};
+  };
 </script>
 

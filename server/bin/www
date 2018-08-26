@@ -16,7 +16,7 @@ const http = require('http');
  * Get port from environment and store in Express.
  */
 
-let port = normalizePort(process.env.PORT || '80');
+let port = normalizePort(process.env.PORT || '8080');
 app.set('port', port);
 
 /**
@@ -115,21 +115,21 @@ if (_.trim(env) === 'production') {
     /**
      * 从创始区块同步到五百万高度账本
      */
-    setTimeout(function () {
-        TimeTask.syncOneByOne(INIT_LEDGER_INDEX, 5000000).then(function () {
-            logger.info("从创始区块同步到五百万高度账本同步完成!")
-        }).catch(function (error) {
-            logger.info(error);
-        })
-    }, 10000)
+    // setTimeout(function () {
+    //     TimeTask.syncOneByOne(INIT_LEDGER_INDEX, 5000000).then(function () {
+    //         logger.info("从创始区块同步到五百万高度账本同步完成!")
+    //     }).catch(function (error) {
+    //         logger.info(error);
+    //     })
+    // }, 10000)
 
-    setTimeout(function () {
-        TimeTask.countTokenAndBalances().then(function () {
-            logger.info('countTokenAndBalances完成!')
-        }).catch(function (error) {
-            logger.info(error)
-        });
-    }, 5000)
+    // setTimeout(function () {
+    //     TimeTask.countTokenAndBalances().then(function () {
+    //         logger.info('countTokenAndBalances完成!')
+    //     }).catch(function (error) {
+    //         logger.info(error)
+    //     });
+    // }, 5000)
 }
 
 /**

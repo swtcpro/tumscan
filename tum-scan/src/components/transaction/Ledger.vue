@@ -23,7 +23,7 @@
     </el-row>
 
     <el-row class="ledger_content" v-loading="loading" element-loading-text="拼命加载中">
-      <el-row gutter="40" style="height: 300px">
+      <el-row :gutter="40" style="height: 300px">
         <el-col :xs="24" :md="12">
           <el-card shadow="never" :body-style="{ padding: '0px', height: '260px'}" v-model="ledger">
             <div style="height: 50px; padding: 15px">
@@ -104,7 +104,7 @@
             <el-table-column prop="date" width="200" label="日期" sortable></el-table-column>
             <el-table-column label="交易金额" sortable>
               <template slot-scope="scope">
-                <span v-if="scope.row.Amount.value">{{scope.row.Amount.value}} {{scope.row.Amount.currency}}</span>
+                <span v-if="scope.row.Amount && scope.row.Amount.value">{{scope.row.Amount.value}} {{scope.row.Amount.currency}}</span>
                 <span v-else>{{scope.row.Amount}} SWT</span>
               </template>
             </el-table-column>
@@ -179,7 +179,6 @@
     },
     methods: {
       getParams() {
-        console.log(this.$route.params.ledger_hash);
         this.ledger_hash = this.$route.params.ledger_hash;
         return this.ledger_hash;
       },

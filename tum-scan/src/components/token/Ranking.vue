@@ -318,7 +318,6 @@
             that.chartPie = echarts.init(chartDiv);
             that.chartPie.setOption(that.option);
           }, 100);
-
         }
       }
     },

@@ -15,7 +15,7 @@ let app = express();
 // view engine setup
 app.set('views', __dirname);
 app.set('view engine', 'html');
-app.engine( '.html', require( 'ejs' ).__express );
+app.engine('.html', require('ejs').__express);
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
@@ -44,7 +44,7 @@ if (env === 'development') {
     console.log(env);
     app.use(cors({
         credentials: true,
-        origin: 'http://localhost:8080'
+        origin: 'http://localhost:8081'
     }));
     // app.all('*', function (req, res, next) {
     //     res.header('Access-Control-Allow-Origin', "http://tumscan.bbswtc.com:8081");
@@ -60,7 +60,7 @@ if (env === 'development') {
     console.log(env);
     app.use(cors({
         credentials: true,
-        origin: 'http://tumscan.bbswtc.com'
+        origin: 'http://106.14.65.102:8080'
     }));
 }
 

@@ -6,7 +6,7 @@
  \* Description:
  \*/
 export default {
-    baseURL: 'http://state.jingtum.com',
+    baseURL: 'https://state.jingtum.com',
     // baseURL: 'http://localhost:80',
     isDev: true
 }

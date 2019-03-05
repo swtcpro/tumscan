@@ -21,7 +21,6 @@ const ClientError = require('../lib/errors').ClientError;
 const NetworkError = require('../lib/errors').NetworkError;
 
 
-
 let timeTask = {};
 const INIT_LEDGER_INDEX = 266955;
 /**
@@ -251,15 +250,15 @@ timeTask.countTokenRanking = function () {
  * @return {promise} balances嵌套数组
  */
 function extractAccountAndSave(transaction) {
-    return new Promise(function (resolve, reject) {
-        let accountBoth = extractAccount(transaction);
-
-        Promise.all(queryBalanceAndSave(accountBoth.Account), queryBalanceAndSave(accountBoth.Destination)).then(function (balanceArr) {
-            resolve(balanceArr);
-        }).catch(function (error) {
-            reject(error)
-        })
-    })
+    return new Promise((resolve, reject) => {
+            let accountBoth = extractAccount(transaction);
+            Promise.all(queryBalanceAndSave(accountBoth.Account), queryBalanceAndSave(accountBoth.Destination)).then(function (balanceArr) {
+                resolve(balanceArr);
+            }).catch(function (error) {
+                reject(error)
+            })
+        }
+    )
 }
 
 /**

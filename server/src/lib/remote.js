@@ -23,14 +23,17 @@ remote.connect(function (err, data) {
             logger.error('reconnect to jingtum');
         });
 
-        remote.on('transactions', function (tx) {
-            // logger.info('remote get transactions:',tx);
-            tumUtils.processTx(tx).then(function (result) {
-                logger.info('processTx完成!')
-            }).catch(function (error) {
-                logger.info(error)
-            })
-        });
+        /**
+         * 注销掉实时获取区块链中的数据
+         */
+        // remote.on('transactions', function (tx) {
+        //     // logger.info('remote get transactions:',tx);
+        //     tumUtils.processTx(tx).then(function (result) {
+        //         logger.info('processTx完成!')
+        //     }).catch(function (error) {
+        //         logger.info(error)
+        //     })
+        // });
     }
 });
 

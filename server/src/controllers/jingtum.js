@@ -187,14 +187,13 @@ tumController.queryLedgersPaging = function (req, res) {
 tumController.queryTransactionsPaging = function (req, res) {
     let page = parseInt(_.trim(req.query.page || 1));
     let limit = parseInt(_.trim(req.query.limit || 20));
-    if (page && limit) {
-        jingtumService.queryTransactionsPaging(page, limit).then(function (result) {
-            return res.json(result);
-        }).catch(function (error) {
-            logger.info(error);
-            return res.json(error);
-        });
-    }
+    jingtumService.queryTransactionsPaging(page, limit).then(function (result) {
+        return res.json(result);
+    }).catch(function (error) {
+        logger.info(error);
+        return res.json(error);
+    });
+
 };
 
 tumController.queryBalancesByAddress = function (req, res) {

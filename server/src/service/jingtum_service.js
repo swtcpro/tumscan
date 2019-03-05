@@ -33,7 +33,6 @@ String.prototype.endWith = function (str) {
 };
 
 
-
 jingtumService.queryLedger = function (hash) {
     return new Promise(((resolve, reject) => {
         if (!remote || !remote.isConnected()) {
@@ -131,10 +130,10 @@ jingtumService.queryLedgersPaging = function (page, limit) {
 };
 
 jingtumService.queryTransactionsPaging = function (page, limit) {
-    return new Promise(function (resolve, reject) {
-        localService.getTransactionsPaging(page, limit).then(function (transactions) {
-            localService.getTransactionsCount().then(function (count) {
-                let tempTransactions = transactions.map(function (transaction, index) {
+    return new Promise((resolve, reject) => {
+        localService.getTransactionsPaging(page, limit).then((transactions) => {
+            localService.getTransactionsCount().then((count) => {
+                let tempTransactions = transactions.map((transaction, index) => {
                     let date = util.generate2000(new Number(transaction.date), 'yyyy-MM-dd hh:mm:ss');
                     return {
                         hash: transaction.hash,
@@ -145,8 +144,12 @@ jingtumService.queryTransactionsPaging = function (page, limit) {
                     }
                 });
                 resolve({total: count, transactions: tempTransactions})
+            }).catch(error => {
+                logger.error(error)
+                reject(error)
             })
         }).catch(function (error) {
+            logger.error(error)
             reject(error)
         })
     })

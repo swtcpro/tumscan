@@ -7,8 +7,8 @@
  \*/
 const Sequelize = require('sequelize');
 let env = process.env.NODE_ENV || 'development';
-let passwd = 'm7315202';
-let host = 'localhost';
+let passwd = '';
+let host = '106.14.65.102';
 if (env === 'production') {
     passwd = '';
     host = '10.28.65.53'

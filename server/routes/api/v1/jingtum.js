@@ -39,7 +39,7 @@ router.get('/query/rankings', tumController.queryRankings);
 router.get('/query/ledgers', tumController.queryLedgersPaging);
 
 // 分页查询近期交易列表数据
-router.get('/query/transactions', tumController.queryTransactionsPaging)
+router.get('/query/transactions', tumController.queryTransactionsPaging);
 
 // 获取钱包地址的余额相关信息
 router.get('/accounts/:address/balances', tumController.queryBalancesByAddress);

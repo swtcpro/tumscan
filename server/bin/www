@@ -105,12 +105,12 @@ if (_.trim(env) === 'production') {
     /**
      * 每隔10秒抓取账本交易中的账户数据
      */
-    let rule = new schedule.RecurrenceRule();
-    let times = [0, 10, 20, 30, 40, 50];
-    rule.second = times;
-    let j = schedule.scheduleJob(rule, function () {
-        TimeTask.getAccountsRealTime();
-    });
+    // let rule = new schedule.RecurrenceRule();
+    // let times = [0, 10, 20, 30, 40, 50];
+    // rule.second = times;
+    // let j = schedule.scheduleJob(rule, function () {
+    //     TimeTask.getAccountsRealTime();
+    // });
 
     /**
      * 从创始区块同步到五百万高度账本
@@ -145,7 +145,7 @@ function dailyCountToken() {
     })
 }
 
-dailyCountToken();
+// dailyCountToken();
 
 /**
  * 每周星期天凌晨1点进行所有账户最新余额的清算，并
@@ -161,4 +161,4 @@ function weeklyCountBalances() {
     })
 }
 
-weeklyCountBalances();
+// weeklyCountBalances();

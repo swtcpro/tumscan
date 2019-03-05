@@ -41,7 +41,6 @@ var env = process.env.NODE_ENV || 'development';
 
 if (env === 'development') {
     //跨域问题处理
-    console.log(env);
     app.use(cors({
         credentials: true,
         origin: 'http://localhost:8081'
@@ -57,7 +56,6 @@ if (env === 'development') {
     //     next();
     // });
 } else {
-    console.log(env);
     app.use(cors({
         credentials: true,
         origin: 'http://106.14.65.102:8080'

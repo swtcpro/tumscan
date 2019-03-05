@@ -12,7 +12,7 @@
             </el-col>
             <el-col :span="20">
               <span style="color: white;">总容量￥59.99 BILLION</span>
-              <h4>1 SWT @ 0.03867 CNY</h4>
+              <!--<h4>1 SWT @ 0.03867 CNY</h4>-->
             </el-col>
           </el-row>
 

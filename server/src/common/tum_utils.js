@@ -7,7 +7,46 @@
  \*/
 
 const logger = require('../lib/logger');
+const remote = require('../lib/remote');
+const config = require('../lib/config');
+var libUtils = require('../lib/utils');
+const util = require('util');
+const issuer = config.get('issuer');
 import localService from '../service/local_service'
+
+/**
+ * 从银关中获取所有的代币
+ */
+function getTokensFromGate() {
+    return new Promise((resolve, reject) => {
+        let options = {
+            account: issuer,
+        };
+        let req = remote.requestAccountTums(options);
+        req.submit((error , result) => {
+            if (error) {
+                reject(error)
+            }
+            else if (result){
+                resolve(result.receive_currencies);
+            }
+        })
+    })
+}
+
+function requestGateRalation(options) {
+    return new Promise(function (resolve, reject) {
+        let req = remote.requestAccountRelations(options);
+        req.submit(function (err, result) {
+            if (err) {
+                reject(err);
+            }
+            else if (result) {
+                resolve(result);
+            }
+        });
+    })
+}
 
 /**
  * 分析交易类型，如果将交易存入数据库
@@ -23,34 +62,6 @@ function processTx(rawTx) {
          */
         localService.saveTransaction(transaction).then(function (savedTransaction) {
             resolve(transaction);
-            // if (extractPandR(transaction)) {
-            //
-            //     logger.info('transaction.Amount: ', transaction.Amount);
-            //     let params = {};
-            //     if (!transaction.Amount) {
-            //         resolve(savedTransaction);
-            //     }
-            //     if (transaction.Amount.currency && transaction.Amount.issuer) {
-            //         params = {
-            //             currency: transaction.Amount.currency,
-            //             issuer: transaction.Amount.issuer
-            //         }
-            //     } else {
-            //         params = {
-            //             currency: 'SWT',
-            //             issuer: 'SWT'
-            //         }
-            //     }
-            //     let att = {
-            //         value: transaction.Amount.value
-            //     };
-            //     localService.updateToken(params, att).then(function (token) {
-            //         // logger.info('已经更新代币余额！', token.dataValues);
-            //         resolve(savedTransaction)
-            //     }).catch(function (error) {
-            //         reject(error);
-            //     })
-            // }
         }).catch(function (error) {
             reject(error);
         })
@@ -122,7 +133,8 @@ function extractPandR(transaction) {
 }
 
 const tumUtils = {
-    processTx: processTx
+    processTx: processTx,
+    getTokensFromGate: getTokensFromGate
 };
 
 export default tumUtils

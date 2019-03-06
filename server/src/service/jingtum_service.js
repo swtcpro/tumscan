@@ -32,6 +32,26 @@ String.prototype.endWith = function (str) {
     return reg.test(this);
 };
 
+/**
+ * 从银关中获取所有的代币
+ */
+jingtumService.getTokensFromGate = function() {
+    return new Promise((resolve, reject) => {
+        let options = {
+            account: issuer,
+        };
+        let req = remote.requestAccountTums(options);
+        req.submit((error , result) => {
+            if (error) {
+                reject(error)
+            }
+            else if (result){
+                resolve(result.receive_currencies);
+            }
+        })
+    })
+}
+
 
 jingtumService.queryLedger = function (hash) {
     return new Promise(((resolve, reject) => {

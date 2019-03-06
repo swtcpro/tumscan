@@ -41,7 +41,7 @@
     "babel-preset-stage-2": "^6.24.1",
     "babel-register": "^6.26.0",
     "cross-env": "^5.2.0",
-    "mocha": "^5.1.1",
+    "mocha": "^5.2.0",
     "should": "^13.2.1"
   }
 }

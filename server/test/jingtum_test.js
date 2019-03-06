@@ -61,7 +61,7 @@ describe('#jingtumLib()', function () {
     });
 
     it.only('通过钱包地址返回钱包余额和交易', function () {
-        remote.connect( function (err, result) {
+        remote.connect(function (err, result) {
             if (err) {
                 return console.log('err', err);
             }
@@ -73,7 +73,7 @@ describe('#jingtumLib()', function () {
     });
 
     it.only('通过hash查询指定交易', function (done) {
-        remote.connect( function (err, result) {
+        remote.connect(function (err, result) {
             if (err) {
                 return console.error('err', err);
             }

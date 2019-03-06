@@ -6,7 +6,6 @@ const logger = require('./logger');
 const utils = require('./utils');
 const Remote = require('jingtum-lib').Remote;
 const remote = new Remote(config.get('skywelld_servers'));
-import tumUtils from '../common/tum_utils'
 
 
 remote.connect(function (err, data) {

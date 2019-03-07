@@ -56,7 +56,7 @@ function getAccountsFromToken(token) {
                         if (line.balance.startsWith('-')) {
                             balance = parseFloat(line.balance.substring(1));
                         }
-                        accounts.push({account: line.account, tokenBalance: balance})
+                        accounts.push({account: line.account, total: balance})
                     }
                 }
             } while (!isStrEmpty(options.marker));

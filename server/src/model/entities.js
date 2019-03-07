@@ -22,15 +22,15 @@ messageTopic.hasMany(messageBoard, {
 });
 
 /**
- * 设置代币和账号一对多关系
+ * 设置代币和余额一对多关系
  */
-Token.hasMany(Account, {
-    as: 'accounts'
+Token.hasMany(Balance, {
+    as: 'balances'
 });
 
-Account.hasMany(Balance, {
-    as: 'balance'
-});
+// Account.hasMany(Balance, {
+//     as: 'balance'
+// });
 
 // Ledger.hasMany(Transaction, {
 //     as: 'transaction'

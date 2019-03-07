@@ -3,7 +3,7 @@
  \* User: 彭诗杰
  \* Date: 2018/6/4
  \* Time: 8:54
- \* Description: 账户余额实体
+ \* Description: 代币余额实体
  \*/
 
 import {sequelize, Sequelize} from "./sequelize_helper";
@@ -22,7 +22,7 @@ const Balance = sequelize.define('balance', {
         primaryKey: true
     },
     value: Sequelize.FLOAT,
-    freezed: Sequelize.STRING
+    freezed: Sequelize.FLOAT
 });
 
 export default Balance;

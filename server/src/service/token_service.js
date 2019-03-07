@@ -18,7 +18,7 @@ const jutils = require('jingtum-lib').utils;
 const CURRENCY = config.get('base_currency') || 'SWT';
 const gate = config.get('issuer');
 
-let tokenService = {}
+let tokenService = {};
 
 tokenService.tokenInit = function () {
     return new Promise(async (resolve, reject) => {
@@ -29,8 +29,8 @@ tokenService.tokenInit = function () {
             //     let accounts = await tumUtils.getAccountsFromToken(token);
             //     tokensInfo.push({token: token,  accounts: accounts})
             // }
-            Promise.all(tokens.map(token => tumUtils.getAccountsFromToken(token))).then(twoDAccounts => {
-                resolve(twoDAccounts)
+            Promise.all(tokens.map(token => tumUtils.getAccountsFromToken(token))).then(tokenAccounts => {
+                resolve(tokenAccounts)
             }).catch(error => {
                 reject(error);
             })
@@ -39,5 +39,13 @@ tokenService.tokenInit = function () {
         }
     })
 };
+
+/**
+ * 将代币和持有该代币的账户和余额存入数据库
+ * @param tokenAccounts [{token: 'YUT', accounts: [{account: '', total: 123} ...]} ...]
+ */
+function saveTwoDAccounts(tokenAccounts) {
+
+}
 
 module.exports = tokenService;

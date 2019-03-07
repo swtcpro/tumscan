@@ -6,8 +6,32 @@
  \*/
 import entities from '../model/entities';
 import Token from '../model/token'
+
 const Sequelize = require('sequelize');
 const logger = require('../lib/logger');
+const config = require('../lib/config');
+const issuer = config.get('issuer');
+
+/**
+ * 保存或更新代币
+ * @param token {issuer: 'issuer', currency: 'currency', total: 'total'}
+ */
+function save(token) {
+    return new Promise((resolve, reject) => {
+        entities.Token.findOrCreate({
+            where: {issuer: issuer, currency: token.currency},
+            defaults: {total: 0.0, value: 0.0}
+        }).spread(function (savedToken, created) {
+            if (created) {
+                resolve(savedToken);
+            } else {
+                resolve(savedToken);
+            }
+        }).catch(function (error) {
+            reject(error);
+        })
+    })
+}
 
 /**
  * 获取所有的Token
@@ -100,4 +124,8 @@ function getTokensCurrencyPaging(page, limit, currency) {
             reject(error)
         })
     })
+}
+
+export default {
+    save: save,
 }

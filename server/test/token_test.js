@@ -1,13 +1,48 @@
 import 'babel-polyfill';
 import tumUtils from "../src/common/tum_utils"; // mocha 支持es6的需要的设置
-let jingtumService = require('../src/service/jingtum_service');
 const logger = require('../src/lib/logger');
 const should = require('should');
 const remote = require('../src/lib/remote');
-import {sequelize, Sequelize} from '../src/model/sequelize_helper';
+import tokenService from '../src/service/token_service'
+
+describe('tum_utils文件', function () {
+    it.only('getAccountsFromToken函数测试', function (done) {
+        this.timeout(0);
+        remote.connect((err, result) => {
+            if (err) {
+                return logger.info(err);
+            }
+            tumUtils.getAccountsFromToken('YUT').then(result => {
+                logger.info(result);
+                result.should.be.a.Object();
+                done();
+            }).catch(error => {
+                logger.error(error)
+                done();
+            })
+        });
+    });
+})
 
 describe('新的测试用例', function () {
-    it.only('should return a bunch of accounts', function (done) {
+    it.only('token_service的tokenInit', function (done) {
+        this.timeout(0);
+        remote.connect((err, result) => {
+            if (err) {
+                return logger.info(err);
+            }
+            tokenService.tokenInit().then(twoDAccounts => {
+                logger.info(twoDAccounts);
+                result.should.be.a.Object();
+                done();
+            }).catch(error => {
+                logger.error(error)
+                done();
+            })
+        });
+    });
+
+    it('should return a bunch of accounts', function (done) {
         this.timeout(0);
         remote.connect((err, result) => {
             if (err) {

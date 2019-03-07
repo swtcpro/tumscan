@@ -9,10 +9,10 @@
 const logger = require('../lib/logger');
 const remote = require('../lib/remote');
 const config = require('../lib/config');
-var libUtils = require('../lib/utils');
-const util = require('util');
+const libUtils = require('../lib/utils');
 const issuer = config.get('issuer');
 import localService from '../service/local_service'
+import util from './utils'
 
 /**
  * 从银关中获取所有的代币
@@ -23,15 +23,57 @@ function getTokensFromGate() {
             account: issuer,
         };
         let req = remote.requestAccountTums(options);
-        req.submit((error , result) => {
+        req.submit((error, result) => {
             if (error) {
                 reject(error)
             }
-            else if (result){
+            else if (result) {
                 resolve(result.receive_currencies);
             }
         })
     })
+}
+
+/**
+ * 获取各种代币的持仓账户
+ * @param token
+ */
+function getAccountsFromToken(token) {
+    return new Promise(async (resolve, reject) => {
+        let options = {
+            account: issuer,
+            type: 'trust',
+            marker: ''
+        };
+        let accounts = [];
+        try {
+            do {
+                let result = await requestGateRalation(options);
+                options.marker = result.marker;
+                for (let line of result.lines) {
+                    if (line.currency === token) {
+                        let balance = 0.0;
+                        if (line.balance.startsWith('-')) {
+                            balance = parseFloat(line.balance.substring(1));
+                        }
+                        accounts.push({account: line.account, tokenBalance: balance})
+                    }
+                }
+            } while (!isStrEmpty(options.marker));
+        } catch (e) {
+            reject(e)
+        }
+        resolve({token: token, accounts: accounts});
+    })
+}
+
+function isStrEmpty(str) {
+
+    if (typeof str === 'undefined'
+        || (str === null) ||
+        (str.length === 0)) return true;
+
+    else return (false);
 }
 
 function requestGateRalation(options) {
@@ -134,7 +176,8 @@ function extractPandR(transaction) {
 
 const tumUtils = {
     processTx: processTx,
-    getTokensFromGate: getTokensFromGate
+    getTokensFromGate: getTokensFromGate,
+    getAccountsFromToken: getAccountsFromToken
 };
 
 export default tumUtils

@@ -20,7 +20,7 @@ function getAllTokens() {
         entities.Token.findAll().then(array => {
             resolve(array);
         }).catch(error => {
-            logger.info(error);
+            logger.error(error);
             reject(error);
         })
     })

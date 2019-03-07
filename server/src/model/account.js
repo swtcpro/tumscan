@@ -12,7 +12,7 @@ const Account = sequelize.define('account', {
     address: {
         type: Sequelize.STRING,
         primaryKey: true
-    }
+    },
 });
 
 export default Account;

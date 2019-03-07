@@ -21,6 +21,13 @@ messageTopic.hasMany(messageBoard, {
     as: 'messageitem',
 });
 
+/**
+ * 设置代币和账号一对多关系
+ */
+Token.hasMany(Account, {
+    as: 'accounts'
+});
+
 Account.hasMany(Balance, {
     as: 'balance'
 });

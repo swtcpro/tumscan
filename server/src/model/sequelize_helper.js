@@ -13,10 +13,6 @@ if (env === 'production') {
     passwd = '';
     host = '10.28.65.53'
 }
-const logger = require('../lib/logger');
-logger.info('host: ', host);
-logger.info('passwd: ', passwd);
-
 
 const sequelize = new Sequelize('temp', 'root', passwd, {
     // host: '106.14.65.102',

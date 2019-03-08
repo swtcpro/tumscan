@@ -6,6 +6,8 @@
  \*/
 
 import tumUtils from '../common/tum_utils'
+import tokenRep from '../repository/token_rep'
+import balanceRep from '../repository/balance_rep'
 
 const jlib = require('jingtum-lib');
 const remote = require('../lib/remote');
@@ -30,7 +32,12 @@ tokenService.tokenInit = function () {
             //     tokensInfo.push({token: token,  accounts: accounts})
             // }
             Promise.all(tokens.map(token => tumUtils.getAccountsFromToken(token))).then(tokenAccounts => {
-                resolve(tokenAccounts)
+                saveAllTokenAccounts(tokenAccounts).then(results => {
+                    resolve(results);
+                }).catch(error => {
+                    reject(error);
+                })
+                // resolve(tokenAccounts)
             }).catch(error => {
                 reject(error);
             })
@@ -42,10 +49,30 @@ tokenService.tokenInit = function () {
 
 /**
  * 将代币和持有该代币的账户和余额存入数据库
- * @param tokenAccounts [{token: 'YUT', accounts: [{account: '', total: 123} ...]} ...]
+ * @param allTokenAccounts [{token: 'YUT', accounts: [{address: '', total: 123} ...]} ...]
  */
-function saveTwoDAccounts(tokenAccounts) {
-
+function saveAllTokenAccounts(allTokenAccounts) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let results = [];
+            for (let tokenAccounts of allTokenAccounts) {
+                let savedToken = await tokenRep.save({issuer: gate, currency: tokenAccounts.token});
+                savedToken.balances = [];
+                for (let account of tokenAccounts.accounts) {
+                    let savedBalance = balanceRep.save(savedToken, {
+                        currency: tokenAccounts.token,
+                        issuer: gate,
+                        address: account.address
+                    });
+                    savedToken.balances.push(savedBalance)
+                }
+                results.push(savedToken);
+            }
+            resolve(results);
+        } catch (e) {
+            reject(e)
+        }
+    })
 }
 
 module.exports = tokenService;

@@ -6,7 +6,6 @@
  \*/
 import entities from '../model/entities';
 import Token from '../model/token'
-
 const Sequelize = require('sequelize');
 const logger = require('../lib/logger');
 const config = require('../lib/config');

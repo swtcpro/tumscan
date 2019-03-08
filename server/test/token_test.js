@@ -22,7 +22,7 @@ describe('tum_utils文件', function () {
             })
         });
     });
-})
+});
 
 describe('新的测试用例', function () {
     it.only('token_service的tokenInit', function (done) {

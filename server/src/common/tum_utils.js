@@ -76,7 +76,7 @@ function isStrEmpty(str) {
     else return (false);
 }
 
-function requestGateRalation(options) {
+function requestGateRelation(options) {
     return new Promise(function (resolve, reject) {
         let req = remote.requestAccountRelations(options);
         req.submit(function (err, result) {
@@ -175,9 +175,11 @@ function extractPandR(transaction) {
 }
 
 const tumUtils = {
+    isStrEmpty: isStrEmpty,
     processTx: processTx,
     getTokensFromGate: getTokensFromGate,
-    getAccountsFromToken: getAccountsFromToken
+    getAccountsFromToken: getAccountsFromToken,
+    requestGateRelation: requestGateRelation
 };
 
 export default tumUtils

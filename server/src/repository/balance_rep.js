@@ -20,7 +20,12 @@ function save(token, balance) {
     return new Promise((resolve, reject) => {
         if (token) {
             entities.Balance.findOrCreate({
-                where: {address: balance.address, currency: balance.currency, issuer: issuer}, defaults: {
+                where: {
+                    address: balance.address,
+                    currency: balance.currency,
+                    value: balance.value,
+                    issuer: issuer
+                }, defaults: {
                     value: 0.0,
                     freezed: 0.0
                 }

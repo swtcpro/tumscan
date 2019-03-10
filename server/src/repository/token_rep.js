@@ -6,6 +6,7 @@
  \*/
 import entities from '../model/entities';
 import Token from '../model/token'
+
 const Sequelize = require('sequelize');
 const logger = require('../lib/logger');
 const config = require('../lib/config');
@@ -29,6 +30,25 @@ function save(token) {
         }).catch(function (error) {
             reject(error);
         })
+    })
+}
+
+function update(token) {
+    return new Promise((resolve, reject) => {
+        if (token) {
+            entities.Token.update(token, {
+                where: {
+                    issuer: issuer,
+                    currency: token.currency,
+                }
+            }).then(function (updatedBill) {
+                resolve(updatedBill);
+            }).catch(function (error) {
+                reject(error);
+            })
+        } else {
+            reject("invalid token");
+        }
     })
 }
 
@@ -127,4 +147,5 @@ function getTokensCurrencyPaging(page, limit, currency) {
 
 export default {
     save: save,
+    update: update
 }

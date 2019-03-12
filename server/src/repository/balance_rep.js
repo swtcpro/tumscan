@@ -26,7 +26,6 @@ function save(token, balance) {
                     value: balance.value,
                     issuer: issuer
                 }, defaults: {
-                    value: 0.0,
                     freezed: 0.0
                 }
             }).spread(function (savedBalance, created) {

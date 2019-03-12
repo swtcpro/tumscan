@@ -63,7 +63,7 @@ function getAccountsFromToken(token) {
         } catch (e) {
             reject(e)
         }
-        resolve({token: token, accounts: accounts});
+        resolve(accounts);
     })
 }
 

@@ -42,14 +42,14 @@ describe('新的测试用例', function () {
         });
     });
 
-    it('should return a bunch of accounts', function (done) {
+    it.only('should return a bunch of accounts', function (done) {
         this.timeout(0);
         remote.connect((err, result) => {
             if (err) {
                 return logger.info(err);
             }
             tumUtils.getTokensFromGate().then(tokens => {
-                logger.info(tokens);
+                logger.info(tokens.length);
                 result.should.be.a.Object();
                 done();
             }).catch(error => {

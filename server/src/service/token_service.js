@@ -34,7 +34,6 @@ tokenService.tokenInit = function () {
             do {
                 let result = await tumUtils.requestGateRelation(options);
                 options.marker = result.marker;
-                let total = 0.0;
                 for (let line of result.lines) {
                     let savedToken = await tokenRep.save({currency: line.currency});
                     let balance = 0.0;
@@ -43,39 +42,56 @@ tokenService.tokenInit = function () {
                     }
                     if (!tumUtils.isStrEmpty(line.currency)) {
                         balanceRep.save(savedToken, {address: line.account, currency: line.currency, value: balance});
-                        total += balance;
                         accounts.push({address: line.account, balance: balance})
                     }
                 }
-                // 此处存在着问题
-
             } while (!tumUtils.isStrEmpty(options.marker));
         } catch (e) {
             reject(e)
         }
         resolve('token init 成功');
-        // try {
-        // let tokens = await tumUtils.getTokensFromGate();
-        // let tokensInfo = [];
-        // for (let token of tokens) {
-        //     let accounts = await tumUtils.getAccountsFromToken(token);
-        //     tokensInfo.push({token: token,  accounts: accounts})
-        // }
-
-        // Promise.all(tokens.map(token => tumUtils.getAccountsFromToken(token))).then(tokenAccounts => {
-        //     saveAllTokenAccounts(tokenAccounts).then(results => {
-        //         resolve(results);
-        //     }).catch(error => {
-        //         reject(error);
-        //     })
-        // }).catch(error => {
-        //     reject(error);
-        // })
-        // } catch (e) {
-        //     reject(e)
-        // }
     })
 };
+
+tokenService.tokenInit2 = function () {
+    return new Promise((resolve, reject) => {
+        try {
+            let tokensArrs = tumUtils.getTokensFromGate();
+            let savedBals = tokensArrs.map(item => saveTokenAndBalances(item));
+
+        } catch (e) {
+            reject(e)
+        }
+    })
+};
+
+/**
+ * 保存代币以及代币所关联的账户余额
+ * @param item 代币名称
+ */
+function saveTokenAndBalances(item) {
+    return new Promise((resolve, reject) => {
+        try {
+            let savedToken = tokenRep.save({currency: item});
+            let accounts = tumUtils.getAccountsFromToken(savedToken.currency);
+            let savedBalances = accounts.map(account => balanceRep.save(savedToken,
+                {address: account.address, currency: item, value: account.balance}));
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
+/**
+ * 统计代币总额
+ * @param token
+ * @return {Promise}
+ */
+function countTokenTotal(token) {
+    return new Promise((resolve, reject) => {
+
+    })
+}
 
 /**
  * 将代币和持有该代币的账户和余额存入数据库
@@ -87,15 +103,15 @@ function saveAllTokenAccounts(allTokenAccounts) {
             let results = [];
             for (let tokenAccounts of allTokenAccounts) {
                 let savedToken = await tokenRep.save({issuer: gate, currency: tokenAccounts.token});
-                // savedToken.balances = [];
-                // for (let account of tokenAccounts.accounts) {
-                //     let savedBalance = balanceRep.save(savedToken, {
-                //         currency: tokenAccounts.token,
-                //         issuer: gate,
-                //         address: account.address
-                //     });
-                //     savedToken.balances.push(savedBalance)
-                // }
+                savedToken.balances = [];
+                for (let account of tokenAccounts.accounts) {
+                    let savedBalance = balanceRep.save(savedToken, {
+                        currency: tokenAccounts.token,
+                        issuer: gate,
+                        address: account.address
+                    });
+                    savedToken.balances.push(savedBalance)
+                }
                 results.push(savedToken);
             }
             resolve(results);

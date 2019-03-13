@@ -25,7 +25,7 @@ describe('tum_utils文件', function () {
 });
 
 describe('新的测试用例', function () {
-    it.only('token_service的tokenInit', function (done) {
+    it('token_service的tokenInit', function (done) {
         this.timeout(0);
         remote.connect((err, result) => {
             if (err) {
@@ -42,7 +42,24 @@ describe('新的测试用例', function () {
         });
     });
 
-    it.only('should return a bunch of accounts', function (done) {
+    it.only('token_service的tokenInit2', function (done) {
+        this.timeout(0);
+        remote.connect((err, result) => {
+            if (err) {
+                return logger.info(err);
+            }
+            tokenService.tokenInit2().then(savedTokens => {
+                logger.info(savedTokens);
+                result.should.be.a.Object();
+                done();
+            }).catch(error => {
+                logger.error(error)
+                done();
+            })
+        });
+    });
+
+    it('should return a bunch of accounts', function (done) {
         this.timeout(0);
         remote.connect((err, result) => {
             if (err) {

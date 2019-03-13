@@ -48,7 +48,7 @@ function getAccountsFromToken(token) {
         let accounts = [];
         try {
             do {
-                let result = await requestGateRalation(options);
+                let result = await requestGateRelation(options);
                 options.marker = result.marker;
                 for (let line of result.lines) {
                     if (line.currency === token) {

@@ -54,11 +54,17 @@ tokenService.tokenInit = function () {
 };
 
 tokenService.tokenInit2 = function () {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            let tokensArrs = tumUtils.getTokensFromGate();
-            let savedBals = tokensArrs.map(item => saveTokenAndBalances(item));
-
+            let tokensArrs = await tumUtils.getTokensFromGate();
+            console.log(tokensArrs)
+            let savedTokens = [];
+            for (let item of tokensArrs) {
+                let savedToken = await saveTokenAndBalances(item);
+                savedTokens.push(savedToken);
+            }
+            // let savedTokens = await tokensArrs.map(item => saveTokenAndBalances(item));
+            resolve(savedTokens);
         } catch (e) {
             reject(e)
         }
@@ -70,12 +76,13 @@ tokenService.tokenInit2 = function () {
  * @param item 代币名称
  */
 function saveTokenAndBalances(item) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         try {
-            let savedToken = tokenRep.save({currency: item});
-            let accounts = tumUtils.getAccountsFromToken(savedToken.currency);
-            let savedBalances = accounts.map(account => balanceRep.save(savedToken,
+            let savedToken =await tokenRep.save({currency: item});
+            let accounts =await tumUtils.getAccountsFromToken(savedToken.currency);
+            let savedBalances =await accounts.map(account => balanceRep.save(savedToken,
                 {address: account.address, currency: item, value: account.balance}));
+            resolve(savedToken);
         } catch (e) {
             reject(e)
         }

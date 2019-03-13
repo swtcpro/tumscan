@@ -11,7 +11,7 @@
   "port": 3000,
   "ws_port": 5020,
   "skywelld_servers": {
-    "server": "wss://c05.jingtum.com:5020"
+    "server": "ws://59.175.148.101:5020"
   },
   "freezed": {
     "reserved": 20.0,

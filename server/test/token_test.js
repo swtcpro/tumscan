@@ -22,6 +22,8 @@ describe('tum_utils文件', function () {
             })
         });
     });
+
+
 });
 
 describe('新的测试用例', function () {
@@ -59,18 +61,21 @@ describe('新的测试用例', function () {
         });
     });
 
-    it('should return a bunch of accounts', function (done) {
+    it.only('tokenInit的countTokenTotal', function (done) {
         this.timeout(0);
         remote.connect((err, result) => {
             if (err) {
                 return logger.info(err);
             }
-            tumUtils.getTokensFromGate().then(tokens => {
-                logger.info(tokens.length);
+            tokenService.countTokenTotal({
+                currency: '520',
+                issuer: 'jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or'
+            }).then(result => {
+                logger.info('result: ', result);
                 result.should.be.a.Object();
                 done();
             }).catch(error => {
-                logger.error(error)
+                logger.error(error);
                 done();
             })
         });

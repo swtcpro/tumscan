@@ -60,6 +60,7 @@ tokenService.tokenInit2 = function () {
             let savedTokens = [];
             for (let item of tokensArrs) {
                 let savedToken = await saveTokenAndBalances(item);
+                await tokenService.countTokenTotal(savedToken);
                 savedTokens.push(savedToken);
             }
             // let savedTokens = await tokensArrs.map(item => saveTokenAndBalances(item));
@@ -75,11 +76,11 @@ tokenService.tokenInit2 = function () {
  * @param item 代币名称
  */
 function saveTokenAndBalances(item) {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            let savedToken =await tokenRep.save({currency: item});
-            let accounts =await tumUtils.getAccountsFromToken(savedToken.currency);
-            let savedBalances =await accounts.map(account => balanceRep.save(savedToken,
+            let savedToken = await tokenRep.save({currency: item});
+            let accounts = await tumUtils.getAccountsFromToken(savedToken.currency);
+            let savedBalances = await accounts.map(account => balanceRep.save(savedToken,
                 {address: account.address, currency: item, value: account.balance}));
             resolve(savedToken);
         } catch (e) {
@@ -93,9 +94,17 @@ function saveTokenAndBalances(item) {
  * @param token
  * @return {Promise}
  */
-function countTokenTotal(token) {
-    return new Promise((resolve, reject) => {
-
+tokenService.countTokenTotal = function (token) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let balances = await balanceRep.findByToken(token);
+            let total = 0.0;
+            balances.forEach(item => total += item.dataValues.value);
+            await tokenRep.update({currency: token.currency, issuer: gate, total: total});
+            resolve();
+        } catch (e) {
+            reject(e);
+        }
     })
 }
 

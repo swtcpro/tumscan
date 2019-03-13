@@ -57,16 +57,26 @@ function save(token, balance) {
  */
 function findByToken(token) {
     return new Promise((resolve, reject) => {
-        entities.Token.findOne({
-            where: {issuer: issuer, currency: token.currency},include: [{
-                model: Balance,
-                as: 'balances'
-            }]
-        }).then((savedToken) => {
-            resolve(savedToken)
-        }).catch(function (error) {
-            reject(error);
+        entities.Balance.findAll({
+            where: {
+                issuer: issuer,
+                currency: token.currency,
+            }
+        }).then(balances => {
+            resolve(balances)
+        }).catch(error => {
+            reject(error)
         })
+        // entities.Token.findOne({
+        //     where: {issuer: issuer, currency: token.currency},include: [{
+        //         model: Balance,
+        //         as: 'balances'
+        //     }]
+        // }).then((savedToken) => {
+        //     resolve(savedToken)
+        // }).catch(function (error) {
+        //     reject(error);
+        // })
     })
 }
 

@@ -57,7 +57,6 @@ tokenService.tokenInit2 = function () {
     return new Promise(async (resolve, reject) => {
         try {
             let tokensArrs = await tumUtils.getTokensFromGate();
-            console.log(tokensArrs)
             let savedTokens = [];
             for (let item of tokensArrs) {
                 let savedToken = await saveTokenAndBalances(item);

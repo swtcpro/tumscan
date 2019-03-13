@@ -50,8 +50,29 @@ function save(token, balance) {
     })
 }
 
+/**
+ *
+ * @param token
+ * @return {Promise}
+ */
+function findByToken(token) {
+    return new Promise((resolve, reject) => {
+        entities.Token.findOne({
+            where: {issuer: issuer, currency: token.currency},include: [{
+                model: Balance,
+                as: 'balances'
+            }]
+        }).then((savedToken) => {
+            resolve(savedToken)
+        }).catch(function (error) {
+            reject(error);
+        })
+    })
+}
+
 export default {
-    save: save
+    save: save,
+    findByToken: findByToken
 }
 
 

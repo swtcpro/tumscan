@@ -145,7 +145,23 @@ function getTokensCurrencyPaging(page, limit, currency) {
     })
 }
 
+/**
+ * 获取所有的Token
+ * @returns {Promise}
+ */
+function getAllTokens() {
+    return new Promise(function (resolve, reject) {
+        entities.Token.findAll().then(array => {
+            resolve(array);
+        }).catch(error => {
+            logger.error(error);
+            reject(error);
+        })
+    })
+}
+
 export default {
     save: save,
-    update: update
+    update: update,
+    getAllTokens: getAllTokens
 }

@@ -67,16 +67,6 @@ function findByToken(token) {
         }).catch(error => {
             reject(error)
         })
-        // entities.Token.findOne({
-        //     where: {issuer: issuer, currency: token.currency},include: [{
-        //         model: Balance,
-        //         as: 'balances'
-        //     }]
-        // }).then((savedToken) => {
-        //     resolve(savedToken)
-        // }).catch(function (error) {
-        //     reject(error);
-        // })
     })
 }
 

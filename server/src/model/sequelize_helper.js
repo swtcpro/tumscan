@@ -7,11 +7,11 @@
  \*/
 const Sequelize = require('sequelize');
 let env = process.env.NODE_ENV || 'development';
-let passwd = '';
-let host = '106.14.65.102';
+let passwd = 'Hptpd511!@#';
+let host = '47.94.244.29';
 if (env === 'production') {
-    passwd = '';
-    host = '10.28.65.53'
+    passwd = 'Hptpd511!@#';
+    host = '172.17.46.50'
 }
 
 const sequelize = new Sequelize('temp', 'root', passwd, {
@@ -22,10 +22,10 @@ const sequelize = new Sequelize('temp', 'root', passwd, {
     logging: false,
     omitNull: true,
     pool: {
-        max: 5,
+        max: 100,
         min: 0,
-        acquire: 30000,
-        idle: 10000,
+        idle: 200000,
+        acquire: 1000000,
     },
     // 仅限 SQLite
     storage: 'path/to/database.sqlite',

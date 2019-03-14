@@ -86,7 +86,7 @@ describe('#jingtumLib()', function () {
                 done();
             })
         })
-    })
+    });
 
     it.only('分页查询代币列表', function () {
         jingtumService.queryTokens(1, 20, '').then(function (tokens) {

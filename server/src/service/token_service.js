@@ -56,12 +56,15 @@ tokenService.tokenInit = function () {
 tokenService.tokenInit2 = function () {
     return new Promise(async (resolve, reject) => {
         try {
+
             let tokensArrs = await tumUtils.getTokensFromGate();
             let savedTokens = [];
             for (let item of tokensArrs) {
                 let savedToken = await saveTokenAndBalances(item);
-                await tokenService.countTokenTotal(savedToken);
-                savedTokens.push(savedToken);
+                if (savedToken) {
+                    await tokenService.countTokenTotal(savedToken);
+                    savedTokens.push(savedToken);
+                }
             }
             // let savedTokens = await tokensArrs.map(item => saveTokenAndBalances(item));
             resolve(savedTokens);
@@ -78,11 +81,15 @@ tokenService.tokenInit2 = function () {
 function saveTokenAndBalances(item) {
     return new Promise(async (resolve, reject) => {
         try {
-            let savedToken = await tokenRep.save({currency: item});
-            let accounts = await tumUtils.getAccountsFromToken(savedToken.currency);
-            let savedBalances = await accounts.map(account => balanceRep.save(savedToken,
-                {address: account.address, currency: item, value: account.balance}));
-            resolve(savedToken);
+            if (item !== 'CNY') {
+                let savedToken = await tokenRep.save({currency: item});
+                let accounts = await tumUtils.getAccountsFromToken(savedToken.currency);
+                let savedBalances = await accounts.map(account => balanceRep.save(savedToken,
+                    {address: account.address, currency: item, value: account.balance}));
+                resolve(savedToken);
+            } else {
+                resolve();
+            }
         } catch (e) {
             reject(e)
         }

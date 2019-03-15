@@ -56,7 +56,6 @@ tokenService.tokenInit = function () {
 tokenService.tokenInit2 = function () {
     return new Promise(async (resolve, reject) => {
         try {
-
             let tokensArrs = await tumUtils.getTokensFromGate();
             let savedTokens = [];
             for (let item of tokensArrs) {
@@ -73,6 +72,43 @@ tokenService.tokenInit2 = function () {
         }
     })
 };
+
+tokenService.tokenInit3 = function () {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let tokens = await getAndSaveAllTokens();
+            // logger.info(tokens)
+            for (let token of tokens) {
+                await saveTokenAndBalances(token.currency);
+            }
+            resolve(tokens)
+        } catch (e) {
+            reject(e)
+        }
+    })
+};
+
+function getAndSaveAllTokens() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let tokensArrs = await tumUtils.getTokensFromGate();
+            logger.info(tokensArrs)
+            let savedTokens = [];
+            for (let item of tokensArrs) {
+                savedTokens.push(await tokenRep.save({currency: item}));
+            }
+            // let savedTokens = tokensArrs.map(item => {
+            //     if (item) {
+            //         return await tokenRep.save({currency: item})
+            //     }
+            // });
+            resolve(savedTokens)
+        } catch (e) {
+            reject(e)
+        }
+
+    })
+}
 
 /**
  * 保存代币以及代币所关联的账户余额

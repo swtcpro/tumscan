@@ -61,6 +61,23 @@ describe('新的测试用例', function () {
         });
     });
 
+    it.only('token_service的tokenInit3', function (done) {
+        this.timeout(0);
+        remote.connect((err, result) => {
+            if (err) {
+                return logger.info(err);
+            }
+            tokenService.tokenInit3().then(savedTokens => {
+                logger.info(savedTokens);
+                result.should.be.a.Object();
+                done();
+            }).catch(error => {
+                logger.error(error)
+                done();
+            })
+        });
+    });
+
     it.only('tokenInit的countTokenTotal', function (done) {
         this.timeout(0);
         remote.connect((err, result) => {

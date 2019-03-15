@@ -35,17 +35,17 @@ String.prototype.endWith = function (str) {
 /**
  * 从银关中获取所有的代币
  */
-jingtumService.getTokensFromGate = function() {
+jingtumService.getTokensFromGate = function () {
     return new Promise((resolve, reject) => {
         let options = {
             account: issuer,
         };
         let req = remote.requestAccountTums(options);
-        req.submit((error , result) => {
+        req.submit((error, result) => {
             if (error) {
                 reject(error)
             }
-            else if (result){
+            else if (result) {
                 resolve(result.receive_currencies);
             }
         })
@@ -114,7 +114,7 @@ jingtumService.queryLedgerByIndex = function (index) {
         req.submit(function (err, ledger) {
             if (err) {
                 reject({err: err});
-                console.log('err:', err);
+                logger.error(err)
             }
             else if (ledger) {
                 resolve(ledger);
@@ -165,11 +165,11 @@ jingtumService.queryTransactionsPaging = function (page, limit) {
                 });
                 resolve({total: count, transactions: tempTransactions})
             }).catch(error => {
-                logger.error(error)
+                logger.error(error);
                 reject(error)
             })
         }).catch(function (error) {
-            logger.error(error)
+            logger.error(error);
             reject(error)
         })
     })

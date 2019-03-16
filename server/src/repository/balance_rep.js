@@ -30,7 +30,6 @@ function save(token, balance) {
                 }
             }).spread(function (savedBalance, created) {
                 if (created) {
-                    // 设置Balance Token 一对多关系
                     Token.hasMany(Balance);
                     Balance.belongsTo(Token);
                     token.addBalance(savedBalance).then(() => {
@@ -39,7 +38,20 @@ function save(token, balance) {
                     });
                 } else {
                     logger.info('find balance对象!');
-                    resolve(savedBalance);
+                    entities.Balance.update({
+                        value: balance.value,
+                        freezed: balance.freezed
+                    }, {
+                        where: {
+                            address: balance.address,
+                            currency: balance.currency,
+                            issuer: balance.issuer
+                        }
+                    }).then(function (array) {
+                        resolve(savedBalance);
+                    }).catch(error => {
+                        reject(error);
+                    });
                 }
             }).catch(function (error) {
                 reject(error)

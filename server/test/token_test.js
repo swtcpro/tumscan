@@ -4,6 +4,8 @@ const logger = require('../src/lib/logger');
 const should = require('should');
 const remote = require('../src/lib/remote');
 import tokenService from '../src/service/token_service'
+import tokenRep from "../src/repository/token_rep";
+import balanceRep from '../src/repository/balance_rep';
 
 describe('tum_utils文件', function () {
     it.only('getAccountsFromToken函数测试', function (done) {
@@ -27,7 +29,7 @@ describe('tum_utils文件', function () {
 });
 
 describe('新的测试用例', function () {
-    it('token_service的tokenInit', function (done) {
+    it.only('token_service的tokenInit', function (done) {
         this.timeout(0);
         remote.connect((err, result) => {
             if (err) {
@@ -97,90 +99,23 @@ describe('新的测试用例', function () {
             })
         });
     });
-})
+});
 
 
-describe('token tests', () => {
-    it('should return a set of account', function () {
+describe('token database tests', () => {
+    it.only('findByToken接口', function () {
         remote.connect((err, result) => {
             if (err) {
-                return console.log(err);
+                return logger.error(err);
             }
-            // TimeTask.traverseLedgers('266955', '9826175').then(ledgers => {
-            TimeTask.traverseLedgers('9826155', '9826175').then(ledgers => {
-                ledgers.should.be.an.instanceOf(Array);
-                ledgers.should.have.length(21)
+            balanceRep.findByToken({currency: 'USD'}).then(balances => {
+                balances.should.be.a.Array();
+                logger.info(balances.length);
+            }).catch(error => {
+                logger.error(error);
             })
         });
     });
-    it('timed_task sync test', () => {
-        remote.connect((err, result) => {
-            if (err) {
-                return console.log('err', err);
-            }
-            TimeTask.sync();
-        });
-    });
-
-    it('timeTask countTokenRanking 测试', function () {
-        TimeTask.countTokenRanking().then(function () {
-            logger.info('完成测试')
-        }).catch(function (error) {
-            logger.info(error);
-        })
-    });
-
-    it('generateBalances 测试', function () {
-        remote.connect(function (err, result) {
-            if (err) {
-                return console.log('err', err);
-            }
-            TimeTask.generateBalances().then(function () {
-                logger.info('generateBalances 测试完成')
-            }).catch(function (error) {
-                logger.info(error);
-            })
-        });
-
-    })
-
-    it('timed_task countTokenAndBalances test', () => {
-        remote.connect((err, result) => {
-            if (err) {
-                return console.log('err', err);
-            }
-            TimeTask.countTokenAndBalances();
-        });
-    });
-
-    it.only('根据本地数据库中账户余额统计代币', function (done) {
-        this.timeout(0);
-        TimeTask.countTokenRanking().then(function () {
-            logger.info('根据本地数据库中账户余额统计代币完成')
-            done()
-        }).catch(function (error) {
-            logger.error(error)
-            done();
-        })
-    });
-
-    it.only('测试账本高度九百万+ 1000', function () {
-        remote.connect(function (err, result) {
-            if (err) {
-                return console.log('err', err);
-            }
-            logger.info("goes here")
-            TimeTask.syncOneByOne(10000000, 10001000).then(function () {
-                logger.info('指定同步范围syncOneByOne完成!')
-            }).catch(function (error) {
-                logger.info(error);
-            })
-        });
-        // TimeTask.syncOneByOne(10000000, 10001000).then(function () {
-        //     logger.info('指定同步范围syncOneByOne完成!')
-        // })
-    });
-
 });
 
 describe('下载公链中所有账本计划', function () {

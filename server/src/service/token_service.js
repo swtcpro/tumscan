@@ -35,14 +35,20 @@ tokenService.tokenInit = function () {
                 let result = await tumUtils.requestGateRelation(options);
                 options.marker = result.marker;
                 for (let line of result.lines) {
-                    let savedToken = await tokenRep.save({currency: line.currency});
-                    let balance = 0.0;
-                    if (line.balance.startsWith('-')) {
-                        balance = parseFloat(line.balance.substring(1));
-                    }
-                    if (!tumUtils.isStrEmpty(line.currency)) {
-                        balanceRep.save(savedToken, {address: line.account, currency: line.currency, value: balance});
-                        accounts.push({address: line.account, balance: balance})
+                    if (line.currency !== 'CNY') {
+                        let savedToken = await tokenRep.save({currency: line.currency});
+                        let balance = 0.0;
+                        if (line.balance.startsWith('-')) {
+                            balance = parseFloat(line.balance.substring(1));
+                        }
+                        if (!tumUtils.isStrEmpty(line.currency) && balance !== 0) {
+                            balanceRep.save(savedToken, {
+                                address: line.account,
+                                currency: line.currency,
+                                value: balance
+                            });
+                            accounts.push({address: line.account, balance: balance})
+                        }
                     }
                 }
             } while (!tumUtils.isStrEmpty(options.marker));
@@ -92,16 +98,10 @@ function getAndSaveAllTokens() {
     return new Promise(async (resolve, reject) => {
         try {
             let tokensArrs = await tumUtils.getTokensFromGate();
-            logger.info(tokensArrs)
             let savedTokens = [];
             for (let item of tokensArrs) {
                 savedTokens.push(await tokenRep.save({currency: item}));
             }
-            // let savedTokens = tokensArrs.map(item => {
-            //     if (item) {
-            //         return await tokenRep.save({currency: item})
-            //     }
-            // });
             resolve(savedTokens)
         } catch (e) {
             reject(e)

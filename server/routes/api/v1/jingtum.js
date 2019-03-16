@@ -29,6 +29,8 @@ router.get('/query/tx/:hash', tumController.queryTx);
 // 查询单个区块相关信息
 router.get('/query/ledger/:hash', tumController.queryLedger);
 
+router.get('/query/ledger/height/:height', tumController.queryLedgerByHeight)
+
 // 查询代币相关信息
 router.get('/query/tokens', tumController.queryTokens);
 

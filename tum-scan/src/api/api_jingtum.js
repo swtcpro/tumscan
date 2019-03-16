@@ -21,7 +21,7 @@ export default {
 
   // 查询钱包相关信息（余额交易）
   queryWallet: params => {
-    return API.GET('/jingtum/query/wallet_lib' , params);
+    return API.GET('/jingtum/query/wallet_lib', params);
   },
 
   // 查询交易相关信息
@@ -32,6 +32,11 @@ export default {
   // 查询账本相关信息
   queryLedger: hash => {
     return API.GET('/jingtum/query/ledger/' + hash);
+  },
+
+  // 通过账本高度查询
+  queryLedgerByHeight: height => {
+    return API.GET('/jingtum/query/ledger/height/' + height)
   },
 
   // 查询钱包余额

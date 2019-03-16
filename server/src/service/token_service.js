@@ -22,6 +22,11 @@ const gate = config.get('issuer');
 
 let tokenService = {};
 
+/**
+ * 启用
+ *
+ * @return {Promise}
+ */
 tokenService.tokenInit = function () {
     return new Promise(async (resolve, reject) => {
         let options = {
@@ -66,6 +71,10 @@ tokenService.tokenInit = function () {
     })
 };
 
+/**
+ * 弃用
+ * @return {Promise}
+ */
 tokenService.tokenInit2 = function () {
     return new Promise(async (resolve, reject) => {
         try {
@@ -86,6 +95,10 @@ tokenService.tokenInit2 = function () {
     })
 };
 
+/**
+ * 弃用
+ * @return {Promise}
+ */
 tokenService.tokenInit3 = function () {
     return new Promise(async (resolve, reject) => {
         try {

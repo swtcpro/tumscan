@@ -94,5 +94,13 @@ export default {
       else return (false);
 
     }
+  },
+
+  isStrEmpty: function (str) {
+
+    if ((typeof str === 'undefined') || (str === null) || (str.length === 0)) return true;
+
+    else return (false);
+
   }
 }

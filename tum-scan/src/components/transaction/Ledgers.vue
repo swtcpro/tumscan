@@ -1,5 +1,5 @@
 <template>
-  <div v-loading='loading' element-loading-text="拼命加载中">
+  <div v-loading='loading' element-loading-text="正在加载">
     <el-row class="breadcrumb">
       <el-col :md="20" :xl="20" :xs="20">
         <b style="font-size: 1.2em">账本</b>
@@ -13,15 +13,25 @@
     </el-row>
 
     <el-row class="pagination-row">
-      <el-col :md="10" :xl="10" :xs="12">
-        <span style="margin: 1em">账本总量：{{pagination.total}}</span>
+      <el-col :md="16" :xl="16" :xs="12">
+        <span>账本总量：{{pagination.total}}</span>
+      </el-col>
+      <el-col :md="8" :xl="8" :xs="12">
+        <el-form inline="true">
+          <el-form-item>
+            <el-input v-model="ledgerHeight" placeholder="请输入账本高度"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="queryHeight">查询</el-button>
+          </el-form-item>
+        </el-form>
       </el-col>
       <!--<el-col :md="14" :xl="14" :xs="12">-->
-        <!--<el-pagination-->
-          <!--background-->
-          <!--layout="prev, pager, sizes, next, jumper" :page-size="pagination.limit" @current-change="flipOver"-->
-          <!--:total="pagination.total">-->
-        <!--</el-pagination>-->
+      <!--<el-pagination-->
+      <!--background-->
+      <!--layout="prev, pager, sizes, next, jumper" :page-size="pagination.limit" @current-change="flipOver"-->
+      <!--:total="pagination.total">-->
+      <!--</el-pagination>-->
       <!--</el-col>-->
     </el-row>
 
@@ -31,7 +41,8 @@
         <el-table-column
           label="账本hash">
           <template slot-scope="scope">
-            <a style="width: 15em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" href="javascript:void(0)" v-on:click="handleLedger(scope.row.hash)">{{scope.row.hash}}</a>
+            <a style="width: 15em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" href="javascript:void(0)"
+               v-on:click="handleLedger(scope.row.hash)">{{scope.row.hash}}</a>
           </template>
         </el-table-column>
         <el-table-column
@@ -67,24 +78,19 @@
 
 <script>
   import API from '../../api/api_jingtum';
+  import uitl from '../../common/util'
 
   export default {
     data() {
       return {
         loading: false,
+        ledgerHeight: '',
         pagination: {
           limit: 20,
           page: 1,
           total: 100
         },
-        ledgers: [
-          {
-            hash: '0001676F2A7BDF920C0C8FABB7E6478BBDC2D141A95670CDFD76C8EC0B09C525',
-            index: 9870622,
-            transNum: 3,
-            time: '2018-06-09 05:01:40'
-          }
-        ]
+        ledgers: []
       }
     },
     methods: {
@@ -117,6 +123,25 @@
           that.$message.error({showClose: true, message: '请求出现异常', duration: 2000});
         })
       },
+      queryHeight() {
+        if (uitl.isStrEmpty(this.ledgerHeight)) {
+          this.init();
+        } else {
+          this.loading = true;
+          API.queryLedgerByHeight(this.ledgerHeight).then(ledger => {
+            this.ledgers = [];
+            this.ledgers.push(ledger);
+            this.pagination.total = 1;
+            this.loading = false;
+          }, err => {
+            this.loading = false;
+            this.$message.error({showClose: true, message: err});
+          }).catch(error => {
+            this.loading = false;
+            this.$message.error({showClose: true, message: error});
+          })
+        }
+      },
       flipOver(page) {
         this.pagination.page = page;
         let params = {
@@ -140,6 +165,5 @@
 
 <style scoped>
   .ledgers-row {
-    margin-top: 3em;
   }
 </style>

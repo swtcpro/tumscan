@@ -151,6 +151,15 @@ tumController.queryLedger = function (req, res) {
     }
 };
 
+tumController.queryLedgerByHeight = function(req, res) {
+    let height = _.trim(req.params.height || '');
+    jingtumService.queryLedgerByIndex(height).then(ledger => {
+        res.json(ledger);
+    }).catch(error => {
+        res.json(error);
+    })
+};
+
 /**
  * 分页查询账本列表数据
  * @param req

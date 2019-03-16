@@ -91,7 +91,7 @@
         <el-card class="transaction" shadow="never" :body-style="{ padding: '2px'}">
           <div slot="header">
             <span>交易</span>
-            <el-button @click="viewAllTransactions" style="float: right; padding: 3px 0" type="text">查看全部</el-button>
+            <!--<el-button @click="viewAllTransactions" style="float: right; padding: 3px 0" type="text">查看全部</el-button>-->
           </div>
 
           <el-card :body-style="{  padding: '10px',height: '100px' }" shadow="hover"

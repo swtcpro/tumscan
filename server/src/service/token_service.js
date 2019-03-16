@@ -31,12 +31,14 @@ tokenService.tokenInit = function () {
         };
         try {
             let accounts = [];
+            let tokens = [];
             do {
                 let result = await tumUtils.requestGateRelation(options);
                 options.marker = result.marker;
                 for (let line of result.lines) {
                     if (line.currency !== 'CNY') {
                         let savedToken = await tokenRep.save({currency: line.currency});
+                        tokens.push(savedToken);
                         let balance = 0.0;
                         if (line.balance.startsWith('-')) {
                             balance = parseFloat(line.balance.substring(1));
@@ -52,6 +54,11 @@ tokenService.tokenInit = function () {
                     }
                 }
             } while (!tumUtils.isStrEmpty(options.marker));
+
+            // 计算各代币的total总量
+            if (tokens) {
+                tokens.forEach(token => tokenService.countTokenTotal(token));
+            }
         } catch (e) {
             reject(e)
         }
@@ -106,7 +113,6 @@ function getAndSaveAllTokens() {
         } catch (e) {
             reject(e)
         }
-
     })
 }
 

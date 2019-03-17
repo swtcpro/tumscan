@@ -223,7 +223,6 @@ jingtumService.queryTokens = function (page, limit, param) {
         if (!param) {
             localService.getTokensPaging(page, limit).then(function (tokens) {
                 localService.getTokensCount().then(function (count) {
-                    logger.info('{total: count, tokens: tokens}: ', {total: count, tokens: tokens})
                     resolve({total: count, tokens: tokens})
                 }).catch(function (error) {
                     logger.error(error);

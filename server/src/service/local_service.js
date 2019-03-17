@@ -37,7 +37,7 @@ function getTokensPaging(page, limit) {
         entities.Token.findAll({offset: offset, limit: limit}).then(function (array) {
             resolve(array);
         }).catch(function (error) {
-            logger.info(error);
+            logger.error(error);
             reject(error);
         })
     })
@@ -80,7 +80,7 @@ function getTokensCount() {
         entities.Token.count().then(function (count) {
             resolve(count)
         }).then(function (error) {
-            logger.info(error);
+            logger.error(error);
             reject(error)
         })
     })
@@ -268,7 +268,7 @@ function getBalanceCount(att) {
         entities.Balance.count({where: att}).then(function (count) {
             resolve(count)
         }).then(function (error) {
-            logger.info(error);
+            logger.error(error);
             reject(error)
         })
     })

@@ -74,10 +74,9 @@ tumController.queryWallet = function (req, res) {
 tumController.queryTx = function (req, res) {
     let hash = _.trim(req.params.hash || '');
     API.queryTx(hash).then(function (result) {
-        console.log(result);
         return res.json(result);
     }, function (error) {
-        console.log(error);
+        console.error(error);
         res.status(500);
         return res.json({"success": false, "msg": error});
     });
@@ -91,7 +90,6 @@ tumController.queryTx = function (req, res) {
 tumController.queryTxLib = function (req, res) {
     let hash = _.trim(req.params.hash || '');
     jingtumService.queryTx(hash).then(result => {
-        console.log(result);
         return res.json(result);
     }, error => {
         console.log(error);
@@ -145,7 +143,6 @@ tumController.queryLedger = function (req, res) {
         return res.json({"success": false, "msg": "hash参数不合法"});
     } else {
         jingtumService.queryLedger(hash).then(ledger => {
-            console.log('tumController', ledger);
             res.json(ledger);
         })
     }
@@ -182,7 +179,7 @@ tumController.queryLedgersPaging = function (req, res) {
             let total = Number(ledgers[0].ledger_index);
             return res.json({total: total, ledgers: tempLedgers});
         }).catch(function (error) {
-            logger.info(error);
+            logger.error(error);
             return res.json(error);
         });
     }

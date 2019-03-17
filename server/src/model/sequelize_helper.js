@@ -11,7 +11,7 @@ let passwd = 'Hptpd511!@#';
 let host = '47.94.244.29';
 if (env === 'production') {
     passwd = 'Hptpd511!@#';
-    host = '172.17.46.50'
+    host = '47.94.244.29'
 }
 
 const sequelize = new Sequelize('temp', 'root', passwd, {

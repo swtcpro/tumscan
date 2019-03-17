@@ -278,15 +278,14 @@ jingtumService.queryRankings = function (page, limit, issuer, currency) {
                     return balance.dataValues;
                 });
                 localService.getBalanceCount({currency: currency, issuer: issuer}).then(function (count) {
-                    logger.info(balancesDataValues);
                     resolve({total: count, rankings: balancesDataValues})
                 })
             }).catch(function (error) {
-                logger.info(error);
+                logger.error(error);
                 reject(error);
             })
         }).catch(function (error) {
-            logger.info(error);
+            logger.error(error);
             reject(error);
         })
     })
@@ -321,7 +320,6 @@ jingtumService.queryWalletLib = function (address) {
             jingtumService.queryAccountTx(address).then(function (transactions) {
                 let wallet = balances;
                 wallet.total = transactions.transactions.length;
-                logger.info(transactions);
                 /**
                  * 处理交易信息，将不同类型的交易sent,received,offernew,offercancel,offereffect
                  * 做归一化处理

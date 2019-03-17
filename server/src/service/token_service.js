@@ -62,7 +62,9 @@ tokenService.tokenInit = function () {
 
             // 计算各代币的total总量
             if (tokens) {
-                tokens.forEach(token => tokenService.countTokenTotal(token));
+                for (let token of tokens) {
+                    await tokenService.countTokenTotal(token);
+                }
             }
         } catch (e) {
             reject(e)
@@ -70,6 +72,22 @@ tokenService.tokenInit = function () {
         resolve('token init 成功');
     })
 };
+
+tokenService.countAllTokensTotal = function() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let tokens = await tokenRep.getAllTokens();
+            if (tokens) {
+                for (let token of tokens) {
+                    await tokenService.countTokenTotal(token);
+                }
+            }
+            resolve();
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
 
 /**
  * 弃用
@@ -166,34 +184,6 @@ tokenService.countTokenTotal = function (token) {
             resolve();
         } catch (e) {
             reject(e);
-        }
-    })
-}
-
-/**
- * 将代币和持有该代币的账户和余额存入数据库
- * @param allTokenAccounts [{token: 'YUT', accounts: [{address: '', total: 123} ...]} ...]
- */
-function saveAllTokenAccounts(allTokenAccounts) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let results = [];
-            for (let tokenAccounts of allTokenAccounts) {
-                let savedToken = await tokenRep.save({issuer: gate, currency: tokenAccounts.token});
-                savedToken.balances = [];
-                for (let account of tokenAccounts.accounts) {
-                    let savedBalance = balanceRep.save(savedToken, {
-                        currency: tokenAccounts.token,
-                        issuer: gate,
-                        address: account.address
-                    });
-                    savedToken.balances.push(savedBalance)
-                }
-                results.push(savedToken);
-            }
-            resolve(results);
-        } catch (e) {
-            reject(e)
         }
     })
 }

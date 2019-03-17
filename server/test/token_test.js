@@ -57,7 +57,7 @@ describe('新的测试用例', function () {
                 result.should.be.a.Object();
                 done();
             }).catch(error => {
-                logger.error(error)
+                logger.error(error);
                 done();
             })
         });
@@ -75,6 +75,21 @@ describe('新的测试用例', function () {
                 done();
             }).catch(error => {
                 logger.error(error)
+                done();
+            })
+        });
+    });
+
+    it.only('tokenInit的countAllTokensTotal', function (done) {
+        this.timeout(0);
+        remote.connect((err, result) => {
+            if (err) {
+                return logger.error(err);
+            }
+            tokenService.countAllTokensTotal().then(() => {
+                done();
+            }).catch(error => {
+                logger.error(error);
                 done();
             })
         });

@@ -8,14 +8,13 @@
 const Sequelize = require('sequelize');
 let env = process.env.NODE_ENV || 'development';
 let passwd = 'Hptpd511!@#';
-let host = '47.94.244.29';
+let host = '106.14.65.102';
 if (env === 'production') {
     passwd = 'Hptpd511!@#';
-    host = '47.94.244.29'
+    host = '106.14.65.102'
 }
 
 const sequelize = new Sequelize('temp', 'root', passwd, {
-    // host: '106.14.65.102',
     host: host,
     dialect: 'mysql',
     port: 3306,

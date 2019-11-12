@@ -40,7 +40,7 @@ describe('新的测试用例', function () {
                 result.should.be.a.Object();
                 done();
             }).catch(error => {
-                logger.error(error)
+                logger.error(error);
                 done();
             })
         });

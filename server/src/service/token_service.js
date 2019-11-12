@@ -157,7 +157,7 @@ function saveTokenAndBalances(item) {
             if (item !== 'CNY') {
                 let savedToken = await tokenRep.save({currency: item});
                 let accounts = await tumUtils.getAccountsFromToken(savedToken.currency);
-                let savedBalances = await accounts.map(account => balanceRep.save(savedToken,
+                await accounts.map(account => balanceRep.save(savedToken,
                     {address: account.address, currency: item, value: account.balance}));
                 resolve(savedToken);
             } else {

@@ -378,6 +378,7 @@ jingtumService.queryAccountTx = function (address) {
 };
 
 jingtumService.queryBalance = function (address) {
+
     return new Promise(function (resolve, reject) {
         if (!address || !jutils.isValidAddress(address)) {
             return new ClientError(resultCode.C_ADDRESS);

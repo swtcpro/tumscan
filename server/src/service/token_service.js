@@ -170,7 +170,7 @@ function saveTokenAndBalances(item) {
 }
 
 /**
- * 统计代币总额
+ * 统计某一种代币总额
  * @param token
  * @return {Promise}
  */
@@ -181,6 +181,7 @@ tokenService.countTokenTotal = function (token) {
             let total = 0.0;
             balances.forEach(item => total += item.dataValues.value);
             await tokenRep.update({currency: token.currency, issuer: gate, total: total});
+            logger.info(token.currency + '代币统计完成', token);
             resolve();
         } catch (e) {
             reject(e);

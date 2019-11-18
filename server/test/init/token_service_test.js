@@ -10,6 +10,7 @@ const logger = require('../../src/lib/logger');
 const remote = require('../../src/lib/remote');
 
 describe('tokenService', function () {
+
     it.only('tokenInit函数测试_初始化代币功能', function (done) {
         this.timeout(0);
         remote.connect((err, result) => {
@@ -26,5 +27,19 @@ describe('tokenService', function () {
         });
     });
 
-
+    it.only('countAllTokensTotal统计所有代币的持仓数目', function (done) {
+        this.timeout(0);
+        remote.connect((err, result) => {
+            if (err) {
+                return logger.info(err);
+            }
+            tokenService.countAllTokensTotal().then(result => {
+                logger.info(result);
+                done();
+            }).catch(error => {
+                logger.error(error);
+                done();
+            })
+        });
+    });
 });

@@ -164,7 +164,7 @@ function extractAmount(tx) {
 /**
  * 从交易中抽取交易类型是Payment和received类型的交易
  * @param transaction
- * @return {'Account': '', 'Destination': ''}
+ * @return {'Account', 'Destination'}
  */
 function extractPandR(transaction) {
     if (transaction.TransactionType === 'Payment' || transaction.TransactionType === 'received') {

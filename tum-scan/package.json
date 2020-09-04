@@ -17,7 +17,7 @@
     "bootstrap": "^3.3.7",
     "echarts": "^4.1.0",
     "element-ui": "^2.3.4",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.13.1",
     "uiv": "^0.21.4",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",

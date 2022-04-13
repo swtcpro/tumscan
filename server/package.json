@@ -9,7 +9,7 @@
     "test": "mocha --compilers js:babel-core/register"
   },
   "dependencies": {
-    "async": "^2.5.0",
+    "async": "^3.2.2",
     "axios": "^0.18.0",
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",

@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^3.4.1",
     "echarts": "^4.1.0",
     "element-ui": "^2.3.4",
     "node-sass": "^4.11.0",
